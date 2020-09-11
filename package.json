@@ -1,0 +1,28 @@
+{
+  "name": "USD-Gluwacoin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "networks.js",
+  "dependencies": {
+    "@openzeppelin/cli": "^2.8.2",
+    "@openzeppelin/contracts-ethereum-package": "^3.0.0",
+    "truffle": "^5.1.43"
+  },
+  "devDependencies": {
+    "@openzeppelin/contracts": "^3.2.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gluwa/USD-Gluwacoin.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gluwa/USD-Gluwacoin/issues"
+  },
+  "homepage": "https://github.com/gluwa/USD-Gluwacoin#readme"
+}
