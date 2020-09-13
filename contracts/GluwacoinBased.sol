@@ -13,12 +13,14 @@ import "./IGluwacoin.sol";
 /**
  * @dev Extension of {ERC20} that has a base token for its token.
  */
-contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, ERC20UpgradeSafe, IGluwacoin {
+contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, AccessControlUpgradeSafe, ERC20UpgradeSafe, IGluwacoin {
     using ECDSA for bytes32;
     using SafeMath for uint256;
 
     // base token
     IERC20 private _token;
+    bytes32 public constant COLLECTOR_ROLE = keccak256("COLLECTOR_ROLE");
+    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
 
     enum ReservationStatus {
         Inactive,
@@ -51,12 +53,17 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, ERC20Up
 
     function __GluwacoinBasedMintable_init(string memory name, string memory symbol, IERC20 token) internal initializer {
         __Context_init_unchained();
+        __AccessControl_init_unchained();
         __ERC20_init_unchained(name, symbol);
         __GluwacoinBased_init_unchained(token);
     }
 
     function __GluwacoinBased_init_unchained(IERC20 token) internal initializer {
         _token = token;
+
+        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+        _setupRole(COLLECTOR_ROLE, _msgSender());
+        _setupRole(PAUSER_ROLE, _msgSender());
     }
 
     /**
@@ -111,10 +118,20 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, ERC20Up
         bytes32 hash = keccak256(abi.encodePacked(address(this), sender, recipient, amount, fee, nonce));
         _validateTransferSignature(hash, sender, nonce, sig);
 
-        _transfer(sender, recipient, amount);
-        _transfer(sender, address(0), amount);
+        _collect(sender, amount);
+        _transfer(sender, recipient, fee);
 
         return true;
+    }
+
+    /** @dev Collects `fee` from the sender.
+     *
+     * Emits a {Transfer} event.
+     */
+    function _collect(address sender, uint256 amount) internal {
+        address collector = getRoleMember(COLLECTOR_ROLE, 0);
+
+        _transfer(sender, collector, amount);
     }
 
     /** @dev Validates if `sig` is a valid signature for the ETHless transfer.
