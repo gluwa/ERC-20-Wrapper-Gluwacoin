@@ -13,7 +13,16 @@ import "@openzeppelin/contracts-ethereum-package/contracts/utils/Address.sol";
 import "./IGluwacoin.sol";
 
 /**
- * @dev Extension of {ERC20} that has a base token for its token.
+ * @dev Implementation of the {IGluwacoin} interface.
+ *
+ * This implementation is creates token based on another ERC20 token.
+ *
+ * There are multiple custom events not required by the ERC20 specification.
+ * {Approval}, {Mint}, {Burnt}, and {NonceUsed}.
+ *
+ * Finally, the non-standard {decreaseAllowance} and {increaseAllowance}
+ * functions have been added to mitigate the well-known issues around setting
+ * allowances. See {IERC20-approve}.
  */
 contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, AccessControlUpgradeSafe, ERC20UpgradeSafe, ERC20PausableUpgradeSafe, IGluwacoin {
     using ECDSA for bytes32;
@@ -118,6 +127,8 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, AccessC
         require(_token.transferFrom(_msgSender(), address(this), amount), "Gluwacoin: could not deposit base tokens");
 
         _mint(_msgSender(), amount);
+
+        emit Mint(_msgSender(), amount);
     }
 
     /**
@@ -129,6 +140,8 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, AccessC
         require(_token.transfer(_msgSender(), amount), "Gluwacoin: could not withdraw base tokens");
 
         _burn(_msgSender(), amount);
+
+        emit Burnt(_msgSender(), amount);
     }
 
     /**
