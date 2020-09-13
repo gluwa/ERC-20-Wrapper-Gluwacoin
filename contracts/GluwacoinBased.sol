@@ -10,7 +10,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
  * @dev Extension of {ERC20} that has a base token for its token.
  */
 contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, ERC20UpgradeSafe {
-    // Contract state: origin token
+    // base token
     IERC20 private _token;
 
     function initialize(string memory name, string memory symbol, IERC20 token) public {
@@ -25,6 +25,13 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, ERC20Up
 
     function __GluwacoinBased_init_unchained(IERC20 token) internal initializer {
         _token = token;
+    }
+
+    /**
+     * @dev Returns the address of the base token.
+     */
+    function token() public view returns (IERC20) {
+        return _token;
     }
 
     /**
