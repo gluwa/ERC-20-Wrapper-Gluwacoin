@@ -111,8 +111,8 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, ERC20Up
         bytes32 hash = keccak256(abi.encodePacked(address(this), sender, recipient, amount, fee, nonce));
         _validateSignature(hash, sender, nonce, sig);
 
-        require(transferFrom(sender, recipient, amount), "Gluwacoin: could not transfer the amount");
-        require(transferFrom(sender, address(0), amount), "Gluwacoin: could not transfer the fee");
+        _transfer(sender, recipient, amount);
+        _transfer(sender, address(0), amount);
 
         return true;
     }
