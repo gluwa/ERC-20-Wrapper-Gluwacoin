@@ -1,5 +1,6 @@
 pragma solidity ^0.6.2;
 
+import "@openzeppelin/contracts-ethereum-package/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/GSN/Context.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
