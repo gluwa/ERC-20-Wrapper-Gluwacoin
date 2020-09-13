@@ -42,12 +42,13 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, ERC20Up
      * Requirements:
      *
      * - the caller must have base tokens of at least `amount`.
+     * - the contract must have allowance for caller's base tokens of at least
+     * `amount`.
      */
     function mint(uint256 amount) public virtual {
-        uint256 increasedAllowance = _token.allowance(_msgSender(), address(this)).sub(amount, "ERC20: mint amount exceeds allowance");
-        require(_token.transferFrom(_msgSender(), address(this), increasedAllowance));
+        require(_token.transferFrom(_msgSender(), address(this), amount), "Gluwacoin: could not deposit base tokens");
 
-        _mint(_msgSender(), increasedAllowance);
+        _mint(_msgSender(), amount);
     }
 
     /**
@@ -56,7 +57,7 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, ERC20Up
      * See {ERC20-_burn}.
      */
     function burn(uint256 amount) public virtual {
-        require(_token.transfer(_msgSender(), amount));
+        require(_token.transfer(_msgSender(), amount), "Gluwacoin: could not withdraw base tokens");
 
         _burn(_msgSender(), amount);
     }
