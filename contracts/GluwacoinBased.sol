@@ -109,7 +109,7 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, ERC20Up
      */
     function transfer(address sender, address recipient, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig) public override returns (bool success) {
         bytes32 hash = keccak256(abi.encodePacked(address(this), sender, recipient, amount, fee, nonce));
-        _validateSignature(hash, sender, nonce, sig);
+        _validateTransferSignature(hash, sender, nonce, sig);
 
         _transfer(sender, recipient, amount);
         _transfer(sender, address(0), amount);
@@ -117,7 +117,16 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, ERC20Up
         return true;
     }
 
-    function _validateSignature(bytes32 hash, address sender, uint256 nonce, bytes memory sig) internal {
+    /** @dev Validates if `sig` is a valid signature for the ETHless transfer.
+     *
+     * Emits a {NonceUsed} event with `sender` and `nonce`.
+     *
+     * Requirements
+     *
+     * - `sender` should match the signer of the `sig`
+     * - `nonce` should never have been used by the `sender`
+     */
+    function _validateTransferSignature(bytes32 hash, address sender, uint256 nonce, bytes memory sig) internal {
         bytes32 messageHash = hash.toEthSignedMessageHash();
 
         address signer = messageHash.recover(sig);
