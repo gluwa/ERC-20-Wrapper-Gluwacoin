@@ -23,11 +23,10 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, AccessC
     IERC20 private _token;
     bytes32 public constant COLLECTOR_ROLE = keccak256("COLLECTOR_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
+    bytes32 public constant RECLAIMER_ROLE = keccak256("RECLAIMER_ROLE");
 
     enum ReservationStatus {
-        Inactive,
         Active,
-        Expired,
         Reclaimed,
         Completed
     }
@@ -66,6 +65,36 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, AccessC
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
         _setupRole(COLLECTOR_ROLE, _msgSender());
         _setupRole(PAUSER_ROLE, _msgSender());
+        _setupRole(RECLAIMER_ROLE, _msgSender());
+    }
+
+
+    /**
+     * @dev Pauses all token transfers.
+     *
+     * See {ERC20Pausable} and {Pausable-_pause}.
+     *
+     * Requirements:
+     *
+     * - the caller must have the `PAUSER_ROLE`.
+     */
+    function pause() public {
+        require(hasRole(PAUSER_ROLE, _msgSender()), "ERC20PresetMinterPauser: must have pauser role to pause");
+        _pause();
+    }
+
+    /**
+     * @dev Unpauses all token transfers.
+     *
+     * See {ERC20Pausable} and {Pausable-_unpause}.
+     *
+     * Requirements:
+     *
+     * - the caller must have the `PAUSER_ROLE`.
+     */
+    function unpause() public {
+        require(hasRole(PAUSER_ROLE, _msgSender()), "ERC20PresetMinterPauser: must have pauser role to unpause");
+        _unpause();
     }
 
     /**
@@ -118,43 +147,67 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, AccessC
      */
     function transfer(address sender, address recipient, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig) public override returns (bool success) {
         bytes32 hash = keccak256(abi.encodePacked(address(this), sender, recipient, amount, fee, nonce));
-        _validateTransferSignature(hash, sender, nonce, sig);
+        _validateSignature(hash, sender, nonce, sig);
 
-        _collect(sender, amount);
-        _transfer(sender, recipient, fee);
+        _collect(sender, fee);
+        _transfer(sender, recipient, amount);
 
         return true;
     }
 
-    /**
-     * @dev Pauses all token transfers.
-     *
-     * See {ERC20Pausable} and {Pausable-_pause}.
-     *
-     * Requirements:
-     *
-     * - the caller must have the `PAUSER_ROLE`.
-     */
-    function pause() public {
-        require(hasRole(PAUSER_ROLE, _msgSender()), "ERC20PresetMinterPauser: must have pauser role to pause");
-        _pause();
+    function reserve(address sender, address recipient, address executor, uint256 amount, uint256 fee, uint256 nonce, uint256 expiryBlockNum, bytes memory sig) public returns (bool success) {
+        require(expiryBlockNum > block.number, "Gluwacoin: invalid block expiry number");
+        require(amount > 0, "Gluwacoin: invalid reserve amount");
+        require(executor != address(0), "Gluwacoin: cannot execute from zero address");
+
+        bytes32 hash = keccak256(abi.encodePacked(address(this), sender, recipient, executor, amount, fee, nonce, expiryBlockNum));
+        _validateSignature(hash, sender, nonce, sig);
+
+        _reserved[sender][nonce] = Reservation(amount, fee, recipient, executor, expiryBlockNum, ReservationStatus.Active);
+        _totalReserved[sender] = _totalReserved[sender].add(amountPlusFee);
+
+        return true;
     }
 
-    /**
-     * @dev Unpauses all token transfers.
-     *
-     * See {ERC20Pausable} and {Pausable-_unpause}.
-     *
-     * Requirements:
-     *
-     * - the caller must have the `PAUSER_ROLE`.
-     */
-    function unpause() public {
-        require(hasRole(PAUSER_ROLE, _msgSender()), "ERC20PresetMinterPauser: must have pauser role to unpause");
-        _unpause();
+    function execute(address sender, uint256 nonce) public returns (bool success) {
+        Reservation storage reservation = _reserved[sender][nonce];
+
+        require(reservation._status == ReservationStatus.Active, "Gluwacoin: invalid reservation to execute");
+        require(reservation._expiryBlockNum > block.number, "Gluwacoin: reservation has expired and can not be executed");
+        require(reservation._executor == _msgSender(), "Gluwacoin: this address is not authorized to execute this reservation");
+
+        uint256 fee = reservation._fee;
+        uint256 amount = reservation._amount;
+        uint256 total = amount.add(fee);
+        address recipient = reservation._recipient;
+
+        _reserved[sender][nonce]._status = ReservationStatus.Completed;
+        _totalReserved[sender] = _totalReserved[sender].subtract(total);
+
+        _collect(sender, fee);
+        _transfer(sender, recipient, amount);
+
+        return true;
+    }
+
+    function reclaim(address sender, uint256 nonce) public returns (bool success) {
+        Reservation storage reservation = _reserved[sender][nonce];
+
+        if (hasRole(RECLAIMER_ROLE, _msgSender()) == false)
+        {
+            require(_msgSender() == sender, "Gluwacoin: cannot reclaim another user's reservation for them");
+            require(reservation._status == ReservationStatus.Active, "Gluwacoin: invalid reservation to execute");
+        }
+
+        _reserved[sender][nonce]._status = ReservationStatus.Reclaimed;
+        _totalReserved[sender] = _totalReserved[sender].subtract(reservation._amount).subtract(reservation._fee);
+
+        return true;
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override(ERC20UpgradeSafe, ERC20PausableUpgradeSafe) {
+        require(_balances[from].subtract(_totalReserved[from]) >= amount, "Gluwacoin: transfer amount exceeds unreserved balance");
+
         super._beforeTokenTransfer(from, to, amount);
     }
 
@@ -177,7 +230,7 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, AccessC
      * - `sender` should match the signer of the `sig`
      * - `nonce` should never have been used by the `sender`
      */
-    function _validateTransferSignature(bytes32 hash, address sender, uint256 nonce, bytes memory sig) internal {
+    function _validateSignature(bytes32 hash, address sender, uint256 nonce, bytes memory sig) internal {
         bytes32 messageHash = hash.toEthSignedMessageHash();
 
         address signer = messageHash.recover(sig);
