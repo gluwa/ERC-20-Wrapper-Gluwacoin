@@ -67,8 +67,7 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, AccessC
         _setupRole(PAUSER_ROLE, _msgSender());
         _setupRole(RECLAIMER_ROLE, _msgSender());
     }
-
-
+    
     /**
      * @dev Pauses all token transfers.
      *
