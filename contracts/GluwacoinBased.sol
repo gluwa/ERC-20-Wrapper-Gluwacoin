@@ -13,7 +13,16 @@ import "@openzeppelin/contracts-ethereum-package/contracts/utils/Address.sol";
 import "./IGluwacoin.sol";
 
 /**
- * @dev Extension of {ERC20} that has a base token for its token.
+ * @dev Implementation of the {IGluwacoin} interface.
+ *
+ * This implementation is creates token based on another ERC20 token.
+ *
+ * There are multiple custom events not required by the ERC20 specification.
+ * {Approval}, {Mint}, {Burnt}, and {NonceUsed}.
+ *
+ * Finally, the non-standard {decreaseAllowance} and {increaseAllowance}
+ * functions have been added to mitigate the well-known issues around setting
+ * allowances. See {IERC20-approve}.
  */
 contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, AccessControlUpgradeSafe, ERC20UpgradeSafe, ERC20PausableUpgradeSafe, IGluwacoin {
     using ECDSA for bytes32;
@@ -118,6 +127,8 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, AccessC
         require(_token.transferFrom(_msgSender(), address(this), amount), "Gluwacoin: could not deposit base tokens");
 
         _mint(_msgSender(), amount);
+
+        emit Mint(_msgSender(), amount);
     }
 
     /**
@@ -129,6 +140,8 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, AccessC
         require(_token.transfer(_msgSender(), amount), "Gluwacoin: could not withdraw base tokens");
 
         _burn(_msgSender(), amount);
+
+        emit Burnt(_msgSender(), amount);
     }
 
     /**
@@ -156,14 +169,14 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, AccessC
 
     function reserve(address sender, address recipient, address executor, uint256 amount, uint256 fee, uint256 nonce, uint256 expiryBlockNum, bytes memory sig) public returns (bool success) {
         require(expiryBlockNum > block.number, "Gluwacoin: invalid block expiry number");
-        require(amount > 0, "Gluwacoin: invalid reserve amount");
+        require(_unreservedBalance(sender) >= amount.add(fee) > 0, "Gluwacoin: invalid reserve amount");
         require(executor != address(0), "Gluwacoin: cannot execute from zero address");
 
         bytes32 hash = keccak256(abi.encodePacked(address(this), sender, recipient, executor, amount, fee, nonce, expiryBlockNum));
         _validateSignature(hash, sender, nonce, sig);
 
         _reserved[sender][nonce] = Reservation(amount, fee, recipient, executor, expiryBlockNum, ReservationStatus.Active);
-        _totalReserved[sender] = _totalReserved[sender].add(amountPlusFee);
+        _totalReserved[sender] = _totalReserved[sender].add(amount.add(fee));
 
         return true;
     }
@@ -171,17 +184,16 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, AccessC
     function execute(address sender, uint256 nonce) public returns (bool success) {
         Reservation storage reservation = _reserved[sender][nonce];
 
-        require(reservation._status == ReservationStatus.Active, "Gluwacoin: invalid reservation to execute");
-        require(reservation._expiryBlockNum > block.number, "Gluwacoin: reservation has expired and can not be executed");
         require(reservation._executor == _msgSender(), "Gluwacoin: this address is not authorized to execute this reservation");
+        require(reservation._expiryBlockNum > block.number, "Gluwacoin: reservation has expired and cannot be executed");
+        require(reservation._status == ReservationStatus.Active, "Gluwacoin: invalid reservation status to execute");
 
         uint256 fee = reservation._fee;
         uint256 amount = reservation._amount;
-        uint256 total = amount.add(fee);
         address recipient = reservation._recipient;
 
         _reserved[sender][nonce]._status = ReservationStatus.Completed;
-        _totalReserved[sender] = _totalReserved[sender].subtract(total);
+        _totalReserved[sender] = _totalReserved[sender].subtract(amount.add(fee));
 
         _collect(sender, fee);
         _transfer(sender, recipient, amount);
@@ -195,7 +207,8 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, AccessC
         if (hasRole(RECLAIMER_ROLE, _msgSender()) == false)
         {
             require(_msgSender() == sender, "Gluwacoin: cannot reclaim another user's reservation for them");
-            require(reservation._status == ReservationStatus.Active, "Gluwacoin: invalid reservation to execute");
+            require(reservation._expiryBlockNum <= block.number, "Gluwacoin: reservation has not expired and cannot be executed");
+            require(reservation._status == ReservationStatus.Active, "Gluwacoin: invalid reservation status to execute");
         }
 
         _reserved[sender][nonce]._status = ReservationStatus.Reclaimed;
@@ -204,8 +217,12 @@ contract GluwacoinBasedUpgradeSafe is Initializable, ContextUpgradeSafe, AccessC
         return true;
     }
 
+    function _unreservedBalance(address sender) internal returns (uint256 amount) {
+        return _balances[sender].subtract(_totalReserved[sender]);
+    }
+
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override(ERC20UpgradeSafe, ERC20PausableUpgradeSafe) {
-        require(_balances[from].subtract(_totalReserved[from]) >= amount, "Gluwacoin: transfer amount exceeds unreserved balance");
+        require(_unreservedBalance(from) >= amount, "Gluwacoin: transfer amount exceeds unreserved balance");
 
         super._beforeTokenTransfer(from, to, amount);
     }
