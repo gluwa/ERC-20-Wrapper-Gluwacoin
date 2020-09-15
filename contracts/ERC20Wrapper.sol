@@ -13,17 +13,19 @@ contract ERC20WrapperUpgradeSafe is Initializable, ERC20UpgradeSafe {
     // base token, the token to be wrapped
     IERC20 private _token;
 
-    function initialize(string memory name, string memory symbol, IERC20 token) public {
-        __ERC20Wrapper_init(name, symbol, token);
+    // note that `decimals` must match that of `token` or less
+    function initialize(string memory name, string memory symbol, uint8 decimals, IERC20 token) public {
+        __ERC20Wrapper_init(name, symbol, decimals, token);
     }
 
-    function __ERC20Wrapper_init(string memory name, string memory symbol, IERC20 token) internal initializer {
+    function __ERC20Wrapper_init(string memory name, string memory symbol, uint8 decimals, IERC20 token) internal initializer {
         __ERC20_init_unchained(name, symbol);
-        __ERC20Wrapper_init_unchained(token);
+        __ERC20Wrapper_init_unchained(token, decimals);
     }
 
-    function __ERC20Wrapper_init_unchained(IERC20 token) internal initializer {
+    function __ERC20Wrapper_init_unchained(IERC20 token, uint8 decimals) internal initializer {
         _token = token;
+        _setupDecimals(decimals);
     }
 
     /**
