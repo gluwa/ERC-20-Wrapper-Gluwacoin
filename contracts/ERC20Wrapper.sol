@@ -18,7 +18,8 @@ contract ERC20WrapperUpgradeSafe is Initializable, ERC20UpgradeSafe {
         __ERC20Wrapper_init(name, symbol, decimals, token);
     }
 
-    function __ERC20Wrapper_init(string memory name, string memory symbol, uint8 decimals, IERC20 token) internal initializer {
+    function __ERC20Wrapper_init(string memory name, string memory symbol, uint8 decimals, IERC20 token) internal
+    initializer {
         __ERC20_init_unchained(name, symbol);
         __ERC20Wrapper_init_unchained(token, decimals);
     }
@@ -46,7 +47,7 @@ contract ERC20WrapperUpgradeSafe is Initializable, ERC20UpgradeSafe {
      * - the contract must have allowance for caller's base tokens of at least
      * `amount`.
      */
-    function mint(uint256 amount) public virtual {
+    function mint(uint256 amount) public {
         require(_token.transferFrom(_msgSender(), address(this), amount), "ERC20Wrapper: could not deposit base tokens");
 
         _mint(_msgSender(), amount);
@@ -57,7 +58,7 @@ contract ERC20WrapperUpgradeSafe is Initializable, ERC20UpgradeSafe {
      *
      * See {ERC20-_burn}.
      */
-    function burn(uint256 amount) public virtual {
+    function burn(uint256 amount) public {
         require(_token.transfer(_msgSender(), amount), "ERC20Wrapper: could not withdraw base tokens");
 
         _burn(_msgSender(), amount);
