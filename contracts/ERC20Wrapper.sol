@@ -1,9 +1,8 @@
 pragma solidity ^0.6.2;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/utils/Address.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
 /**
  * @dev Extension of {ERC20} that allows a certain ERC20 token holders to wrap the token to mint this token.
@@ -21,10 +20,10 @@ contract ERC20WrapperUpgradeSafe is Initializable, ERC20UpgradeSafe {
     function __ERC20Wrapper_init(string memory name, string memory symbol, uint8 decimals, IERC20 token) internal
     initializer {
         __ERC20_init_unchained(name, symbol);
-        __ERC20Wrapper_init_unchained(token, decimals);
+        __ERC20Wrapper_init_unchained(decimals, token);
     }
 
-    function __ERC20Wrapper_init_unchained(IERC20 token, uint8 decimals) internal initializer {
+    function __ERC20Wrapper_init_unchained(uint8 decimals, IERC20 token) internal initializer {
         _token = token;
         _setupDecimals(decimals);
     }
@@ -48,7 +47,8 @@ contract ERC20WrapperUpgradeSafe is Initializable, ERC20UpgradeSafe {
      * `amount`.
      */
     function mint(uint256 amount) public {
-        require(_token.transferFrom(_msgSender(), address(this), amount), "ERC20Wrapper: could not deposit base tokens");
+        require(_token.transferFrom(_msgSender(), address(this), amount),
+            "ERC20Wrapper: could not deposit base tokens");
 
         _mint(_msgSender(), amount);
     }
