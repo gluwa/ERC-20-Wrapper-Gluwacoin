@@ -4,7 +4,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
-import "./Validate.sol";
+import "../Validate.sol";
 
 /**
  * @dev Extension of {ERC20} that allows users to escrow a transfer. When the fund is reserved, the sender designates
@@ -12,7 +12,7 @@ import "./Validate.sol";
  * a `fee`. If the `reserve` gets expired without getting executed, the `sender` or the `executor` can `reclaim`
  * the fund back to the `sender`.
  */
-contract ERC20ReservableUpgradeSafe is Initializable, ERC20UpgradeSafe {
+abstract contract ERC20ReservableUpgradeSafe is Initializable, ERC20UpgradeSafe {
     using Address for address;
 
     enum ReservationStatus {
@@ -36,10 +36,6 @@ contract ERC20ReservableUpgradeSafe is Initializable, ERC20UpgradeSafe {
     // Total amount of reserved balance for address
     mapping (address => uint256) private _totalReserved;
 
-    function initialize(string memory name, string memory symbol) public {
-        __ERC20Reservable_init(name, symbol);
-    }
-
     function __ERC20Reservable_init(string memory name, string memory symbol) internal
     initializer {
         __ERC20_init_unchained(name, symbol);
@@ -47,10 +43,6 @@ contract ERC20ReservableUpgradeSafe is Initializable, ERC20UpgradeSafe {
     }
 
     function __ERC20Reservable_init_unchained() internal initializer {
-    }
-
-    function mint(address to, uint256 amount) virtual public {
-        _mint(to, amount);
     }
 
     function getReservation(address sender, uint256 nonce) public view returns (uint256 amount, uint256 fee,
@@ -128,7 +120,7 @@ contract ERC20ReservableUpgradeSafe is Initializable, ERC20UpgradeSafe {
         return balanceOf(sender).sub(_totalReserved[sender]);
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal override (ERC20UpgradeSafe) {
+    function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override (ERC20UpgradeSafe) {
         if (from != address(0)) {
             require(_unreservedBalance(from) >= amount, "ERC20Reservable: transfer amount exceeds unreserved balance");
         }

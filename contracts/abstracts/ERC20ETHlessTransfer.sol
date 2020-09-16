@@ -4,23 +4,19 @@ import "@openzeppelin/contracts-ethereum-package/contracts/access/AccessControl.
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
-import "./Validate.sol";
+import "../Validate.sol";
 
 /**
  * @dev Extension of {ERC20} that allows users to send ETHless transfer by hiring a transaction relayer to pay the
  * gas fee for them. The relayer gets paid in this ERC20 token for `fee`.
  */
-contract ERC20ETHlessUpgradeSafe is Initializable, AccessControlUpgradeSafe, ERC20UpgradeSafe {
+abstract contract ERC20ETHlessUpgradeSafe is Initializable, AccessControlUpgradeSafe, ERC20UpgradeSafe {
     using Address for address;
 
     mapping (address => mapping (uint256 => bool)) private _usedNonces;
 
     // collects transaction relay fee
     bytes32 public constant RELAYER_ROLE = keccak256("RELAYER_ROLE");
-
-    function initialize(string memory name, string memory symbol) public {
-        __ERC20ETHless_init(name, symbol);
-    }
 
     function __ERC20ETHless_init(string memory name, string memory symbol) internal
     initializer {
@@ -33,8 +29,8 @@ contract ERC20ETHlessUpgradeSafe is Initializable, AccessControlUpgradeSafe, ERC
     }
 
     /**
-     * @dev Moves `amount` tokens from the caller's account to `recipient`
-     * and moves `fee` tokens from the caller's account to zero address.
+     * @dev Moves `amount` tokens from the `sender`'s account to `recipient`
+     * and moves `fee` tokens from the `sender`'s account to a relayer's address.
      *
      * Returns a boolean value indicating whether the operation succeeded.
      *
@@ -56,15 +52,6 @@ contract ERC20ETHlessUpgradeSafe is Initializable, AccessControlUpgradeSafe, ERC
         _transfer(sender, recipient, amount);
 
         return true;
-    }
-
-    /**
-     * @dev Creates `amount` new tokens for `to`.
-     *
-     * See {ERC20-_mint}.
-     */
-    function mint(address to, uint256 amount) virtual public {
-        _mint(to, amount);
     }
 
     /* @dev Uses `nonce` for the signer.
