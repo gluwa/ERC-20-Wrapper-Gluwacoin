@@ -1,7 +1,6 @@
 pragma solidity ^0.6.2;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
@@ -13,7 +12,6 @@ import "./Validate.sol";
  */
 contract ERC20ETHlessUpgradeSafe is Initializable, AccessControlUpgradeSafe, ERC20UpgradeSafe {
     using Address for address;
-    using ECDSA for bytes32;
 
     mapping (address => mapping (uint256 => bool)) private _usedNonces;
 
@@ -52,8 +50,7 @@ contract ERC20ETHlessUpgradeSafe is Initializable, AccessControlUpgradeSafe, ERC
     public returns (bool success) {
         _useNonce(sender, nonce);
 
-        bytes32 hash = keccak256(abi.encodePacked(address(this), sender, recipient, amount, fee, nonce));
-        Validate.validateSignature(hash, sender, sig);
+        Validate.validateSignature(address(this), sender, recipient, amount, fee, nonce, sig);
 
         _collect(sender, fee);
         _transfer(sender, recipient, amount);
