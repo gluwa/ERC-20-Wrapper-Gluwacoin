@@ -53,6 +53,17 @@ contract ERC20ReservableUpgradeSafe is Initializable, ERC20UpgradeSafe {
         _mint(to, amount);
     }
 
+    function getReservation(address sender, uint256 nonce) public view returns (uint256 amount, uint256 fee,
+        address recipient, address executor, uint256 expiryBlockNum, ReservationStatus status) {
+        Reservation memory reservation = _reserved[sender][nonce];
+
+        amount = reservation._amount;
+        fee = reservation._fee;
+        recipient = reservation._recipient;
+        executor = reservation._executor;
+        expiryBlockNum = reservation._expiryBlockNum;
+    }
+
     function reserve(address sender, address recipient, address executor, uint256 amount, uint256 fee, uint256 nonce,
         uint256 expiryBlockNum, bytes memory sig) public returns (bool success) {
         require(expiryBlockNum > block.number, "ERC20Reservable: invalid block expiry number");
