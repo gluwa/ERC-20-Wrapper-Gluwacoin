@@ -1,7 +1,6 @@
 ### Setup
 
-####Installing OpenZeppelin
-
+#### Installing OpenZeppelin
 ```commandline
 $ npm install @openzeppelin/cli
 ```
