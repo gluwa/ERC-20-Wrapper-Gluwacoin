@@ -1,4 +1,4 @@
-pragma solidity ^0.6.2;
+pragma solidity ^0.5.0;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
@@ -8,7 +8,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
  * @dev Extension of {ERC20} that allows a certain ERC20 token holders to wrap the token to mint this token.
  * Holder of this token can retrieve the wrapped token by burning this token.
  */
-abstract contract ERC20ControllableUpgradeSafe is Initializable, AccessControlUpgradeSafe, ERC20UpgradeSafe {
+abstract contract ERC20Controllable is Initializable, AccessControlUpgradeSafe, ERC20UpgradeSafe {
     event Mint(address indexed _mintTo, uint256 _value);
     event Burnt(address indexed _burnFrom, uint256 _value);
 

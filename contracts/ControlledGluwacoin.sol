@@ -1,4 +1,4 @@
-pragma solidity ^0.6.2;
+pragma solidity ^0.5.0;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/GSN/Context.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
@@ -11,8 +11,8 @@ import "./abstracts/ERC20Controllable.sol";
 /**
  * @dev Extension of {Gluwacoin} that allows the owner of the contract to mint or burn this token.
  */
-contract ControlledGluwacoinUpgradeSafe is Initializable, ContextUpgradeSafe, ERC20ETHlessUpgradeSafe,
-ERC20ReservableUpgradeSafe, ERC20ControllableUpgradeSafe  {
+contract ControlledGluwacoin is Initializable, ContextUpgradeSafe, ERC20UpgradeSafe, ERC20ETHless,
+ERC20Reservable, ERC20Controllable  {
     // note that `decimals` must match that of `token` or less
     function initialize(string memory name, string memory symbol, uint8 decimals) public {
         __ControlledGluwacoin_init(name, symbol, decimals);
@@ -32,7 +32,7 @@ ERC20ReservableUpgradeSafe, ERC20ControllableUpgradeSafe  {
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override
-    (ERC20UpgradeSafe, ERC20ReservableUpgradeSafe) {
+    (ERC20UpgradeSafe, ERC20Reservable) {
         super._beforeTokenTransfer(from, to, amount);
     }
 

@@ -1,4 +1,4 @@
-pragma solidity ^0.6.2;
+pragma solidity ^0.5.0;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
@@ -12,7 +12,7 @@ import "../Validate.sol";
  * a `fee`. If the `reserve` gets expired without getting executed, the `sender` or the `executor` can `reclaim`
  * the fund back to the `sender`.
  */
-abstract contract ERC20ReservableUpgradeSafe is Initializable, ERC20UpgradeSafe {
+abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
     using Address for address;
 
     enum ReservationStatus {
@@ -46,7 +46,7 @@ abstract contract ERC20ReservableUpgradeSafe is Initializable, ERC20UpgradeSafe 
     }
 
     function getReservation(address sender, uint256 nonce) public view returns (uint256 amount, uint256 fee,
-        address recipient, address executor, uint256 expiryBlockNum, ReservationStatus status) {
+        address recipient, address executor, uint256 expiryBlockNum) {
         Reservation memory reservation = _reserved[sender][nonce];
 
         amount = reservation._amount;

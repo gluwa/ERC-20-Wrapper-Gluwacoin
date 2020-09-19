@@ -1,4 +1,4 @@
-pragma solidity ^0.6.2;
+pragma solidity ^0.5.0;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
@@ -8,7 +8,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
  * @dev Extension of {ERC20} that allows a certain ERC20 token holders to wrap the token to mint this token.
  * Holder of this token can retrieve the wrapped token by burning this token.
  */
-abstract contract ERC20WrapperUpgradeSafe is Initializable, ERC20UpgradeSafe {
+abstract contract ERC20Wrapper is Initializable, ERC20UpgradeSafe {
     // base token, the token to be wrapped
     IERC20 private _token;
 
@@ -25,7 +25,6 @@ abstract contract ERC20WrapperUpgradeSafe is Initializable, ERC20UpgradeSafe {
     function __ERC20Wrapper_init_unchained(uint8 decimals, IERC20 token) internal initializer {
         _token = token;
         _setupDecimals(decimals);
-        _setupRole(BURNER_ROLE, _msgSender());
     }
 
     /**
