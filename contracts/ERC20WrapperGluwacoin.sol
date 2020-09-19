@@ -9,7 +9,7 @@ import "./abstracts/ERC20Reservable.sol";
 import "./abstracts/ERC20Wrapper.sol";
 
 /**
- * @dev Extension of {ERC20} that allows a certain ERC20 token holders to wrap the token to mint this token.
+ * @dev Extension of {Gluwacoin} that allows a certain ERC20 token holders to wrap the token to mint this token.
  * Holder of this token can retrieve the wrapped token by burning this token.
  */
 contract ERC20WrapperGluwacoinUpgradeSafe is Initializable, ContextUpgradeSafe, ERC20ETHlessUpgradeSafe,
