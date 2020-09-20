@@ -33,7 +33,7 @@ ERC20Reservable, ERC20Wrapper  {
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override
-    (ERC20UpgradeSafe, ERC20ReservableUpgradeSafe) {
+    (ERC20UpgradeSafe, ERC20Reservable) {
         super._beforeTokenTransfer(from, to, amount);
     }
 
