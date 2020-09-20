@@ -22,7 +22,7 @@ abstract contract ERC20Controllable is Initializable, AccessControlUpgradeSafe, 
         __ERC20Controllable_init_unchained(decimals);
     }
 
-    function __ERC20Controllable_init_unchained(uint8 decimals) internal initializer {
+    function __ERC20Controllable_init_unchained(uint8 decimals) internal virtual initializer {
         _setupDecimals(decimals);
         _setupRole(CONTROLLER_ROLE, _msgSender());
     }
