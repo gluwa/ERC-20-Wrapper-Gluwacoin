@@ -142,7 +142,7 @@ describe('ControlledGluwacoin', function () {
         expect(await this.token.getRoleMember(RELAYER_ROLE, 0)).to.equal(deployer);
     });
 
-    it('deployer has the default relayer role', async function () {
+    it('relayer can send ETHless transfer', async function () {
         await this.token.mint(amount, { from: deployer });
         await this.token.transfer(other, amount, { from: deployer });
 
@@ -165,31 +165,11 @@ describe('ControlledGluwacoin', function () {
 
         var signature = obj.signature;
 
-        await this.token.ethlessTransfer(other, another, amount_string, fee_string, nonce_string, signature, { from: deployer });
+        //await this.token.ethlessTransfer(other, another, amount_string, fee_string, nonce_string, signature, { from: deployer });
+        await this.token.transfer(other, another, amount_string, fee_string, nonce_string, signature, { from: deployer });
 
         expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(fee_string);
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(another)).to.be.bignumber.equal(amount_string);
     });
-/*
-    it('deployer can relay ETHless transfer', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.transfer(other, amount, { from: deployer });
-
-        const nonce = '1'
-
-        var hash = web3.utils.soliditySha3({ t: 'address', v: this.token.address },
-            { t: 'address', v: other },
-            { t: 'address', v: another },
-            { t: 'uint256', v: amount - fee },
-            { t: 'uint256', v: fee },
-            { t: 'uint256', v: nonce });
-
-        var obj = web3.eth.accounts.sign(hash , deployer_privateKey);
-
-        var signature = obj.signature;
-
-        await this.token.ethlessTransfer(other, another, amount - fee, amount, nonce, signature)
-    });
-*/
 });
