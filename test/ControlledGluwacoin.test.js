@@ -1,5 +1,5 @@
 // Load dependencies
-const { accounts, contract, web3 } = require('@openzeppelin/test-environment');
+const { accounts, privateKeys, contract, web3 } = require('@openzeppelin/test-environment');
 const { expect } = require('chai');
 
 // Import utilities from Test Helpers
@@ -11,9 +11,10 @@ const ControlledGluwacoin = contract.fromArtifact('ControlledGluwacoinMock');
 
 // Start test block
 describe('ControlledGluwacoin', function () {
-    const deployer = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0';
-    const deployer_privateKey = '0x6cbed15c793ce57650b9877cf6fa156fbef513c4e6134f022a85b1ffdd59b2a1';
-    const [ other, another ] = accounts;
+    //const deployer = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0';
+    //const deployer_privateKey = '0x6cbed15c793ce57650b9877cf6fa156fbef513c4e6134f022a85b1ffdd59b2a1';
+    const [ deployer, other, another ] = accounts;
+    const [ deployer_privateKey, other_privateKey, another_privateKey ] = privateKeys;
 
     const name = 'ControlledGluwacoin';
     const symbol = 'CG';
@@ -48,6 +49,7 @@ describe('ControlledGluwacoin', function () {
     it('initial balance is 0', async function () {
         expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(another)).to.be.bignumber.equal('0');
     });
 
     it('initial totalSupply is 0', async function () {
@@ -140,13 +142,43 @@ describe('ControlledGluwacoin', function () {
         expect(await this.token.getRoleMember(RELAYER_ROLE, 0)).to.equal(deployer);
     });
 
+    it('deployer has the default relayer role', async function () {
+        await this.token.mint(amount, { from: deployer });
+        await this.token.transfer(other, amount, { from: deployer });
+
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+        expect(await this.token.balanceOf(another)).to.be.bignumber.equal('0');
+
+        const amount_string = (amount - fee).toString();
+        const fee_string = fee.toString();
+        const nonce_string = '1'
+
+        var hash = web3.utils.soliditySha3({ t: 'address', v: this.token.address },
+            { t: 'address', v: other },
+            { t: 'address', v: another },
+            { t: 'uint256', v: amount_string },
+            { t: 'uint256', v: fee_string },
+            { t: 'uint256', v: nonce_string});
+
+        var obj = web3.eth.accounts.sign(hash , other_privateKey);
+
+        var signature = obj.signature;
+
+        await this.token.ethlessTransfer(other, another, amount_string, fee_string, nonce_string, signature, { from: deployer });
+
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(fee_string);
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(another)).to.be.bignumber.equal(amount_string);
+    });
+/*
     it('deployer can relay ETHless transfer', async function () {
         await this.token.mint(amount, { from: deployer });
         await this.token.transfer(other, amount, { from: deployer });
 
         const nonce = '1'
 
-        var hash = web3.utils.soliditySha3({ t: 'address', v: this.token },
+        var hash = web3.utils.soliditySha3({ t: 'address', v: this.token.address },
             { t: 'address', v: other },
             { t: 'address', v: another },
             { t: 'uint256', v: amount - fee },
@@ -159,4 +191,5 @@ describe('ControlledGluwacoin', function () {
 
         await this.token.ethlessTransfer(other, another, amount - fee, amount, nonce, signature)
     });
+*/
 });
