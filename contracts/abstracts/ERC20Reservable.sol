@@ -12,7 +12,7 @@ import "../Validate.sol";
  * a `fee`. If the `reserve` gets expired without getting executed, the `sender` or the `executor` can `reclaim`
  * the fund back to the `sender`.
  */
-abstract contract ERC20ReservableUpgradeSafe is Initializable, ERC20UpgradeSafe {
+abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
     using Address for address;
 
     enum ReservationStatus {
@@ -46,7 +46,7 @@ abstract contract ERC20ReservableUpgradeSafe is Initializable, ERC20UpgradeSafe 
     }
 
     function getReservation(address sender, uint256 nonce) public view returns (uint256 amount, uint256 fee,
-        address recipient, address executor, uint256 expiryBlockNum, ReservationStatus status) {
+        address recipient, address executor, uint256 expiryBlockNum) {
         Reservation memory reservation = _reserved[sender][nonce];
 
         amount = reservation._amount;
@@ -54,6 +54,14 @@ abstract contract ERC20ReservableUpgradeSafe is Initializable, ERC20UpgradeSafe 
         recipient = reservation._recipient;
         executor = reservation._executor;
         expiryBlockNum = reservation._expiryBlockNum;
+    }
+
+    function reservedBalanceOf(address account) public view returns (uint256 amount) {
+        return balanceOf(account) - _unreservedBalance(account);
+    }
+
+    function unreservedBalanceOf(address account) public view returns (uint256 amount) {
+        return _unreservedBalance(account);
     }
 
     function reserve(address sender, address recipient, address executor, uint256 amount, uint256 fee, uint256 nonce,
@@ -105,8 +113,8 @@ abstract contract ERC20ReservableUpgradeSafe is Initializable, ERC20UpgradeSafe 
 
         require(_msgSender() == sender || _msgSender() == executor,
             "ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender");
-        require(reservation._expiryBlockNum <= block.number,
-            "ERC20Reservable: reservation has not expired and cannot be executed");
+        require(reservation._expiryBlockNum <= block.number || _msgSender() == executor,
+            "ERC20Reservable: reservation has not expired or you are not the executor and cannot be reclaimed");
         require(reservation._status == ReservationStatus.Active,
             "ERC20Reservable: invalid reservation status to reclaim");
 

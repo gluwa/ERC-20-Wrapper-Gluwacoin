@@ -10,7 +10,7 @@ import "../Validate.sol";
  * @dev Extension of {ERC20} that allows users to send ETHless transfer by hiring a transaction relayer to pay the
  * gas fee for them. The relayer gets paid in this ERC20 token for `fee`.
  */
-abstract contract ERC20ETHlessUpgradeSafe is Initializable, AccessControlUpgradeSafe, ERC20UpgradeSafe {
+abstract contract ERC20ETHless is Initializable, AccessControlUpgradeSafe, ERC20UpgradeSafe {
     using Address for address;
 
     mapping (address => mapping (uint256 => bool)) private _usedNonces;
@@ -42,7 +42,7 @@ abstract contract ERC20ETHlessUpgradeSafe is Initializable, AccessControlUpgrade
      * - the `sender` must have a balance of at least the sum of `amount` and `fee`.
      * - the `nonce` is only used once per `sender`.
      */
-    function transfer(address sender, address recipient, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig)
+    function ethlessTransfer(address sender, address recipient, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig)
     public returns (bool success) {
         _useNonce(sender, nonce);
 
