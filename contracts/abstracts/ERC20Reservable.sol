@@ -56,6 +56,14 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
         expiryBlockNum = reservation._expiryBlockNum;
     }
 
+    function reservedBalanceOf(address account) public view returns (uint256 amount) {
+        return balanceOf(account) - _unreservedBalance(account);
+    }
+
+    function unreservedBalanceOf(address account) public view returns (uint256 amount) {
+        return _unreservedBalance(account);
+    }
+
     function reserve(address sender, address recipient, address executor, uint256 amount, uint256 fee, uint256 nonce,
         uint256 expiryBlockNum, bytes memory sig) public returns (bool success) {
         require(expiryBlockNum > block.number, "ERC20Reservable: invalid block expiry number");
@@ -105,8 +113,8 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
 
         require(_msgSender() == sender || _msgSender() == executor,
             "ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender");
-        require(reservation._expiryBlockNum <= block.number,
-            "ERC20Reservable: reservation has not expired and cannot be executed");
+        require(reservation._expiryBlockNum <= block.number || _msgSender() == executor,
+            "ERC20Reservable: reservation has not expired or you are not the executor and cannot be reclaimed");
         require(reservation._status == ReservationStatus.Active,
             "ERC20Reservable: invalid reservation status to reclaim");
 
