@@ -1,5 +1,5 @@
 {
-  "name": "USD-Gluwacoin",
+  "name": "Gluwacoin",
   "version": "1.0.0",
   "description": "",
   "main": "networks.js",
@@ -28,7 +28,7 @@
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/gluwa/USD-Gluwacoin/issues"
+    "url": "https://github.com/gluwa/Gluwacoin/issues"
   },
-  "homepage": "https://github.com/gluwa/USD-Gluwacoin#readme"
+  "homepage": "https://github.com/gluwa/Gluwacoin#readme"
 }
