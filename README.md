@@ -29,6 +29,9 @@ $ npx oz init
 ```
 
 #### Linking the Contracts Ethereum Package
+
+You need this for local testing. We will use a preset of ERC20 to use as a base token for the ERC-20 Wrapper Gluwacoin.
+
 ```commandline
 $ npx oz link @openzeppelin/contracts-ethereum-package
 ```
@@ -58,9 +61,9 @@ All implementations are up to date
 ? Select which function initialize(name: string, symbol: string)
 ? name: string: Token
 ? symbol: string: T
-✓ Instance created at 0x59d3631c86BbE35EF041872d502F218A39FBa150
+✓ Instance created at [ADRESS OF THE CONTRACT]
 To upgrade this instance run 'oz upgrade'
-0x59d3631c86BbE35EF041872d502F218A39FBa150
+[ADRESS OF THE CONTRACT]
 ```
 
 #### Deploy ERC20Wrapper token
@@ -69,19 +72,16 @@ $ npx oz deploy
 Nothing to compile, all contracts are up to date.
 ? Choose the kind of deployment upgradeable
 ? Pick a network development
-? Pick a contract to deploy ERC20WrapperUpgradeSafe
-✓ Added contract ERC20WrapperUpgradeSafe
-✓ Deploying @openzeppelin/contracts-ethereum-package dependency to network dev-1600180434016
-✓ Contract ERC20WrapperUpgradeSafe deployed
-All implementations have been deployed
+? Pick a contract to deploy ERC20WrapperGluwacoin
+All implementations are up to date
 ? Call a function to initialize the instance after creating it? Yes
-? Select which function initialize(name: string, symbol: string, token: address)
-? name: string: Wrapper
-? symbol: string: W
-? token: address: 0x59d3631c86BbE35EF041872d502F218A39FBa150
-✓ Setting everything up to create contract instances
-✓ Instance created at 0x9b1f7F645351AF3631a656421eD2e40f2802E6c0
+? Select which function initialize(name: string, symbol: string, decimals: uint8, token: address)
+? name: string: Gluwacoin
+? symbol: string: G
+? decimals: uint8: 18
+? token: address: [ADRESS OF THE CONTRACT]
+✓ Instance created at [ADRESS OF THE GLUWACOIN CONTRACT]
 To upgrade this instance run 'oz upgrade'
-0x9b1f7F645351AF3631a656421eD2e40f2802E6c0
+[ADRESS OF THE GLUWACOIN CONTRACT]
 ```
 
