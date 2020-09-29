@@ -57,4 +57,28 @@ describe('ERC20WrapperGluwacoin', function () {
     it('initial totalSupply is 0', async function () {
         expect(await this.token.totalSupply()).to.be.bignumber.equal('0');
     });
+
+    /* Wrapper related
+    */
+    it('token() returns baseToken address', async function () {
+        expect(await this.token.token()).to.equal(this.baseToken.address);
+    });
+
+    it('deployer can mint', async function () {
+        console.log(this.baseToken.address);
+
+        console.log((await this.baseToken.balanceOf(deployer)).toString());
+        await this.baseToken.mint(amount, { from: deployer });
+        console.log((await this.baseToken.balanceOf(deployer)).toString());
+
+        console.log((await this.baseToken.allowance(deployer, this.baseToken.address)).toString());
+        await this.baseToken.increaseAllowance(this.baseToken.address, amount, { from: deployer });
+        console.log((await this.baseToken.allowance(deployer, this.baseToken.address)).toString());
+
+        console.log(await this.baseToken.transferFrom(deployer, this.baseToken.address, new BN('0')));
+        console.log(await this.baseToken.transferFrom(deployer, this.baseToken.address, amount));
+        console.log((await this.baseToken.balanceOf(deployer)).toString());
+
+        //await this.token.mint(fee, { from: deployer });
+    });
 });
