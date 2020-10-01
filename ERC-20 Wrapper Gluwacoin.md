@@ -1,7 +1,7 @@
 ## Preamble
 
     Title: ERC-20 Wrapper Gluwacoin Standard
-    Author: Tae Lim Oh <taelimoh@gluwa.com>
+    Author: Tae Lim Oh <taelim.oh@gluwa.com>
     Type: Standard
     Created: 2020-09-14
 
@@ -68,7 +68,8 @@ function token() public view returns (address)
 
 ##### mint
 
-Creates `amount` tokens to the caller, transferring base tokens from the caller to the contract using `transferFrom`.
+Creates `amount` tokens to the caller.
+Transfers `amount` of base tokens from the caller to the contract using `transferFrom`.
 
 **Note** 
 - the caller must have base tokens of at least `amount`.
@@ -80,16 +81,63 @@ function mint(uint256 amount)
 
 
 
+##### ETHless mint
+
+`mint` but with `receiver`, `fee`, `nonce`, and `sig` as extra parameters.
+`fee` is a transfer fee amount in Gluwacoin, which the receiver will pay for the mint.
+`sig` is a signature created by signing the mint information with the receiver’s private key.
+Anyone can initiate the mint for the receiver by calling the Etherless Mint function 
+with the mint information and the signature. 
+The caller will have to pay the gas for calling the function.
+
+Creates `amount` of tokens to the receiver and `fee` tokens to the caller.
+Transfers `amount` + `fee` of base tokens from the caller to the contract using `transferFrom`.
+
+**Note** 
+- the receiver must have base tokens of at least `amount` + `fee`.
+- the contract must have allowance for receiver's base tokens of at least `amount` + `fee`.
+
+``` js
+function mint(address receiver, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig)
+```
+
+
+
 ##### burn
 
-Destroys `amount` tokens from the caller, transferring base tokens from the contract to the caller.
+Destroys `amount` of tokens from the caller.
+Transfers `amount` of base tokens from the contract to the caller.
+
+**Note** 
+- the caller must have tokens of at least `amount`.
 
 ``` js
 function burn(uint256 amount)
 ```
 
 
-Refer to [Gluwacoin.md](./Gluwacoin.md) for non-Controlled Gluwacoin specific methods and events.
+
+##### ETHless burn
+
+`burn` but with `receiver`, `fee`, `nonce`, and `sig` as extra parameters.
+`fee` is a transfer fee amount in Gluwacoin, which the receiver will pay for the burn.
+`sig` is a signature created by signing the burn information with the receiver’s private key.
+Anyone can initiate the burn for the receiver by calling the Etherless Burn function 
+with the burn information and the signature. 
+The caller will have to pay the gas for calling the function.
+
+Destroys `amount` + `fee` tokens from the receiver.
+Transfers `amount` of base tokens from the contract to the receiver and `fee` of base token to the caller.
+
+**Note** 
+- the receiver must have tokens of at least `amount` + `fee`.
+
+``` js
+function burn(address receiver, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig)
+```
+
+
+Refer to [Gluwacoin](./Gluwacoin.md) for general Gluwacoin methods and events.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).

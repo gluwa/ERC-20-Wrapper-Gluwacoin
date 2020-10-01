@@ -1,7 +1,7 @@
 ## Preamble
 
     Title: Controlled Gluwacoin Standard
-    Author: Tae Lim Oh <taelimoh@gluwa.com>
+    Author: Tae Lim Oh <taelim.oh@gluwa.com>
     Type: Standard
     Created: 2020-09-19
 
@@ -72,7 +72,7 @@ function burn(uint256 amount)
 
 
 
-Refer to [Gluwacoin.md](./Gluwacoin.md) for non-Controlled Gluwacoin specific methods and events.
+Refer to [Gluwacoin](./Gluwacoin.md) for general Gluwacoin methods and events.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
