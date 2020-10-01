@@ -22,9 +22,9 @@ abstract contract ERC20Wrapper is Initializable, ERC20UpgradeSafe {
         __ERC20Wrapper_init_unchained(decimals, token);
     }
 
-    function __ERC20Wrapper_init_unchained(uint8 decimals, IERC20 token) internal initializer {
-        _token = token;
+    function __ERC20Wrapper_init_unchained(uint8 decimals, IERC20 token) internal virtual initializer {
         _setupDecimals(decimals);
+        _setupToken(token);
     }
 
     /**
@@ -65,6 +65,18 @@ abstract contract ERC20Wrapper is Initializable, ERC20UpgradeSafe {
         _burn(_msgSender(), amount);
 
         emit Burnt(_msgSender(), amount);
+    }
+
+
+    /**
+     * @dev Sets {token} as the base token.
+     *
+     * WARNING: This function should only be called from the constructor. Most
+     * applications that interact with token contracts will not expect
+     * {token} to ever change, and may work incorrectly if it does.
+     */
+    function _setupToken(IERC20 token_) internal {
+        _token = token_;
     }
 
     uint256[50] private __gap;

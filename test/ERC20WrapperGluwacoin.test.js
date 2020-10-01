@@ -8,27 +8,30 @@ const { ZERO_ADDRESS, MAX_UINT256 } = constants;
 
 // Load compiled artifacts
 const ControlledGluwacoin = contract.fromArtifact('ControlledGluwacoinMock');
+const ERC20WrapperGluwacoin = contract.fromArtifact('ERC20WrapperGluwacoinMock');
 
 var sign = require('./signature');
 
 // Start test block
-describe('ControlledGluwacoin', function () {
+describe('ERC20WrapperGluwacoin', function () {
     const [ deployer, other, another ] = accounts;
     const [ deployer_privateKey, other_privateKey, another_privateKey ] = privateKeys;
 
-    const name = 'ControlledGluwacoin';
-    const symbol = 'CG';
+    const name = 'ERC20WrapperGluwacoin';
+    const symbol = 'WG';
     const decimals = new BN('18');
 
     const amount = new BN('5000');
     const fee = new BN('1');
 
-    const CONTROLLER_ROLE = web3.utils.soliditySha3('CONTROLLER_ROLE');
+    //const CONTROLLER_ROLE = web3.utils.soliditySha3('CONTROLLER_ROLE');
     const RELAYER_ROLE = web3.utils.soliditySha3('RELAYER_ROLE');
 
     beforeEach(async function () {
         // Deploy a new ControlledGluwacoin contract for each test
-        this.token = await ControlledGluwacoin.new(name, symbol, decimals, { from: deployer });
+        this.baseToken = await ControlledGluwacoin.new('ControlledGluwacoin', 'CG', decimals, { from: deployer });
+        // Deploy a new ERC20WrapperGluwacoin contract for each test
+        this.token = await ERC20WrapperGluwacoin.new(name, symbol, decimals, this.baseToken.address, { from: deployer });
     });
 
     /* ERC20
@@ -55,92 +58,203 @@ describe('ControlledGluwacoin', function () {
         expect(await this.token.totalSupply()).to.be.bignumber.equal('0');
     });
 
-    /* Controllable related
+    /* Wrapper related
     */
-    it('deployer has the default controller role', async function () {
-        expect(await this.token.getRoleMemberCount(CONTROLLER_ROLE)).to.be.bignumber.equal('1');
-        expect(await this.token.getRoleMember(CONTROLLER_ROLE, 0)).to.equal(deployer);
+    it('token() returns baseToken address', async function () {
+        expect(await this.token.token()).to.equal(this.baseToken.address);
     });
 
-    it('controller can mint', async function () {
-        await this.token.mint(amount, { from: deployer });
+    it('other can mint', async function () {
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
+
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+
+        await this.token.mint(amount, { from: other });
+
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+        expect(await this.token.totalSupply()).to.be.bignumber.equal(amount.toString());
     });
 
-    it('controller can mint MAX_UINT256', async function () {
-        await this.token.mint(MAX_UINT256, { from: deployer });
+    it('other can mint MAX_UINT256', async function () {
+        await this.baseToken.mint(MAX_UINT256, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, MAX_UINT256, { from: deployer });
+
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(MAX_UINT256.toString());
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
+
+        await this.baseToken.increaseAllowance(this.token.address, MAX_UINT256, { from: other });
+
+        await this.token.mint(MAX_UINT256, { from: other });
+
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(MAX_UINT256.toString());
+        expect(await this.token.totalSupply()).to.be.bignumber.equal(MAX_UINT256.toString());
     });
 
-    it('controller can mint 0', async function () {
-        await this.token.mint(0, { from: deployer });
+    it('other can mint 0', async function () {
+        await this.token.mint(0, { from: other });
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
+        expect(await this.token.totalSupply()).to.be.bignumber.equal('0');
     });
 
-    it('non-controller cannot mint', async function () {
+    it('other can mint less than allowance', async function () {
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
+
+        await this.baseToken.increaseAllowance(this.token.address, new BN('2'), { from: other });
+
+        await this.token.mint(new BN('1'), { from: other });
+
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.sub(new BN('1')));
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('1');
+        expect(await this.token.totalSupply()).to.be.bignumber.equal('1');
+    });
+
+    it('other cannot mint more than allowance', async function () {
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
+
+        await this.baseToken.increaseAllowance(this.token.address, new BN('1'), { from: other });
+
         await expectRevert(
-            this.token.mint(amount, { from: other }),
-            'ERC20Controllable: only controllers can call this method'
+            this.token.mint(new BN('2'), { from: other }),
+            'ERC20: transfer amount exceeds allowance'
         );
     });
 
     it('mint emits a Mint event', async function () {
-        const receipt = await this.token.mint(amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
 
-        expectEvent(receipt, 'Mint', { _mintTo: deployer, _value: amount });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+
+        const receipt = await this.token.mint(amount, { from: other });
+
+        expectEvent(receipt, 'Mint', { _mintTo: other, _value: amount });
     });
 
     it('mint emits a Transfer event', async function () {
-        const receipt = await this.token.mint(amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
 
-        expectEvent(receipt, 'Transfer', { from: ZERO_ADDRESS, to: deployer, value: amount });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+
+        const receipt = await this.token.mint(amount, { from: other });
+
+        expectEvent(receipt, 'Transfer', { from: ZERO_ADDRESS, to: other, value: amount });
     });
 
     it('mint increases the totalSupply', async function () {
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
+
+        expect(await this.token.totalSupply()).to.be.bignumber.equal(amount.toString());
+    });
+
+    it('other can burn', async function () {
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
+
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+
+        await this.token.mint(amount, { from: other });
+
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+        expect(await this.token.totalSupply()).to.be.bignumber.equal(amount.toString());
+
+        await this.token.burn(amount, { from: other });
+
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.totalSupply()).to.be.bignumber.equal('0');
-        await this.token.mint(amount, { from: deployer });
-        expect(await this.token.totalSupply()).to.be.bignumber.equal(amount);
-    });
-
-    it('controller can burn', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.burn(amount, { from: deployer });
-    });
-
-    it('non-controller cannot burn', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await expectRevert(
-            this.token.burn(amount, { from: other }),
-            'ERC20Controllable: only controllers can call this method'
-        );
     });
 
     it('burn emits a Burnt event', async function () {
-        await this.token.mint(amount, { from: deployer });
-        const receipt = await this.token.burn(amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
 
-        expectEvent(receipt, 'Burnt', { _burnFrom: deployer, _value: amount });
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
+
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+
+        await this.token.mint(amount, { from: other });
+
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+        expect(await this.token.totalSupply()).to.be.bignumber.equal(amount.toString());
+
+        const receipt = await this.token.burn(amount, { from: other });
+
+        expectEvent(receipt, 'Burnt', { _burnFrom: other, _value: amount });
     });
 
     it('burn emits a Transfer event', async function () {
-        await this.token.mint(amount, { from: deployer });
-        const receipt = await this.token.burn(amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
 
-        expectEvent(receipt, 'Transfer', { from: deployer, to: ZERO_ADDRESS, value: amount });
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
+
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+
+        await this.token.mint(amount, { from: other });
+
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+        expect(await this.token.totalSupply()).to.be.bignumber.equal(amount.toString());
+
+        const receipt = await this.token.burn(amount, { from: other });
+
+        expectEvent(receipt, 'Transfer', { from: other, to: ZERO_ADDRESS, value: amount });
     });
 
     it('burn decreases the totalSupply', async function () {
-        expect(await this.token.totalSupply()).to.be.bignumber.equal('0');
-        await this.token.mint(amount, { from: deployer });
-        expect(await this.token.totalSupply()).to.be.bignumber.equal(amount);
-        await this.token.burn(amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
+
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+
+        await this.token.mint(amount, { from: other });
+
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+        expect(await this.token.totalSupply()).to.be.bignumber.equal(amount.toString());
+
+        const receipt = await this.token.burn(amount, { from: other });
+
         expect(await this.token.totalSupply()).to.be.bignumber.equal('0');
     });
 
     /* Reservable related
     */
     it('can reserve', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -158,10 +272,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('cannot reserve with outdated expiryBlockNum', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -180,10 +296,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('cannot reserve with zero address as the executor', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = ZERO_ADDRESS;
@@ -202,10 +320,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('cannot reserve if amount + fee > balance', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -224,10 +344,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('cannot reserve if amount + fee + reserved > balance', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -252,10 +374,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('cannot reserve if not amount + fee > 0', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -274,10 +398,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('getReservation works', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -301,10 +427,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('executor can execute', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -322,10 +450,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('sender can execute', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -343,10 +473,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('receiver cannot execute', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -367,10 +499,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('cannot execute expired reserve', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -393,10 +527,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('cannot execute executed reserve', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -419,10 +555,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('cannot execute reclaimed reserve', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -445,10 +583,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('executor can reclaim unexpired reserve', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -466,10 +606,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('executor can reclaim expired reserve', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -489,10 +631,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('sender can reclaim expired reserve', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -512,10 +656,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('sender cannot reclaim unexpired reserve', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -536,10 +682,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('receiver cannot reclaim unexpired reserve', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -560,10 +708,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('receiver cannot reclaim expired reserve', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -586,10 +736,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('reservedBalanceOf accurate after reserve', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -609,10 +761,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('unreservedBalanceOf accurate after reserve', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -632,10 +786,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('reservedBalanceOf accurate after execute', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -659,10 +815,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('unreservedBalanceOf accurate after execute', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
 
         var executor = deployer;
@@ -693,10 +851,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('relayer can send ETHless transfer', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
         expect(await this.token.balanceOf(another)).to.be.bignumber.equal('0');
 
@@ -712,10 +872,12 @@ describe('ControlledGluwacoin', function () {
     });
 
     it('cannot send ETHless transfer more than balance', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
         expect(await this.token.balanceOf(another)).to.be.bignumber.equal('0');
 
