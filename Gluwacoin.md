@@ -1,7 +1,7 @@
 ## Preamble
 
     Title: Gluwacoin Standard
-    Author: Tae Lim Oh <taelimoh@gluwa.com>
+    Author: Tae Lim Oh <taelim.oh@gluwa.com>
     Type: Standard
     Created: 2020-09-19
 
