@@ -83,22 +83,22 @@ function mint(uint256 amount)
 
 ##### ETHless mint
 
-`mint` but with `receiver`, `fee`, `nonce`, and `sig` as extra parameters.
-`fee` is a transfer fee amount in Gluwacoin, which the receiver will pay for the mint.
-`sig` is a signature created by signing the mint information with the receiver’s private key.
-Anyone can initiate the mint for the receiver by calling the Etherless Mint function 
+`mint` but with `minter`, `fee`, `nonce`, and `sig` as extra parameters.
+`fee` is a mint fee amount in Gluwacoin, which the minter will pay for the mint.
+`sig` is a signature created by signing the mint information with the minter’s private key.
+Anyone can initiate the mint for the minter by calling the Etherless Mint function 
 with the mint information and the signature. 
 The caller will have to pay the gas for calling the function.
 
-Creates `amount` of tokens to the receiver and `fee` tokens to the caller.
-Transfers `amount` + `fee` of base tokens from the caller to the contract using `transferFrom`.
+Transfers `amount` + `fee` of base tokens from the minter to the contract using `transferFrom`.
+Creates `amount` + `fee` of tokens to the minter and transfers `fee` tokens to the caller.
 
 **Note** 
-- the receiver must have base tokens of at least `amount` + `fee`.
-- the contract must have allowance for receiver's base tokens of at least `amount` + `fee`.
+- the minter must have base tokens of at least `amount` + `fee`.
+- the contract must have allowance for minter's base tokens of at least `amount` + `fee`.
 
 ``` js
-function mint(address receiver, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig)
+function mint(address minter, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig)
 ```
 
 
@@ -119,21 +119,21 @@ function burn(uint256 amount)
 
 ##### ETHless burn
 
-`burn` but with `receiver`, `fee`, `nonce`, and `sig` as extra parameters.
-`fee` is a transfer fee amount in Gluwacoin, which the receiver will pay for the burn.
-`sig` is a signature created by signing the burn information with the receiver’s private key.
-Anyone can initiate the burn for the receiver by calling the Etherless Burn function 
+`burn` but with `burner`, `fee`, `nonce`, and `sig` as extra parameters.
+`fee` is a burn fee amount in Gluwacoin, which the burner will pay for the burn.
+`sig` is a signature created by signing the burn information with the burner’s private key.
+Anyone can initiate the burn for the burner by calling the Etherless Burn function 
 with the burn information and the signature. 
 The caller will have to pay the gas for calling the function.
 
-Destroys `amount` + `fee` tokens from the receiver.
-Transfers `amount` of base tokens from the contract to the receiver and `fee` of base token to the caller.
+Destroys `amount` + `fee` tokens from the burner.
+Transfers `amount` of base tokens from the contract to the burner and `fee` of base token to the caller.
 
 **Note** 
-- the receiver must have tokens of at least `amount` + `fee`.
+- the burner must have tokens of at least `amount` + `fee`.
 
 ``` js
-function burn(address receiver, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig)
+function burn(address burner, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig)
 ```
 
 
