@@ -35,6 +35,7 @@ contract ERC20WrapperGluwacoinMock is Initializable, ERC20WrapperGluwacoin {
     ) internal override initializer {
         _setupDecimals(decimals);
         _setupToken(token);
+        _setupRole(WRAPPER_ROLE, _msgSender());
     }
 
 

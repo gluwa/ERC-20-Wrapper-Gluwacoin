@@ -24,7 +24,7 @@ describe('ERC20WrapperGluwacoin', function () {
     const amount = new BN('5000');
     const fee = new BN('1');
 
-    //const CONTROLLER_ROLE = web3.utils.soliditySha3('CONTROLLER_ROLE');
+    const WRAPPER_ROLE = web3.utils.soliditySha3('WRAPPER_ROLE');
     const RELAYER_ROLE = web3.utils.soliditySha3('RELAYER_ROLE');
 
     beforeEach(async function () {
@@ -244,6 +244,81 @@ describe('ERC20WrapperGluwacoin', function () {
         const receipt = await this.token.burn(amount, { from: other });
 
         expect(await this.token.totalSupply()).to.be.bignumber.equal('0');
+    });
+
+    it('deployer has the default wrapper role', async function () {
+        expect(await this.token.getRoleMemberCount(WRAPPER_ROLE)).to.be.bignumber.equal('1');
+        expect(await this.token.getRoleMember(WRAPPER_ROLE, 0)).to.equal(deployer);
+    });
+
+    it('wrapper can mint ETHlessly', async function () {
+        var total = amount.add(fee);
+
+        await this.baseToken.mint(total, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, total, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, total, { from: other });
+
+        var nonce = Date.now();
+
+        var signature = sign.sign(this.token.address, other, other_privateKey, this.token.address, amount, fee, nonce);
+        await this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, amount, fee, nonce, signature, { from: deployer });
+
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(fee);
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount);
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
+    });
+
+    it('another can mint ETHlessly but wrapper gets the fee', async function () {
+        var total = amount.add(fee);
+
+        await this.baseToken.mint(total, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, total, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, total, { from: other });
+
+        var nonce = Date.now();
+
+        var signature = sign.sign(this.token.address, other, other_privateKey, this.token.address, amount, fee, nonce);
+        await this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, amount, fee, nonce, signature, { from: another });
+
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(fee);
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount);
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
+    });
+
+    it('wrapper can burn ETHlessly', async function () {
+        var total = amount.add(fee);
+
+        await this.baseToken.mint(total, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, total, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, total, { from: other });
+        await this.token.mint(total, { from: other });
+
+        var nonce = Date.now();
+
+        var signature = sign.sign(this.token.address, other, other_privateKey, this.token.address, amount, fee, nonce);
+        await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, amount, fee, nonce, signature, { from: deployer });
+
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(fee);
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount);
+    });
+
+    it('another can burn ETHlessly but wrapper gets the fee', async function () {
+        var total = amount.add(fee);
+
+        await this.baseToken.mint(total, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, total, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, total, { from: other });
+        await this.token.mint(total, { from: other });
+
+        var nonce = Date.now();
+
+        var signature = sign.sign(this.token.address, other, other_privateKey, this.token.address, amount, fee, nonce);
+        await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, amount, fee, nonce, signature, { from: another });
+
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(fee);
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
+        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount);
     });
 
     /* Reservable related
