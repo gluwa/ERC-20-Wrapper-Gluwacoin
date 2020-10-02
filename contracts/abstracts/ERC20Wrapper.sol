@@ -20,7 +20,7 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
     mapping (address => mapping (uint256 => bool)) private _usedNonces;
 
     // collects mint/burn relay fee
-    bytes32 public constant ISSUER_ROLE = keccak256("ISSUER_ROLE");
+    bytes32 public constant WRAPPER_ROLE = keccak256("WRAPPER_ROLE");
 
     event Mint(address indexed _mintTo, uint256 _value);
     event Burnt(address indexed _burnFrom, uint256 _value);
@@ -35,6 +35,7 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
     function __ERC20Wrapper_init_unchained(uint8 decimals, IERC20 token) internal virtual initializer {
         _setupDecimals(decimals);
         _setupToken(token);
+        _setupRole(WRAPPER_ROLE, _msgSender());
     }
 
     /**
@@ -56,12 +57,7 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
      * `amount`.
      */
     function mint(uint256 amount) public {
-        require(_token.transferFrom(_msgSender(), address(this), amount),
-            "ERC20Wrapper: could not deposit base tokens");
-
-        _mint(_msgSender(), amount);
-
-        emit Mint(_msgSender(), amount);
+        __mint(_msgSender(), amount);
     }
 
     /**
@@ -84,21 +80,13 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
      */
     function mint(address minter, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig) public {
         _useWrapperNonce(minter, nonce);
-
         Validate.validateSignature(address(this), minter, address(this), amount, fee, nonce, sig);
 
         uint256 total = amount.add(fee);
+        __mint(minter, total);
 
-        require(_token.transferFrom(minter, address(this), total),
-            "ERC20Wrapper: could not deposit base tokens");
-
-        _mint(minter, total);
-
-        emit Mint(minter, total);
-
-        address issuer = getRoleMember(ISSUER_ROLE, 0);
-
-        _transfer(minter, issuer, amount);
+        address wrapper = getRoleMember(WRAPPER_ROLE, 0);
+        _transfer(minter, wrapper, amount);
     }
 
     /**
@@ -107,11 +95,7 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
      * See {ERC20-_burn}.
      */
     function burn(uint256 amount) public {
-        require(_token.transfer(_msgSender(), amount), "ERC20Wrapper: could not withdraw base tokens");
-
-        _burn(_msgSender(), amount);
-
-        emit Burnt(_msgSender(), amount);
+        __burn(_msgSender(), amount);
     }
 
     /**
@@ -133,17 +117,28 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
      */
     function burn(address burner, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig) public {
         _useWrapperNonce(burner, nonce);
-
         Validate.validateSignature(address(this), burner, address(this), amount, fee, nonce, sig);
 
-        uint256 total = amount.add(fee);
+        address wrapper = getRoleMember(WRAPPER_ROLE, 0);
+        _transfer(burner, wrapper, fee);
 
-        require(_token.transfer(burner, amount), "ERC20Wrapper: could not withdraw base tokens");
-        require(_token.transfer(_msgSender(), fee), "ERC20Wrapper: could not withdraw base tokens");
+        __burn(burner, amount);
+    }
 
-        _burn(_msgSender(), total);
+    function __mint(address account, uint256 amount) internal {
+        require(_token.transferFrom(account, address(this), amount), "ERC20Wrapper: could not deposit base tokens");
 
-        emit Burnt(_msgSender(), total);
+        emit Mint(account, amount);
+
+        _mint(account, amount);
+    }
+
+    function __burn(address account, uint256 amount) internal {
+        require(_token.transfer(account, amount), "ERC20Wrapper: could not withdraw base tokens");
+
+        emit Burnt(account, amount);
+
+        _burn(account, amount);
     }
 
     /**
