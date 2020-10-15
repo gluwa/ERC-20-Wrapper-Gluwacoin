@@ -1,6 +1,6 @@
 // Load dependencies
 const { accounts, privateKeys, contract, web3 } = require('@openzeppelin/test-environment');
-const { expect } = require('chai');
+const { expect, assert } = require('chai');
 
 // Import utilities from Test Helpers
 const { BN, constants, expectEvent, expectRevert, time } = require('@openzeppelin/test-helpers');
@@ -20,7 +20,8 @@ describe('ControlledGluwacoin_ERC20Base', function () {
     const symbol = 'CG';
     const decimals = new BN('18');
 
-    const amount = new BN('5000');
+    const approveAmount = new BN('100');
+    const amount = new BN('1000');
     const fee = new BN('1');
 
     const CONTROLLER_ROLE = web3.utils.soliditySha3('CONTROLLER_ROLE');
@@ -54,28 +55,51 @@ describe('ControlledGluwacoin_ERC20Base', function () {
     it('initial totalSupply is 0', async function () {
         expect(await this.token.totalSupply()).to.be.bignumber.equal('0');
     });
-});
 
-
-describe('ControlledGluwacoin_Transfer', function () {
-    const [ deployer, other, another ] = accounts;
-    const [ deployer_privateKey, other_privateKey, another_privateKey ] = privateKeys;
-
-    const name = 'ControlledGluwacoin';
-    const symbol = 'CG';
-    const decimals = new BN('18');
-
-    const amount = new BN('5000');
-    const fee = new BN('1');
-
-    const CONTROLLER_ROLE = web3.utils.soliditySha3('CONTROLLER_ROLE');
-    const RELAYER_ROLE = web3.utils.soliditySha3('RELAYER_ROLE');
-
-    beforeEach(async function () {
-        // Deploy a new ControlledGluwacoin contract for each test
-        this.token = await ControlledGluwacoin.new(name, symbol, decimals, { from: deployer });
+    it('approve other to withdraw from deployer', async function () {
+        const receipt = await this.token.approve(other, approveAmount, { from: deployer });
+        expectEvent(receipt, 'Approval', { spender: other, owner: deployer, value: approveAmount });
+        expect(await this.token.approve(other, approveAmount)).to.be.true;
     });
 
+    it('allowance that other can withdraw from deployer is approveAmount', async function () {
+        await this.token.approve(other, approveAmount, { from: deployer });
+        expect(await this.token.allowance(deployer, other)).to.be.bignumber.equal(approveAmount);
+    });
+
+    it('transfer money from deployer to other', async function () {
+        
+        await this.token.mint(amount, { from: deployer });
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(amount.toString());
+        const receipt = await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        console.log(receipt);
+        console.log(receipt.logs[0].args);
+        expectEvent(receipt, 'Transfer', { from: deployer, to: other, value: amount});
+
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+    });
+
+    it('transfer money from other to another via deployer', async function () {
+        // TODO: work in progress, trying to solve Error: Returned error: VM Exception while processing transaction: revert ERC20: transfer amount exceeds allowance -- Reason given: ERC20: transfer amount exceeds allowance.
+        await this.token.mint(amount, { from: deployer });
+        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+
+        // Setting allowance for another
+        await this.token.approve(another, approveAmount, { from: other });
+        const allowanceNum = await this.token.allowance(other, another);
+        console.log(allowanceNum);
+        const otherBalance = await this.token.balanceOf(other);
+        console.log(otherBalance);
+
+        const receipt = await this.token.methods['transferFrom(address,address,uint256)'](other, another, approveAmount);
+        console.log(receipt);
+        console.log(receipt.logs[0].args);
+
+        
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(another)).to.be.bignumber.equal(approveAmount.toString());
+    });
 });
 
 describe('ControlledGluwacoin_Mint', function () {
@@ -107,7 +131,7 @@ describe('ControlledGluwacoin_Mint', function () {
         await this.token.mint(amount, { from: deployer });
         
         // Asserting balance of contract/token to increase
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(amount);
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(MAX_UINT256);
     });
 
     it('controller can mint MAX_UINT256', async function () {
@@ -126,13 +150,21 @@ describe('ControlledGluwacoin_Mint', function () {
 
     it('controller cannot mint negative', async function () {
 
-        await this.token.mint(-1, { from: deployer });
+        await this.token.mint(-2, { from: deployer });
         // await expectRevert(
-        //     this.token.mint('-1', { from: deployer }),
+        //     this.token.mint(-1.0, { from: deployer }),
         //     'ERC20Controllable: only controllers can call this method'
         // );
 
         // Asserting balance of contract/token to increase
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+    });
+
+    it('controller cannot mint floating point', async function() {
+        await expectRevert(
+            this.token.mint(5.6, { from: deployer }),
+            'invalid number value'
+        );
         expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
     });
 
@@ -149,7 +181,7 @@ describe('ControlledGluwacoin_Mint', function () {
     it('mint emits a Mint event', async function () {
         const receipt = await this.token.mint(amount, { from: deployer });
 
-        expectEvent(receipt, 'Mint', { _mintTo: deployer, _value: amount });
+        expectEvent(receipt, 'Mint', { _mintTo: deployer, _value: 'amount' });
     });
 
     it('mint increases the totalSupply', async function () {
@@ -168,7 +200,7 @@ describe('ControlledGluwacoin_Burn', function () {
     const decimals = new BN('18');
 
     const amount = new BN('5000');
-    const negativeAmount = new BN('-1');
+    const veryBigNumber = new BN('-1');
     const fee = new BN('1');
 
     const CONTROLLER_ROLE = web3.utils.soliditySha3('CONTROLLER_ROLE');
@@ -232,8 +264,9 @@ describe('ControlledGluwacoin_Burn', function () {
         await this.token.mint(amount, { from: deployer });
         expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(amount);
 
+        // Since burn is accepting UINT, -1 is a very big number
         await expectRevert(
-            this.token.burn('-1', { from: deployer }),
+            this.token.burn(veryBigNumber, { from: deployer }),
             'ERC20Reservable: transfer amount exceeds unreserved balance'
         );
         expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(amount);
@@ -304,6 +337,7 @@ describe('ControlledGluwacoin_Reserve', function () {
 
     it('cannot reserve with zero address as the executor', async function () {
         await this.token.mint(amount, { from: deployer });
+        // Giving other account minted money from deployer to test
         await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
 
         expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
@@ -374,7 +408,7 @@ describe('ControlledGluwacoin_Reserve', function () {
         );
     });
 
-    it('cannot reserve if not amount + fee > 0', async function () {
+    it('cannot reserve if not amount + fee = 0', async function () {
         await this.token.mint(amount, { from: deployer });
         await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
 
