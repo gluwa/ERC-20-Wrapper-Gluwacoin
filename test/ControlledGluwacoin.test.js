@@ -105,14 +105,23 @@ describe('ControlledGluwacoin_Mint', function () {
 
     it('controller can mint', async function () {
         await this.token.mint(amount, { from: deployer });
+        
+        // Asserting balance of contract/token to increase
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(amount);
     });
 
     it('controller can mint MAX_UINT256', async function () {
         await this.token.mint(MAX_UINT256, { from: deployer });
+
+        // Asserting balance of contract/token to increase
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(MAX_UINT256);
     });
 
     it('controller can mint 0', async function () {
         await this.token.mint(0, { from: deployer });
+
+        // Asserting balance of contract/token to increase
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
     });
 
     it('non-controller cannot mint', async function () {
@@ -120,6 +129,9 @@ describe('ControlledGluwacoin_Mint', function () {
             this.token.mint(amount, { from: other }),
             'ERC20Controllable: only controllers can call this method'
         );
+
+        // Asserting balance of contract/token to increase
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
     });
 
     it('mint emits a Mint event', async function () {
@@ -156,7 +168,9 @@ describe('ControlledGluwacoin_Burn', function () {
 
     it('controller can burn', async function () {
         await this.token.mint(amount, { from: deployer });
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(amount);
         await this.token.burn(amount, { from: deployer });
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
     });
 
     it('non-controller cannot burn', async function () {
@@ -165,6 +179,7 @@ describe('ControlledGluwacoin_Burn', function () {
             this.token.burn(amount, { from: other }),
             'ERC20Controllable: only controllers can call this method'
         );
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
     });
 
     it('burn emits a Burnt event', async function () {
