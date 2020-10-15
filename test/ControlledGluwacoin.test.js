@@ -12,7 +12,7 @@ const ControlledGluwacoin = contract.fromArtifact('ControlledGluwacoinMock');
 var sign = require('./signature');
 
 // Start test block
-describe('ControlledGluwacoin', function () {
+describe('ControlledGluwacoin_ERC20Base', function () {
     const [ deployer, other, another ] = accounts;
     const [ deployer_privateKey, other_privateKey, another_privateKey ] = privateKeys;
 
@@ -54,12 +54,53 @@ describe('ControlledGluwacoin', function () {
     it('initial totalSupply is 0', async function () {
         expect(await this.token.totalSupply()).to.be.bignumber.equal('0');
     });
+});
 
-    /* Controllable related
-    */
-    it('deployer has the default controller role', async function () {
-        expect(await this.token.getRoleMemberCount(CONTROLLER_ROLE)).to.be.bignumber.equal('1');
-        expect(await this.token.getRoleMember(CONTROLLER_ROLE, 0)).to.equal(deployer);
+
+describe('ControlledGluwacoin_Transfer', function () {
+    const [ deployer, other, another ] = accounts;
+    const [ deployer_privateKey, other_privateKey, another_privateKey ] = privateKeys;
+
+    const name = 'ControlledGluwacoin';
+    const symbol = 'CG';
+    const decimals = new BN('18');
+
+    const amount = new BN('5000');
+    const fee = new BN('1');
+
+    const CONTROLLER_ROLE = web3.utils.soliditySha3('CONTROLLER_ROLE');
+    const RELAYER_ROLE = web3.utils.soliditySha3('RELAYER_ROLE');
+
+    beforeEach(async function () {
+        // Deploy a new ControlledGluwacoin contract for each test
+        this.token = await ControlledGluwacoin.new(name, symbol, decimals, { from: deployer });
+    });
+
+});
+
+describe('ControlledGluwacoin_Mint', function () {
+    const [ deployer, other, another ] = accounts;
+    const [ deployer_privateKey, other_privateKey, another_privateKey ] = privateKeys;
+
+    const name = 'ControlledGluwacoin';
+    const symbol = 'CG';
+    const decimals = new BN('18');
+
+    const amount = new BN('5000');
+    const fee = new BN('1');
+
+    const CONTROLLER_ROLE = web3.utils.soliditySha3('CONTROLLER_ROLE');
+    const RELAYER_ROLE = web3.utils.soliditySha3('RELAYER_ROLE');
+
+    beforeEach(async function () {
+        // Deploy a new ControlledGluwacoin contract for each test
+        this.token = await ControlledGluwacoin.new(name, symbol, decimals, { from: deployer });
+    });
+
+    it('mint emits a Transfer event', async function () {
+        const receipt = await this.token.mint(amount, { from: deployer });
+
+        expectEvent(receipt, 'Transfer', { from: ZERO_ADDRESS, to: deployer, value: amount });
     });
 
     it('controller can mint', async function () {
@@ -87,16 +128,30 @@ describe('ControlledGluwacoin', function () {
         expectEvent(receipt, 'Mint', { _mintTo: deployer, _value: amount });
     });
 
-    it('mint emits a Transfer event', async function () {
-        const receipt = await this.token.mint(amount, { from: deployer });
-
-        expectEvent(receipt, 'Transfer', { from: ZERO_ADDRESS, to: deployer, value: amount });
-    });
-
     it('mint increases the totalSupply', async function () {
         expect(await this.token.totalSupply()).to.be.bignumber.equal('0');
         await this.token.mint(amount, { from: deployer });
         expect(await this.token.totalSupply()).to.be.bignumber.equal(amount);
+    });
+});
+
+describe('ControlledGluwacoin_Burn', function () {
+    const [ deployer, other, another ] = accounts;
+    const [ deployer_privateKey, other_privateKey, another_privateKey ] = privateKeys;
+
+    const name = 'ControlledGluwacoin';
+    const symbol = 'CG';
+    const decimals = new BN('18');
+
+    const amount = new BN('5000');
+    const fee = new BN('1');
+
+    const CONTROLLER_ROLE = web3.utils.soliditySha3('CONTROLLER_ROLE');
+    const RELAYER_ROLE = web3.utils.soliditySha3('RELAYER_ROLE');
+
+    beforeEach(async function () {
+        // Deploy a new ControlledGluwacoin contract for each test
+        this.token = await ControlledGluwacoin.new(name, symbol, decimals, { from: deployer });
     });
 
     it('controller can burn', async function () {
@@ -133,9 +188,27 @@ describe('ControlledGluwacoin', function () {
         await this.token.burn(amount, { from: deployer });
         expect(await this.token.totalSupply()).to.be.bignumber.equal('0');
     });
+});
 
-    /* Reservable related
-    */
+describe('ControlledGluwacoin_Reserve', function () {
+    const [ deployer, other, another ] = accounts;
+    const [ deployer_privateKey, other_privateKey, another_privateKey ] = privateKeys;
+
+    const name = 'ControlledGluwacoin';
+    const symbol = 'CG';
+    const decimals = new BN('18');
+
+    const amount = new BN('5000');
+    const fee = new BN('1');
+
+    const CONTROLLER_ROLE = web3.utils.soliditySha3('CONTROLLER_ROLE');
+    const RELAYER_ROLE = web3.utils.soliditySha3('RELAYER_ROLE');
+
+    beforeEach(async function () {
+        // Deploy a new ControlledGluwacoin contract for each test
+        this.token = await ControlledGluwacoin.new(name, symbol, decimals, { from: deployer });
+    });
+
     it('can reserve', async function () {
         await this.token.mint(amount, { from: deployer });
         await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
@@ -300,6 +373,233 @@ describe('ControlledGluwacoin', function () {
         expect(reserve.expiryBlockNum).to.be.bignumber.equal(expiryBlockNum);
     });
 
+    it('reservedBalanceOf accurate after reserve', async function () {
+        await this.token.mint(amount, { from: deployer });
+        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+
+        var executor = deployer;
+        var reserve_amount = amount.sub(fee);
+        var reserve_fee = fee;
+        var latestBlock = await time.latestBlock();
+        var expiryBlockNum = latestBlock.add(new BN('100'));
+        var nonce = Date.now();
+
+        var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+
+        expect(await this.token.reservedBalanceOf(other)).to.be.bignumber.equal('0');
+
+        await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
+
+        expect(await this.token.reservedBalanceOf(other)).to.be.bignumber.equal(amount.toString());
+    });
+
+    it('unreservedBalanceOf accurate after reserve', async function () {
+        await this.token.mint(amount, { from: deployer });
+        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+
+        var executor = deployer;
+        var reserve_amount = amount.sub(fee);
+        var reserve_fee = fee;
+        var latestBlock = await time.latestBlock();
+        var expiryBlockNum = latestBlock.add(new BN('100'));
+        var nonce = Date.now();
+
+        var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+
+        expect(await this.token.unreservedBalanceOf(other)).to.be.bignumber.equal(await this.token.balanceOf(other));
+
+        await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
+
+        expect(await this.token.unreservedBalanceOf(other)).to.be.bignumber.equal(amount.sub(await this.token.reservedBalanceOf(other)).toString());
+    });
+});
+
+describe('ControlledGluwacoin_Reclaim', function () {
+    const [ deployer, other, another ] = accounts;
+    const [ deployer_privateKey, other_privateKey, another_privateKey ] = privateKeys;
+
+    const name = 'ControlledGluwacoin';
+    const symbol = 'CG';
+    const decimals = new BN('18');
+
+    const amount = new BN('5000');
+    const fee = new BN('1');
+
+    const CONTROLLER_ROLE = web3.utils.soliditySha3('CONTROLLER_ROLE');
+    const RELAYER_ROLE = web3.utils.soliditySha3('RELAYER_ROLE');
+
+    beforeEach(async function () {
+        // Deploy a new ControlledGluwacoin contract for each test
+        this.token = await ControlledGluwacoin.new(name, symbol, decimals, { from: deployer });
+    });
+
+    it('executor can reclaim unexpired reserve', async function () {
+        await this.token.mint(amount, { from: deployer });
+        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+
+        var executor = deployer;
+        var reserve_amount = amount.sub(fee);
+        var reserve_fee = fee;
+        var latestBlock = await time.latestBlock();
+        var expiryBlockNum = latestBlock.add(new BN('100'));
+        var nonce = Date.now();
+
+        var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+
+        await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
+
+        await this.token.reclaim(other, nonce, { from: deployer });
+    });
+
+    it('executor can reclaim expired reserve', async function () {
+        await this.token.mint(amount, { from: deployer });
+        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+
+        var executor = deployer;
+        var reserve_amount = amount.sub(fee);
+        var reserve_fee = fee;
+        var latestBlock = await time.latestBlock();
+        var expiryBlockNum = latestBlock.add(new BN('100'));
+        var nonce = Date.now();
+
+        var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+
+        await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
+
+        await time.advanceBlockTo(expiryBlockNum.add(new BN('1')));
+
+        await this.token.reclaim(other, nonce, { from: deployer });
+    });
+
+    it('sender can reclaim expired reserve', async function () {
+        await this.token.mint(amount, { from: deployer });
+        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+
+        var executor = deployer;
+        var reserve_amount = amount.sub(fee);
+        var reserve_fee = fee;
+        var latestBlock = await time.latestBlock();
+        var expiryBlockNum = latestBlock.add(new BN('100'));
+        var nonce = Date.now();
+
+        var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+
+        await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
+
+        await time.advanceBlockTo(expiryBlockNum.add(new BN('1')));
+
+        await this.token.reclaim(other, nonce, { from: other });
+    });
+
+    it('sender cannot reclaim unexpired reserve', async function () {
+        await this.token.mint(amount, { from: deployer });
+        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+
+        var executor = deployer;
+        var reserve_amount = amount.sub(fee);
+        var reserve_fee = fee;
+        var latestBlock = await time.latestBlock();
+        var expiryBlockNum = latestBlock.add(new BN('100'));
+        var nonce = Date.now();
+
+        var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+
+        await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
+
+        await expectRevert(
+            this.token.reclaim(other, nonce, { from: other }),
+            'ERC20Reservable: reservation has not expired or you are not the executor and cannot be reclaimed'
+        );
+    });
+
+    it('receiver cannot reclaim unexpired reserve', async function () {
+        await this.token.mint(amount, { from: deployer });
+        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+
+        var executor = deployer;
+        var reserve_amount = amount.sub(fee);
+        var reserve_fee = fee;
+        var latestBlock = await time.latestBlock();
+        var expiryBlockNum = latestBlock.add(new BN('100'));
+        var nonce = Date.now();
+
+        var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+
+        await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
+
+        await expectRevert(
+            this.token.reclaim(other, nonce, { from: another }),
+            'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
+        );
+    });
+
+    it('receiver cannot reclaim expired reserve', async function () {
+        await this.token.mint(amount, { from: deployer });
+        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+
+        var executor = deployer;
+        var reserve_amount = amount.sub(fee);
+        var reserve_fee = fee;
+        var latestBlock = await time.latestBlock();
+        var expiryBlockNum = latestBlock.add(new BN('100'));
+        var nonce = Date.now();
+
+        var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+
+        await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
+
+        await time.advanceBlockTo(expiryBlockNum.add(new BN('1')));
+
+        await expectRevert(
+            this.token.reclaim(other, nonce, { from: another }),
+            'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
+        );
+    });
+});
+
+describe('ControlledGluwacoin_Execute', function () {
+    const [ deployer, other, another ] = accounts;
+    const [ deployer_privateKey, other_privateKey, another_privateKey ] = privateKeys;
+
+    const name = 'ControlledGluwacoin';
+    const symbol = 'CG';
+    const decimals = new BN('18');
+
+    const amount = new BN('5000');
+    const fee = new BN('1');
+
+    const CONTROLLER_ROLE = web3.utils.soliditySha3('CONTROLLER_ROLE');
+    const RELAYER_ROLE = web3.utils.soliditySha3('RELAYER_ROLE');
+
+    beforeEach(async function () {
+        // Deploy a new ControlledGluwacoin contract for each test
+        this.token = await ControlledGluwacoin.new(name, symbol, decimals, { from: deployer });
+    });
+
     it('executor can execute', async function () {
         await this.token.mint(amount, { from: deployer });
         await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
@@ -444,193 +744,6 @@ describe('ControlledGluwacoin', function () {
         );
     });
 
-    it('executor can reclaim unexpired reserve', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
-
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
-        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-
-        var executor = deployer;
-        var reserve_amount = amount.sub(fee);
-        var reserve_fee = fee;
-        var latestBlock = await time.latestBlock();
-        var expiryBlockNum = latestBlock.add(new BN('100'));
-        var nonce = Date.now();
-
-        var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
-
-        await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
-
-        await this.token.reclaim(other, nonce, { from: deployer });
-    });
-
-    it('executor can reclaim expired reserve', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
-
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
-        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-
-        var executor = deployer;
-        var reserve_amount = amount.sub(fee);
-        var reserve_fee = fee;
-        var latestBlock = await time.latestBlock();
-        var expiryBlockNum = latestBlock.add(new BN('100'));
-        var nonce = Date.now();
-
-        var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
-
-        await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
-
-        await time.advanceBlockTo(expiryBlockNum.add(new BN('1')));
-
-        await this.token.reclaim(other, nonce, { from: deployer });
-    });
-
-    it('sender can reclaim expired reserve', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
-
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
-        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-
-        var executor = deployer;
-        var reserve_amount = amount.sub(fee);
-        var reserve_fee = fee;
-        var latestBlock = await time.latestBlock();
-        var expiryBlockNum = latestBlock.add(new BN('100'));
-        var nonce = Date.now();
-
-        var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
-
-        await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
-
-        await time.advanceBlockTo(expiryBlockNum.add(new BN('1')));
-
-        await this.token.reclaim(other, nonce, { from: other });
-    });
-
-    it('sender cannot reclaim unexpired reserve', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
-
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
-        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-
-        var executor = deployer;
-        var reserve_amount = amount.sub(fee);
-        var reserve_fee = fee;
-        var latestBlock = await time.latestBlock();
-        var expiryBlockNum = latestBlock.add(new BN('100'));
-        var nonce = Date.now();
-
-        var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
-
-        await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
-
-        await expectRevert(
-            this.token.reclaim(other, nonce, { from: other }),
-            'ERC20Reservable: reservation has not expired or you are not the executor and cannot be reclaimed'
-        );
-    });
-
-    it('receiver cannot reclaim unexpired reserve', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
-
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
-        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-
-        var executor = deployer;
-        var reserve_amount = amount.sub(fee);
-        var reserve_fee = fee;
-        var latestBlock = await time.latestBlock();
-        var expiryBlockNum = latestBlock.add(new BN('100'));
-        var nonce = Date.now();
-
-        var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
-
-        await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
-
-        await expectRevert(
-            this.token.reclaim(other, nonce, { from: another }),
-            'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
-        );
-    });
-
-    it('receiver cannot reclaim expired reserve', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
-
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
-        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-
-        var executor = deployer;
-        var reserve_amount = amount.sub(fee);
-        var reserve_fee = fee;
-        var latestBlock = await time.latestBlock();
-        var expiryBlockNum = latestBlock.add(new BN('100'));
-        var nonce = Date.now();
-
-        var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
-
-        await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
-
-        await time.advanceBlockTo(expiryBlockNum.add(new BN('1')));
-
-        await expectRevert(
-            this.token.reclaim(other, nonce, { from: another }),
-            'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
-        );
-    });
-
-    it('reservedBalanceOf accurate after reserve', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
-
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
-        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-
-        var executor = deployer;
-        var reserve_amount = amount.sub(fee);
-        var reserve_fee = fee;
-        var latestBlock = await time.latestBlock();
-        var expiryBlockNum = latestBlock.add(new BN('100'));
-        var nonce = Date.now();
-
-        var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
-
-        expect(await this.token.reservedBalanceOf(other)).to.be.bignumber.equal('0');
-
-        await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
-
-        expect(await this.token.reservedBalanceOf(other)).to.be.bignumber.equal(amount.toString());
-    });
-
-    it('unreservedBalanceOf accurate after reserve', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
-
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
-        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-
-        var executor = deployer;
-        var reserve_amount = amount.sub(fee);
-        var reserve_fee = fee;
-        var latestBlock = await time.latestBlock();
-        var expiryBlockNum = latestBlock.add(new BN('100'));
-        var nonce = Date.now();
-
-        var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
-
-        expect(await this.token.unreservedBalanceOf(other)).to.be.bignumber.equal(await this.token.balanceOf(other));
-
-        await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
-
-        expect(await this.token.unreservedBalanceOf(other)).to.be.bignumber.equal(amount.sub(await this.token.reservedBalanceOf(other)).toString());
-    });
-
     it('reservedBalanceOf accurate after execute', async function () {
         await this.token.mint(amount, { from: deployer });
         await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
@@ -683,6 +796,53 @@ describe('ControlledGluwacoin', function () {
         await this.token.execute(other, nonce, { from: deployer });
 
         expect(await this.token.unreservedBalanceOf(other)).to.be.bignumber.equal('0');
+    });
+});
+
+describe('ControlledGluwacoin_Controller', function () {
+    const [ deployer, other, another ] = accounts;
+    const [ deployer_privateKey, other_privateKey, another_privateKey ] = privateKeys;
+
+    const name = 'ControlledGluwacoin';
+    const symbol = 'CG';
+    const decimals = new BN('18');
+
+    const amount = new BN('5000');
+    const fee = new BN('1');
+
+    const CONTROLLER_ROLE = web3.utils.soliditySha3('CONTROLLER_ROLE');
+    const RELAYER_ROLE = web3.utils.soliditySha3('RELAYER_ROLE');
+
+    beforeEach(async function () {
+        // Deploy a new ControlledGluwacoin contract for each test
+        this.token = await ControlledGluwacoin.new(name, symbol, decimals, { from: deployer });
+    });
+    /* Controllable related
+    */
+    it('deployer has the default controller role', async function () {
+        expect(await this.token.getRoleMemberCount(CONTROLLER_ROLE)).to.be.bignumber.equal('1');
+        expect(await this.token.getRoleMember(CONTROLLER_ROLE, 0)).to.equal(deployer);
+    });
+});
+
+
+describe('ControlledGluwacoin_ETHless', function () {
+    const [ deployer, other, another ] = accounts;
+    const [ deployer_privateKey, other_privateKey, another_privateKey ] = privateKeys;
+
+    const name = 'ControlledGluwacoin';
+    const symbol = 'CG';
+    const decimals = new BN('18');
+
+    const amount = new BN('5000');
+    const fee = new BN('1');
+
+    const CONTROLLER_ROLE = web3.utils.soliditySha3('CONTROLLER_ROLE');
+    const RELAYER_ROLE = web3.utils.soliditySha3('RELAYER_ROLE');
+
+    beforeEach(async function () {
+        // Deploy a new ControlledGluwacoin contract for each test
+        this.token = await ControlledGluwacoin.new(name, symbol, decimals, { from: deployer });
     });
 
     /* ETHless related
