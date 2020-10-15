@@ -124,6 +124,18 @@ describe('ControlledGluwacoin_Mint', function () {
         expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
     });
 
+    it('controller cannot mint negative', async function () {
+
+        await this.token.mint(-1, { from: deployer });
+        // await expectRevert(
+        //     this.token.mint('-1', { from: deployer }),
+        //     'ERC20Controllable: only controllers can call this method'
+        // );
+
+        // Asserting balance of contract/token to increase
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+    });
+
     it('non-controller cannot mint', async function () {
         await expectRevert(
             this.token.mint(amount, { from: other }),
@@ -156,6 +168,7 @@ describe('ControlledGluwacoin_Burn', function () {
     const decimals = new BN('18');
 
     const amount = new BN('5000');
+    const negativeAmount = new BN('-1');
     const fee = new BN('1');
 
     const CONTROLLER_ROLE = web3.utils.soliditySha3('CONTROLLER_ROLE');
@@ -202,6 +215,28 @@ describe('ControlledGluwacoin_Burn', function () {
         expect(await this.token.totalSupply()).to.be.bignumber.equal(amount);
         await this.token.burn(amount, { from: deployer });
         expect(await this.token.totalSupply()).to.be.bignumber.equal('0');
+    });
+
+    it('burn insufficient balance', async function() {
+        await this.token.mint(0, { from: deployer });
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+
+        await expectRevert(
+            this.token.burn(amount, { from: deployer }),
+            'ERC20Reservable: transfer amount exceeds unreserved balance'
+        );
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+    });
+
+    it('burn out of range', async function() {
+        await this.token.mint(amount, { from: deployer });
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(amount);
+
+        await expectRevert(
+            this.token.burn('-1', { from: deployer }),
+            'ERC20Reservable: transfer amount exceeds unreserved balance'
+        );
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(amount);
     });
 });
 
