@@ -14,7 +14,6 @@ var sign = require('./signature');
 // Start test block
 describe('ControlledGluwacoin_ERC20Base', function () {
     const [ deployer, other, another ] = accounts;
-    const [ deployer_privateKey, other_privateKey, another_privateKey ] = privateKeys;
 
     const name = 'ControlledGluwacoin';
     const symbol = 'CG';
@@ -23,9 +22,6 @@ describe('ControlledGluwacoin_ERC20Base', function () {
     const approveAmount = new BN('100');
     const amount = new BN('1000');
     const fee = new BN('1');
-
-    const CONTROLLER_ROLE = web3.utils.soliditySha3('CONTROLLER_ROLE');
-    const RELAYER_ROLE = web3.utils.soliditySha3('RELAYER_ROLE');
 
     beforeEach(async function () {
         // Deploy a new ControlledGluwacoin contract for each test
@@ -59,7 +55,6 @@ describe('ControlledGluwacoin_ERC20Base', function () {
     it('approve other to withdraw from deployer', async function () {
         const receipt = await this.token.approve(other, approveAmount, { from: deployer });
         expectEvent(receipt, 'Approval', { spender: other, owner: deployer, value: approveAmount });
-        expect(await this.token.approve(other, approveAmount)).to.be.true;
     });
 
     it('allowance that other can withdraw from deployer is approveAmount', async function () {
@@ -72,8 +67,7 @@ describe('ControlledGluwacoin_ERC20Base', function () {
         await this.token.mint(amount, { from: deployer });
         expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(amount.toString());
         const receipt = await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
-        console.log(receipt);
-        console.log(receipt.logs[0].args);
+
         expectEvent(receipt, 'Transfer', { from: deployer, to: other, value: amount});
 
         expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
@@ -86,25 +80,20 @@ describe('ControlledGluwacoin_ERC20Base', function () {
         await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
 
         // Setting allowance for another
-        await this.token.approve(another, approveAmount, { from: other });
-        const allowanceNum = await this.token.allowance(other, another);
-        console.log(allowanceNum);
-        const otherBalance = await this.token.balanceOf(other);
-        console.log(otherBalance);
+        // await this.token.approve(another, approveAmount, { from: other });
 
-        const receipt = await this.token.methods['transferFrom(address,address,uint256)'](other, another, approveAmount);
-        console.log(receipt);
-        console.log(receipt.logs[0].args);
+        // Approve deployer to transfer money on behalf of other
+        await this.token.approve(deployer, approveAmount, { from: other });
 
+        const receipt = await this.token.methods['transferFrom(address,address,uint256)'](other, another, approveAmount, { from: deployer });
         
-        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.sub(approveAmount).toString());
         expect(await this.token.balanceOf(another)).to.be.bignumber.equal(approveAmount.toString());
     });
 });
 
 describe('ControlledGluwacoin_Mint', function () {
-    const [ deployer, other, another ] = accounts;
-    const [ deployer_privateKey, other_privateKey, another_privateKey ] = privateKeys;
+    const [ deployer, other ] = accounts;
 
     const name = 'ControlledGluwacoin';
     const symbol = 'CG';
@@ -112,9 +101,6 @@ describe('ControlledGluwacoin_Mint', function () {
 
     const amount = new BN('5000');
     const fee = new BN('1');
-
-    const CONTROLLER_ROLE = web3.utils.soliditySha3('CONTROLLER_ROLE');
-    const RELAYER_ROLE = web3.utils.soliditySha3('RELAYER_ROLE');
 
     beforeEach(async function () {
         // Deploy a new ControlledGluwacoin contract for each test
@@ -181,7 +167,7 @@ describe('ControlledGluwacoin_Mint', function () {
     it('mint emits a Mint event', async function () {
         const receipt = await this.token.mint(amount, { from: deployer });
 
-        expectEvent(receipt, 'Mint', { _mintTo: deployer, _value: 'amount' });
+        expectEvent(receipt, 'Mint', { _mintTo: deployer, _value: amount });
     });
 
     it('mint increases the totalSupply', async function () {
@@ -202,9 +188,6 @@ describe('ControlledGluwacoin_Burn', function () {
     const amount = new BN('5000');
     const veryBigNumber = new BN('-1');
     const fee = new BN('1');
-
-    const CONTROLLER_ROLE = web3.utils.soliditySha3('CONTROLLER_ROLE');
-    const RELAYER_ROLE = web3.utils.soliditySha3('RELAYER_ROLE');
 
     beforeEach(async function () {
         // Deploy a new ControlledGluwacoin contract for each test
@@ -584,9 +567,6 @@ describe('ControlledGluwacoin_Reclaim', function () {
     const amount = new BN('5000');
     const fee = new BN('1');
 
-    const CONTROLLER_ROLE = web3.utils.soliditySha3('CONTROLLER_ROLE');
-    const RELAYER_ROLE = web3.utils.soliditySha3('RELAYER_ROLE');
-
     beforeEach(async function () {
         // Deploy a new ControlledGluwacoin contract for each test
         this.token = await ControlledGluwacoin.new(name, symbol, decimals, { from: deployer });
@@ -732,6 +712,30 @@ describe('ControlledGluwacoin_Reclaim', function () {
             'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
         );
     });
+
+    it('executor cannot reclaim from no reservation', async function () {
+        var nonce = Date.now();
+        await expectRevert(
+            this.token.reclaim(other, nonce, { from: deployer }),
+            'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
+        );
+    });
+
+    it('sender cannot reclaim from no reservation', async function () {
+        var nonce = Date.now();
+        await expectRevert(
+            this.token.reclaim(other, nonce, { from: other }),
+            'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
+        );
+    });
+
+    it('receiver cannot reclaim from no reservation', async function () {
+        var nonce = Date.now();
+        await expectRevert(
+            this.token.reclaim(other, nonce, { from: another }),
+            'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
+        );
+    });
 });
 
 describe('ControlledGluwacoin_Execute', function () {
@@ -744,9 +748,6 @@ describe('ControlledGluwacoin_Execute', function () {
 
     const amount = new BN('5000');
     const fee = new BN('1');
-
-    const CONTROLLER_ROLE = web3.utils.soliditySha3('CONTROLLER_ROLE');
-    const RELAYER_ROLE = web3.utils.soliditySha3('RELAYER_ROLE');
 
     beforeEach(async function () {
         // Deploy a new ControlledGluwacoin contract for each test
@@ -891,6 +892,14 @@ describe('ControlledGluwacoin_Execute', function () {
 
         await this.token.reclaim(other, nonce, { from: deployer });
 
+        await expectRevert(
+            this.token.execute(other, nonce, { from: deployer }),
+            'ERC20Reservable: invalid reservation status to execute'
+        );
+    });
+
+    it('cannot execute non existing reserve', async function () {
+        var nonce = Date.now();
         await expectRevert(
             this.token.execute(other, nonce, { from: deployer }),
             'ERC20Reservable: invalid reservation status to execute'
