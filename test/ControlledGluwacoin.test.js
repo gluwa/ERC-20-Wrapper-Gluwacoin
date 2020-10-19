@@ -117,7 +117,7 @@ describe('ControlledGluwacoin_Mint', function () {
         await this.token.mint(amount, { from: deployer });
         
         // Asserting balance of contract/token to increase
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(MAX_UINT256);
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(amount);
     });
 
     it('controller can mint MAX_UINT256', async function () {
