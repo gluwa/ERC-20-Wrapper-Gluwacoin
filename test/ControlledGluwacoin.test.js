@@ -459,7 +459,7 @@ describe('ControlledGluwacoin_Reserve', function () {
         );
     });
 
-    it('cannot reserve if signature invalid', async function () {
+    it('cannot reserve if signature is invalid', async function () {
         await this.token.mint(amount, { from: deployer });
         await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
 

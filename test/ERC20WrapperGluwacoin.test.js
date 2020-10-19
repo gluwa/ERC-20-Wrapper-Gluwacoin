@@ -57,6 +57,28 @@ describe('ERC20WrapperGluwacoin', function () {
     it('initial totalSupply is 0', async function () {
         expect(await this.token.totalSupply()).to.be.bignumber.equal('0');
     });
+});
+
+describe('ERC20WrapperGluwacoin_Wrapper', function () {
+    const [ deployer, other, another ] = accounts;
+    const [ deployer_privateKey, other_privateKey, another_privateKey ] = privateKeys;
+
+    const name = 'ERC20WrapperGluwacoin';
+    const symbol = 'WG';
+    const decimals = new BN('18');
+
+    const amount = new BN('5000');
+    const fee = new BN('1');
+
+    const WRAPPER_ROLE = web3.utils.soliditySha3('WRAPPER_ROLE');
+    const RELAYER_ROLE = web3.utils.soliditySha3('RELAYER_ROLE');
+
+    beforeEach(async function () {
+        // Deploy a new ControlledGluwacoin contract for each test
+        this.baseToken = await ControlledGluwacoin.new('ControlledGluwacoin', 'CG', decimals, { from: deployer });
+        // Deploy a new ERC20WrapperGluwacoin contract for each test
+        this.token = await ERC20WrapperGluwacoin.new(name, symbol, decimals, this.baseToken.address, { from: deployer });
+    });
 
     /* Wrapper related
     */
@@ -320,7 +342,27 @@ describe('ERC20WrapperGluwacoin', function () {
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
         expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount);
     });
+});
+describe('ERC20WrapperGluwacoin_Reservable', function () {
+    const [ deployer, other, another ] = accounts;
+    const [ deployer_privateKey, other_privateKey, another_privateKey ] = privateKeys;
 
+    const name = 'ERC20WrapperGluwacoin';
+    const symbol = 'WG';
+    const decimals = new BN('18');
+
+    const amount = new BN('5000');
+    const fee = new BN('1');
+
+    const WRAPPER_ROLE = web3.utils.soliditySha3('WRAPPER_ROLE');
+    const RELAYER_ROLE = web3.utils.soliditySha3('RELAYER_ROLE');
+
+    beforeEach(async function () {
+        // Deploy a new ControlledGluwacoin contract for each test
+        this.baseToken = await ControlledGluwacoin.new('ControlledGluwacoin', 'CG', decimals, { from: deployer });
+        // Deploy a new ERC20WrapperGluwacoin contract for each test
+        this.token = await ERC20WrapperGluwacoin.new(name, symbol, decimals, this.baseToken.address, { from: deployer });
+    });
     /* Reservable related
     */
     it('can reserve', async function () {
@@ -469,6 +511,53 @@ describe('ERC20WrapperGluwacoin', function () {
         await expectRevert(
             this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer }),
             'ERC20Reservable: invalid reserve amount'
+        );
+    });
+
+    it('cannot reserve if Nonce is already used', async function () {
+        await this.token.mint(amount, { from: deployer });
+        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+
+        var executor = deployer;
+        var reserve_amount = amount.sub(fee);
+        var reserve_fee = fee;
+        var latestBlock = await time.latestBlock();
+        var expiryBlockNum = latestBlock.add(new BN('100'));
+        var nonce = Date.now();
+
+        var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+
+        await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
+
+        await expectRevert(
+            this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer }),
+            'ERC20Reservable: insufficient unreserved balance'
+        );
+    });
+
+    it('cannot reserve if signature is invalid', async function () {
+        await this.token.mint(amount, { from: deployer });
+        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+
+        var executor = deployer;
+        var reserve_amount = amount.sub(fee);
+        var reserve_fee = fee;
+        var dummy_amount = amount.sub(fee).sub(fee); 
+        var latestBlock = await time.latestBlock();
+        var expiryBlockNum = latestBlock.add(new BN('100'));
+        var nonce = Date.now();
+
+        var signature = sign.sign(this.token.address, other, other_privateKey, another, dummy_amount, reserve_fee, nonce);
+
+        await expectRevert(
+            this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer }),
+            'Validate: invalid signature'
         );
     });
 
@@ -657,6 +746,14 @@ describe('ERC20WrapperGluwacoin', function () {
         );
     });
 
+    it('cannot execute non existing reserve', async function () {
+        var nonce = Date.now();
+        await expectRevert(
+            this.token.execute(other, nonce, { from: deployer }),
+            'ERC20Reservable: invalid reservation status to execute'
+        );
+    });
+
     it('executor can reclaim unexpired reserve', async function () {
         await this.baseToken.mint(amount, { from: deployer });
         await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
@@ -804,6 +901,30 @@ describe('ERC20WrapperGluwacoin', function () {
 
         await time.advanceBlockTo(expiryBlockNum.add(new BN('1')));
 
+        await expectRevert(
+            this.token.reclaim(other, nonce, { from: another }),
+            'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
+        );
+    });
+
+    it('executor cannot reclaim from no reservation', async function () {
+        var nonce = Date.now();
+        await expectRevert(
+            this.token.reclaim(other, nonce, { from: deployer }),
+            'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
+        );
+    });
+
+    it('sender cannot reclaim from no reservation', async function () {
+        var nonce = Date.now();
+        await expectRevert(
+            this.token.reclaim(other, nonce, { from: other }),
+            'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
+        );
+    });
+
+    it('receiver cannot reclaim from no reservation', async function () {
+        var nonce = Date.now();
         await expectRevert(
             this.token.reclaim(other, nonce, { from: another }),
             'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
