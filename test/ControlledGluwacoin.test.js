@@ -137,8 +137,13 @@ describe('ControlledGluwacoin_Mint', function () {
     it('controller cannot mint negative', async function () {
         await this.token.mint(new BN('-2'), { from: deployer });
 
+        await expectRevert(
+            this.token.mint(new BN('-1'), { from: deployer }),
+            'ERC20Reservable: Invalid implicit conversion from int256 to uint256 requested.'
+        );
         // Asserting balance of contract/token to increase
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(MAX_UINT256.add(new BN('-2')));
+        // uint -2 = MAX_UINT256(-1) + -1
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(0);
     });
 
     it('controller cannot mint floating point', async function() {
