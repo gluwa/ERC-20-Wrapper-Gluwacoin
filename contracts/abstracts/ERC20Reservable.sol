@@ -66,12 +66,17 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
 
     function reserve(address sender, address recipient, address executor, uint256 amount, uint256 fee, uint256 nonce,
         uint256 expiryBlockNum, bytes memory sig) public returns (bool success) {
+        //Reservation storage reservation = _reserved[sender][nonce];
+        //address executor = reservation._executor;
+
+        require(_reserved[sender][nonce]._expiryBlockNum == 0, "ERC20Reservable: the sender used the nonce already");
+
         require(expiryBlockNum > block.number, "ERC20Reservable: invalid block expiry number");
         require(executor != address(0), "ERC20Reservable: cannot execute from zero address");
+        require(amount > 0, "ERC20Reservable: invalid reserve amount");
 
         uint256 total = amount.add(fee);
         require(_unreservedBalance(sender) >= total, "ERC20Reservable: insufficient unreserved balance");
-        require(total > 0, "ERC20Reservable: invalid reserve amount");
 
         Validate.validateSignature(address(this), sender, recipient, amount, fee, nonce, sig);
 
@@ -85,18 +90,19 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
     function execute(address sender, uint256 nonce) public returns (bool success) {
         Reservation storage reservation = _reserved[sender][nonce];
 
-        require(reservation._executor == _msgSender() || sender == _msgSender() ,
+        require(reservation._expiryBlockNum != 0, "ERC20Reservable: reservation does not exist");
+        require(_msgSender() == sender || _msgSender() == reservation._executor,
             "ERC20Reservable: this address is not authorized to execute this reservation");
         require(reservation._expiryBlockNum > block.number,
             "ERC20Reservable: reservation has expired and cannot be executed");
         require(reservation._status == ReservationStatus.Active,
             "ERC20Reservable: invalid reservation status to execute");
 
+        address executor = reservation._executor;
+        address recipient = reservation._recipient;
         uint256 fee = reservation._fee;
         uint256 amount = reservation._amount;
         uint256 total = amount.add(fee);
-        address recipient = reservation._recipient;
-        address executor = reservation._executor;
 
         _reserved[sender][nonce]._status = ReservationStatus.Completed;
         _totalReserved[sender] = _totalReserved[sender].sub(total);
@@ -109,11 +115,11 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
 
     function reclaim(address sender, uint256 nonce) public returns (bool success) {
         Reservation storage reservation = _reserved[sender][nonce];
-        address executor = reservation._executor;
 
-        require(_msgSender() == sender || _msgSender() == executor,
+        require(reservation._expiryBlockNum != 0, "ERC20Reservable: reservation does not exist");
+        require(_msgSender() == sender || _msgSender() == reservation._executor,
             "ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender");
-        require(reservation._expiryBlockNum <= block.number || _msgSender() == executor,
+        require(reservation._expiryBlockNum <= block.number || _msgSender() == reservation._executor,
             "ERC20Reservable: reservation has not expired or you are not the executor and cannot be reclaimed");
         require(reservation._status == ReservationStatus.Active,
             "ERC20Reservable: invalid reservation status to reclaim");
