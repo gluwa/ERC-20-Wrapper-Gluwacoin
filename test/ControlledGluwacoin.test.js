@@ -135,15 +135,10 @@ describe('ControlledGluwacoin_Mint', function () {
     });
 
     it('controller cannot mint negative', async function () {
-
-        await this.token.mint(-2, { from: deployer });
-        // await expectRevert(
-        //     this.token.mint(-1.0, { from: deployer }),
-        //     'ERC20Controllable: only controllers can call this method'
-        // );
+        await this.token.mint(new BN('-2'), { from: deployer });
 
         // Asserting balance of contract/token to increase
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(MAX_UINT256.add(new BN('-2')));
     });
 
     it('controller cannot mint floating point', async function() {
@@ -368,7 +363,7 @@ describe('ControlledGluwacoin_Reserve', function () {
         await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
 
         expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
-        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount);
 
         var executor = deployer;
         var send_amount2 = new BN('10');
@@ -377,17 +372,40 @@ describe('ControlledGluwacoin_Reserve', function () {
         var expiryBlockNum = latestBlock.add(new BN('100'));
         var nonce = Date.now();
 
-        var signature = sign.sign(this.token.address, other, other_privateKey, another, send_amount, fee, nonce);
+        var signature = await sign.sign(this.token.address, other, other_privateKey, another, send_amount, fee, nonce);
 
         await this.token.reserve(other, another, executor, send_amount, fee, nonce, expiryBlockNum, signature, { from: deployer });
 
         send_amount = send_amount2;
+        nonce = nonce + 1;
 
         signature = sign.sign(this.token.address, other, other_privateKey, another, send_amount, fee, nonce);
 
         await expectRevert(
             this.token.reserve(other, another, executor, send_amount, fee, nonce, expiryBlockNum, signature, { from: deployer }),
             'ERC20Reservable: insufficient unreserved balance'
+        );
+    });
+
+    it('cannot reserve if amount = 0', async function () {
+        await this.token.mint(amount, { from: deployer });
+        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+
+        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount);
+
+        var executor = deployer;
+        var reserve_amount = new BN('0');
+        var reserve_fee = fee;
+        var latestBlock = await time.latestBlock();
+        var expiryBlockNum = latestBlock.add(new BN('100'));
+        var nonce = Date.now();
+
+        var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+
+        await expectRevert(
+            this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer }),
+            'ERC20Reservable: invalid reserve amount'
         );
     });
 
@@ -413,12 +431,12 @@ describe('ControlledGluwacoin_Reserve', function () {
         );
     });
 
-    it('cannot reserve if Nonce is already used', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+    it('cannot reserve if nonce is already used', async function () {
+        await this.token.mint(amount.add(amount), { from: deployer });
+        await this.token.methods['transfer(address,uint256)'](other, amount.add(amount), { from: deployer });
 
         expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
-        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.add(amount));
 
         var executor = deployer;
         var reserve_amount = amount.sub(fee);
@@ -433,7 +451,7 @@ describe('ControlledGluwacoin_Reserve', function () {
 
         await expectRevert(
             this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer }),
-            'ERC20Reservable: insufficient unreserved balance'
+            'ERC20Reservable: the sender used the nonce already'
         );
     });
 
@@ -695,7 +713,7 @@ describe('ControlledGluwacoin_Reclaim', function () {
         var nonce = Date.now();
         await expectRevert(
             this.token.reclaim(other, nonce, { from: deployer }),
-            'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
+            'ERC20Reservable: reservation does not exist'
         );
     });
 
@@ -703,7 +721,7 @@ describe('ControlledGluwacoin_Reclaim', function () {
         var nonce = Date.now();
         await expectRevert(
             this.token.reclaim(other, nonce, { from: other }),
-            'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
+            'ERC20Reservable: reservation does not exist'
         );
     });
 
@@ -711,7 +729,7 @@ describe('ControlledGluwacoin_Reclaim', function () {
         var nonce = Date.now();
         await expectRevert(
             this.token.reclaim(other, nonce, { from: another }),
-            'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
+            'ERC20Reservable: reservation does not exist'
         );
     });
 });
@@ -880,7 +898,7 @@ describe('ControlledGluwacoin_Execute', function () {
         var nonce = Date.now();
         await expectRevert(
             this.token.execute(other, nonce, { from: deployer }),
-            'ERC20Reservable: invalid reservation status to execute'
+            'ERC20Reservable: reservation does not exist'
         );
     });
 
