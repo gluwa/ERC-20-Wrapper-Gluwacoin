@@ -391,28 +391,6 @@ describe('ControlledGluwacoin_Reserve', function () {
         );
     });
 
-    it('cannot reserve if amount = 0', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
-
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
-        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-
-        var executor = deployer;
-        var reserve_amount = new BN('0');
-        var reserve_fee = fee;
-        var latestBlock = await time.latestBlock();
-        var expiryBlockNum = latestBlock.add(new BN('100'));
-        var nonce = Date.now();
-
-        var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
-
-        await expectRevert(
-            this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer }),
-            'ERC20Reservable: invalid reserve amount'
-        );
-    });
-
     it('cannot reserve if not amount + fee = 0', async function () {
         await this.token.mint(amount, { from: deployer });
         await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
