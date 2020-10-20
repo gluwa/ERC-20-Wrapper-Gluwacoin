@@ -515,8 +515,10 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('cannot reserve if Nonce is already used', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
         expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
@@ -539,8 +541,10 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('cannot reserve if signature is invalid', async function () {
-        await this.token.mint(amount, { from: deployer });
-        await this.token.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(amount, { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+        await this.token.mint(amount, { from: other });
 
         expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
