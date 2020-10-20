@@ -481,6 +481,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
         await this.token.reserve(other, another, executor, send_amount, fee, nonce, expiryBlockNum, signature, { from: deployer });
 
         send_amount = send_amount2;
+        nonce = Date.now();
 
         signature = sign.sign(this.token.address, other, other_privateKey, another, send_amount, fee, nonce);
 
@@ -514,14 +515,14 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
         );
     });
 
-    it('cannot reserve if Nonce is already used', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
-        await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
-        await this.token.mint(amount, { from: other });
+    it('cannot reserve if nonce is already used', async function () {
+        await this.baseToken.mint(amount.add(amount), { from: deployer });
+        await this.baseToken.methods['transfer(address,uint256)'](other, amount.add(amount), { from: deployer });
+        await this.baseToken.increaseAllowance(this.token.address, amount.add(amount), { from: other });
+        await this.token.mint(amount.add(amount), { from: other });
 
         expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
-        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.add(amount));
 
         var executor = deployer;
         var reserve_amount = amount.sub(fee);
@@ -536,7 +537,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
 
         await expectRevert(
             this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer }),
-            'ERC20Reservable: insufficient unreserved balance'
+            'ERC20Reservable: the sender used the nonce already'
         );
     });
 
@@ -754,7 +755,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
         var nonce = Date.now();
         await expectRevert(
             this.token.execute(other, nonce, { from: deployer }),
-            'ERC20Reservable: invalid reservation status to execute'
+            'ERC20Reservable: reservation does not exist'
         );
     });
 
@@ -915,7 +916,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
         var nonce = Date.now();
         await expectRevert(
             this.token.reclaim(other, nonce, { from: deployer }),
-            'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
+            'ERC20Reservable: reservation does not exist'
         );
     });
 
@@ -923,7 +924,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
         var nonce = Date.now();
         await expectRevert(
             this.token.reclaim(other, nonce, { from: other }),
-            'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
+            'ERC20Reservable: reservation does not exist'
         );
     });
 
@@ -931,7 +932,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
         var nonce = Date.now();
         await expectRevert(
             this.token.reclaim(other, nonce, { from: another }),
-            'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
+            'ERC20Reservable: reservation does not exist'
         );
     });
 
