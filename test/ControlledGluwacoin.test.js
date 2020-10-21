@@ -134,13 +134,6 @@ describe('ControlledGluwacoin_Mint', function () {
         expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal('0');
     });
 
-    it('controller cannot mint negative', async function () {
-        await this.token.mint(new BN('-2'), { from: deployer });
-
-        // Asserting balance of contract/token to increase
-        expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(MAX_UINT256.add(new BN('-2')));
-    });
-
     it('controller cannot mint floating point', async function() {
         await expectRevert(
             this.token.mint(5.6, { from: deployer }),
