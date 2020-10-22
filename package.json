@@ -1,5 +1,5 @@
 {
-  "name": "Gluwacoin",
+  "name": "ERC-20 Wrapper Gluwacoin",
   "version": "1.0.0",
   "description": "",
   "main": "networks.js",
@@ -25,13 +25,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gluwa/USD-Gluwacoin.git"
+    "url": "git+https://github.com/gluwa/ERC-20-Wrapper-Gluwacoin.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/gluwa/Gluwacoin/issues"
+    "url": "https://github.com/gluwa/ERC-20-Wrapper-Gluwacoin/issues"
   },
-  "homepage": "https://github.com/gluwa/Gluwacoin#readme"
+  "homepage": "https://github.com/gluwa/ERC-20-Wrapper-Gluwacoin#readme"
 }

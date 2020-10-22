@@ -7,7 +7,7 @@ const { BN, constants, expectEvent, expectRevert, time } = require('@openzeppeli
 const { ZERO_ADDRESS, MAX_UINT256 } = constants;
 
 // Load compiled artifacts
-const ControlledGluwacoin = contract.fromArtifact('ControlledGluwacoinMock');
+const ERC20PresetMinterPauser = contract.fromArtifact('ERC20PresetMinterPauserMockUpgradeSafe');
 const ERC20WrapperGluwacoin = contract.fromArtifact('ERC20WrapperGluwacoinMock');
 
 var sign = require('./signature');
@@ -29,7 +29,7 @@ describe('ERC20WrapperGluwacoin', function () {
 
     beforeEach(async function () {
         // Deploy a new ControlledGluwacoin contract for each test
-        this.baseToken = await ControlledGluwacoin.new('ControlledGluwacoin', 'CG', decimals, { from: deployer });
+        this.baseToken = await ERC20PresetMinterPauser.new('Gluwacoin', 'GC', { from: deployer });
         // Deploy a new ERC20WrapperGluwacoin contract for each test
         this.token = await ERC20WrapperGluwacoin.new(name, symbol, decimals, this.baseToken.address, { from: deployer });
     });
@@ -75,7 +75,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
 
     beforeEach(async function () {
         // Deploy a new ControlledGluwacoin contract for each test
-        this.baseToken = await ControlledGluwacoin.new('ControlledGluwacoin', 'CG', decimals, { from: deployer });
+        this.baseToken = await ERC20PresetMinterPauser.new('Gluwacoin', 'GC', { from: deployer });
         // Deploy a new ERC20WrapperGluwacoin contract for each test
         this.token = await ERC20WrapperGluwacoin.new(name, symbol, decimals, this.baseToken.address, { from: deployer });
     });
@@ -87,11 +87,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
     });
 
     it('other can mint', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
-
-        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
+        await this.baseToken.mint(other, amount, { from: deployer });
 
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
 
@@ -103,11 +99,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
     });
 
     it('other can mint MAX_UINT256', async function () {
-        await this.baseToken.mint(MAX_UINT256, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, MAX_UINT256, { from: deployer });
-
-        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(MAX_UINT256.toString());
-        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
+        await this.baseToken.mint(other, MAX_UINT256, { from: deployer });
 
         await this.baseToken.increaseAllowance(this.token.address, MAX_UINT256, { from: other });
 
@@ -125,11 +117,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
     });
 
     it('other can mint less than allowance', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
-
-        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
+        await this.baseToken.mint(other, amount, { from: deployer });
 
         await this.baseToken.increaseAllowance(this.token.address, new BN('2'), { from: other });
 
@@ -141,11 +129,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
     });
 
     it('other cannot mint more than allowance', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
-
-        expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-        expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
+        await this.baseToken.mint(other, amount, { from: deployer });
 
         await this.baseToken.increaseAllowance(this.token.address, new BN('1'), { from: other });
 
@@ -156,8 +140,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
     });
 
     it('mint emits a Mint event', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
 
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
 
@@ -167,8 +150,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
     });
 
     it('mint emits a Transfer event', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
 
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
 
@@ -178,8 +160,8 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
     });
 
     it('mint increases the totalSupply', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
+
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -187,8 +169,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
     });
 
     it('other can burn', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
 
         expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.toString());
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
@@ -209,8 +190,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
     });
 
     it('burn emits a Burnt event', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
 
         expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.toString());
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
@@ -229,8 +209,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
     });
 
     it('burn emits a Transfer event', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
 
         expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.toString());
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
@@ -249,8 +228,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
     });
 
     it('burn decreases the totalSupply', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
 
         expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.toString());
         expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
@@ -276,8 +254,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
     it('wrapper can mint ETHlessly', async function () {
         var total = amount.add(fee);
 
-        await this.baseToken.mint(total, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, total, { from: deployer });
+        await this.baseToken.mint(other, total, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, total, { from: other });
 
         var nonce = Date.now();
@@ -293,8 +270,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
     it('another can mint ETHlessly but wrapper gets the fee', async function () {
         var total = amount.add(fee);
 
-        await this.baseToken.mint(total, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, total, { from: deployer });
+        await this.baseToken.mint(other, total, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, total, { from: other });
 
         var nonce = Date.now();
@@ -310,8 +286,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
     it('wrapper can burn ETHlessly', async function () {
         var total = amount.add(fee);
 
-        await this.baseToken.mint(total, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, total, { from: deployer });
+        await this.baseToken.mint(other, total, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, total, { from: other });
         await this.token.mint(total, { from: other });
 
@@ -328,8 +303,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
     it('another can burn ETHlessly but wrapper gets the fee', async function () {
         var total = amount.add(fee);
 
-        await this.baseToken.mint(total, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, total, { from: deployer });
+        await this.baseToken.mint(other, total, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, total, { from: other });
         await this.token.mint(total, { from: other });
 
@@ -343,6 +317,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
         expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount);
     });
 });
+
 describe('ERC20WrapperGluwacoin_Reservable', function () {
     const [ deployer, other, another ] = accounts;
     const [ deployer_privateKey, other_privateKey, another_privateKey ] = privateKeys;
@@ -359,15 +334,14 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
 
     beforeEach(async function () {
         // Deploy a new ControlledGluwacoin contract for each test
-        this.baseToken = await ControlledGluwacoin.new('ControlledGluwacoin', 'CG', decimals, { from: deployer });
+        this.baseToken = await ERC20PresetMinterPauser.new('Gluwacoin', 'GC', { from: deployer });
         // Deploy a new ERC20WrapperGluwacoin contract for each test
         this.token = await ERC20WrapperGluwacoin.new(name, symbol, decimals, this.baseToken.address, { from: deployer });
     });
     /* Reservable related
     */
     it('can reserve', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -389,8 +363,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('cannot reserve with outdated expiryBlockNum', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -413,8 +386,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('cannot reserve with zero address as the executor', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -437,8 +409,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('cannot reserve if amount + fee > balance', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -461,8 +432,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('cannot reserve if amount + fee + reserved > balance', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -492,8 +462,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('cannot reserve if not amount + fee > 0', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -516,8 +485,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('cannot reserve if nonce is already used', async function () {
-        await this.baseToken.mint(amount.add(amount), { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount.add(amount), { from: deployer });
+        await this.baseToken.mint(other, amount.add(amount), { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount.add(amount), { from: other });
         await this.token.mint(amount.add(amount), { from: other });
 
@@ -542,8 +510,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('cannot reserve if signature is invalid', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -567,8 +534,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('getReservation works', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -596,8 +562,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('executor can execute', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -619,8 +584,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('sender can execute', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -642,8 +606,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('receiver cannot execute', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -668,8 +631,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('cannot execute expired reserve', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -696,8 +658,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('cannot execute executed reserve', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -724,8 +685,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('cannot execute reclaimed reserve', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -760,8 +720,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('executor can reclaim unexpired reserve', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -783,8 +742,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('executor can reclaim expired reserve', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -808,8 +766,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('sender can reclaim expired reserve', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -833,8 +790,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('sender cannot reclaim unexpired reserve', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -859,8 +815,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('receiver cannot reclaim unexpired reserve', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -885,8 +840,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('receiver cannot reclaim expired reserve', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -937,8 +891,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('reservedBalanceOf accurate after reserve', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -962,8 +915,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('unreservedBalanceOf accurate after reserve', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -987,8 +939,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('reservedBalanceOf accurate after execute', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -1016,8 +967,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('unreservedBalanceOf accurate after execute', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -1052,8 +1002,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('relayer can send ETHless transfer', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
@@ -1073,8 +1022,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
 
     it('cannot send ETHless transfer more than balance', async function () {
-        await this.baseToken.mint(amount, { from: deployer });
-        await this.baseToken.methods['transfer(address,uint256)'](other, amount, { from: deployer });
+        await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
 
