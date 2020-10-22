@@ -1,13 +1,12 @@
 {
   "manifestVersion": "2.2",
   "contracts": {
-    "ERC20WrapperGluwacoin": "ERC20WrapperGluwacoin",
-    "ControlledGluwacoin": "ControlledGluwacoin"
+    "ERC20WrapperGluwacoin": "ERC20WrapperGluwacoin"
   },
   "dependencies": {
     "@openzeppelin/contracts-ethereum-package": "^3.0.0"
   },
-  "name": "Gluwacoin",
+  "name": "ERC-20 Wrapper Gluwacoin",
   "version": "1.0.0",
   "compiler": {
     "compilerSettings": {

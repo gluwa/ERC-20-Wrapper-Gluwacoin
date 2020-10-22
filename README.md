@@ -1,8 +1,8 @@
 [![license](https://img.shields.io/github/license/jamesisaac/react-native-background-task.svg)](https://opensource.org/licenses/MIT)
 
-# Gluwacoin
+# ERC-20 Wrapper Gluwacoin
 
-Interoperable Stablecoin Standard
+ERC-20 to Gluwacoin Adapter
 
 ## What is Gluwacoin?
 
@@ -16,12 +16,6 @@ For more information, see [Gluwacoin](/Gluwacoin.md), [gluwacoin.com](https://gl
 
 This repository is composed of two different type of Gluwacoin: Controlled and ERC-20 Wrapper.
 
-### Controlled Gluwacoin
-
-Gluwacoin controlled by a centralized operator
-
-Read [Controlled Gluwacoin](Controlled%20Gluwacoin.md) for details.
-
 ### ERC-20 Wrapper Gluwacoin
 
 Gluwacoin backed by another [ERC-20](https://eips.ethereum.org/EIPS/eip-20) token
@@ -34,11 +28,6 @@ Read [ERC-20 Wrapper Gluwacoin](ERC-20%20Wrapper%20Gluwacoin.md) for details.
 
 ```commandline
 $ npm install
-```
-
-#### Installing OpenZeppelin
-```commandline
-$ npm install @openzeppelin/cli
 ```
 
 #### Initializing the openzeppelin project
@@ -64,25 +53,6 @@ $ npx ganache-cli --deterministic
 Note that the current version of Ganache does not work on `Node 14`.
 We are using `Node 12`.
 https://github.com/trufflesuite/ganache-cli/issues/732
-
-#### Deploy ERC20 token
-```commandline
-% npx oz deploy
-
-Nothing to compile, all contracts are up to date.
-? Choose the kind of deployment regular
-? Pick a network development
-? Pick a contract to deploy @openzeppelin/contracts-ethereum-package/ERC20PresetMinterPauserUpgradeSafe
-✓ Deployed instance of ERC20PresetMinterPauserUpgradeSafe
-All implementations are up to date
-? Call a function to initialize the instance after creating it? Yes
-? Select which function initialize(name: string, symbol: string)
-? name: string: Token
-? symbol: string: T
-✓ Instance created at [ADRESS OF THE CONTRACT]
-To upgrade this instance run 'oz upgrade'
-[ADRESS OF THE CONTRACT]
-```
 
 #### Deploy ERC20Wrapper token
 ```commandline
