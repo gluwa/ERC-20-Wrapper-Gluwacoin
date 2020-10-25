@@ -80,91 +80,143 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
     /* Wrapper related
     */
     describe('mint test', async function () {
-        it('other can mint', async function () {
+        // minter
+        it('another can mint', async function () {
             var baseToken_amount = amount;
             var allowance_amount = baseToken_amount;
             var mint_amount = allowance_amount;
+            var minter = other;
 
             await this.baseToken.mint(other, baseToken_amount, { from: deployer });
             await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
-            await this.token.mint(mint_amount, { from: other });
+            await this.token.mint(mint_amount, { from: minter });
 
             expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.baseToken.balanceOf(this.token.address)).to.be.bignumber.equal(mint_amount);
             expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
             expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
         });
-    
-        it('other can mint MAX_UINT256', async function () {
+
+        // amount
+        it('can mint MAX_UINT256', async function () {
             var baseToken_amount = MAX_UINT256;
             var allowance_amount = baseToken_amount;
             var mint_amount = allowance_amount;
+            var minter = other;
 
             await this.baseToken.mint(other, baseToken_amount, { from: deployer });
             await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
-            await this.token.mint(mint_amount, { from: other });
+            await this.token.mint(mint_amount, { from: minter });
     
             expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
             expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
             expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
         });
     
-        it('other can mint 0', async function () {
+        it('can mint 0', async function () {
             var mint_amount = new BN('0');
+            var minter = other;
 
-            await this.token.mint(mint_amount, { from: other });
+            await this.token.mint(mint_amount, { from: minter });
 
             expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
             expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
         });
-    
-        it('other can mint less than allowance', async function () {
+
+        // allowance
+        it('can mint less than allowance', async function () {
             var baseToken_amount = amount;
             var allowance_amount = baseToken_amount;
             var mint_amount = allowance_amount.sub(new BN('1'));
+            var minter = other;
 
             await this.baseToken.mint(other, baseToken_amount, { from: deployer });
             await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
-            await this.token.mint(mint_amount, { from: other });
+            await this.token.mint(mint_amount, { from: minter });
     
             expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
             expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
             expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
         });
     
-        it('other cannot mint more than allowance', async function () {
+        it('cannot mint more than allowance', async function () {
             var baseToken_amount = MAX_UINT256;
             var allowance_amount = amount;
             var mint_amount = allowance_amount.add(new BN('1'));
+            var minter = other;
 
             await this.baseToken.mint(other, baseToken_amount, { from: deployer });
             await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
             await expectRevert(
-                this.token.mint(mint_amount, { from: other }),
+                this.token.mint(mint_amount, { from: minter }),
                 'ERC20: transfer amount exceeds allowance'
             );
         });
-    
-        it('mint increases the totalSupply', async function () {
+
+        // balance
+        it('mint decreases the balance of baseToken of the user by the minted amount', async function () {
             var baseToken_amount = amount;
             var allowance_amount = baseToken_amount;
             var mint_amount = allowance_amount;
+            var minter = other;
 
             await this.baseToken.mint(other, baseToken_amount, { from: deployer });
             await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
-            await this.token.mint(mint_amount, { from: other });
-    
+            await this.token.mint(mint_amount, { from: minter });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+        });
+
+        it('mint increases the balance of baseToken of the contract by the minted amount', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var minter = other;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: minter });
+
+            expect(await this.baseToken.balanceOf(this.token.address)).to.be.bignumber.equal(mint_amount);
+        });
+
+        it('mint increases the balance of token for the user by the minted amount', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var minter = other;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: minter });
+
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+        });
+
+        it('mint increases the totalSupply of token by the minted amount', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var minter = other;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: minter });
+
             expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
         });
 
+        // event
         it('mint emits a Mint event', async function () {
             var baseToken_amount = amount;
             var allowance_amount = baseToken_amount;
             var mint_amount = allowance_amount;
+            var minter = other;
 
             await this.baseToken.mint(other, baseToken_amount, { from: deployer });
             await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
 
-            const receipt = await this.token.mint(mint_amount, { from: other });
+            const receipt = await this.token.mint(mint_amount, { from: minter });
 
             expectEvent(receipt, 'Mint', { _mintTo: other, _value: mint_amount });
         });
@@ -173,18 +225,263 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var baseToken_amount = amount;
             var allowance_amount = baseToken_amount;
             var mint_amount = allowance_amount;
+            var minter = other;
 
             await this.baseToken.mint(other, baseToken_amount, { from: deployer });
             await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
 
-            const receipt = await this.token.mint(mint_amount, { from: other });
+            const receipt = await this.token.mint(mint_amount, { from: minter });
+
+            expectEvent(receipt, 'Transfer', { from: ZERO_ADDRESS, to: other, value: mint_amount });
+        });
+    });
+
+    describe('ETHless mint test', async function () {
+        // minter
+        it('wrapper can ETHless mint', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var mint_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var minter = wrapper;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, mint_amount, mint_fee, nonce, signature, { from: minter });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.baseToken.balanceOf(this.token.address)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount.sub(mint_fee));
+            expect(await this.token.balanceOf(wrapper)).to.be.bignumber.equal(mint_fee);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+        });
+
+        it('non-wrapper can ETHless mint', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var mint_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var minter = other;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, mint_amount, mint_fee, nonce, signature, { from: minter });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount.sub(mint_fee));
+            expect(await this.token.balanceOf(wrapper)).to.be.bignumber.equal(mint_fee);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+        });
+
+        // amount
+        it('can ETHless mint MAX_UINT256', async function () {
+            var baseToken_amount = MAX_UINT256;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var mint_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var minter = other;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, mint_amount, mint_fee, nonce, signature, { from: minter });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount.sub(mint_fee));
+            expect(await this.token.balanceOf(wrapper)).to.be.bignumber.equal(mint_fee);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+        });
+
+        it('can ETHless mint 0', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = new BN('0');
+            var mint_fee = new BN('0');
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var minter = other;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, mint_amount, mint_fee, nonce, signature, { from: minter });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount.sub(mint_fee));
+            expect(await this.token.balanceOf(wrapper)).to.be.bignumber.equal(mint_fee);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+        });
+
+        // allowance
+        it('can ETHless mint less than allowance', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount.sub(new BN('1'));
+            var mint_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var minter = other;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, mint_amount, mint_fee, nonce, signature, { from: minter });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount.sub(mint_fee));
+            expect(await this.token.balanceOf(wrapper)).to.be.bignumber.equal(mint_fee);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+        });
+
+        it('cannot ETHless mint more than allowance', async function () {
+            var baseToken_amount = MAX_UINT256;
+            var allowance_amount = amount;
+            var mint_amount = allowance_amount.add(new BN('1'));
+            var mint_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var minter = other;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await expectRevert(
+                this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, mint_amount, mint_fee, nonce, signature, { from: deployer }),
+                'ERC20: transfer amount exceeds allowance'
+            );
+        });
+
+        // balance
+        it('ETHless mint decreases the balance of baseToken of the user by the minted amount', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var mint_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var minter = another;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, mint_amount, mint_fee, nonce, signature, { from: minter });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+        });
+
+        it('ETHless mint increases the balance of baseToken of the contract by the minted amount', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var mint_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var minter = another;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, mint_amount, mint_fee, nonce, signature, { from: minter });
+
+            expect(await this.baseToken.balanceOf(this.token.address)).to.be.bignumber.equal(mint_amount);
+        });
+
+        it('ETHless mint increases the balance of token for the user by the minted amount deducted by fee', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var mint_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var minter = another;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, mint_amount, mint_fee, nonce, signature, { from: minter });
+
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount.sub(mint_fee));
+        });
+
+        it('ETHless mint increases the balance of token for the wrapper by fee', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var mint_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var minter = wrapper;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, mint_amount, mint_fee, nonce, signature, { from: minter });
+
+            expect(await this.token.balanceOf(wrapper)).to.be.bignumber.equal(mint_fee);
+        });
+
+        it('ETHless mint increases the totalSupply of token by the minted amount', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var mint_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var minter = wrapper;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, mint_amount, mint_fee, nonce, signature, { from: minter });
+
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+        });
+
+        // event
+        it('ETHless mint emits a Mint event', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var mint_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+
+            const receipt = await this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, mint_amount, mint_fee, nonce, signature, { from: deployer });
+
+            expectEvent(receipt, 'Mint', { _mintTo: other, _value: mint_amount });
+        });
+
+        it('ETHless mint emits a Transfer event', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var mint_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+
+            const receipt = await this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, mint_amount, mint_fee, nonce, signature, { from: deployer });
 
             expectEvent(receipt, 'Transfer', { from: ZERO_ADDRESS, to: other, value: mint_amount });
         });
     });
 
     describe('burn test', async function () {
-        it('other can burn', async function () {
+        // amount
+        it('can burn', async function () {
             var baseToken_amount = amount;
             var allowance_amount = baseToken_amount;
             var mint_amount = allowance_amount;
@@ -205,7 +502,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount.sub(burn_amount));
         });
 
-        it('other can burn MAX_UINT256', async function () {
+        it('can burn MAX_UINT256', async function () {
             var baseToken_amount = MAX_UINT256;
             var allowance_amount = baseToken_amount;
             var mint_amount = allowance_amount;
@@ -226,11 +523,11 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount.sub(burn_amount));
         });
 
-        it('other can burn 0', async function () {
+        it('can burn 0', async function () {
             await this.token.burn(0, { from: other });
         });
 
-        it('other can burn less than its balance', async function () {
+        it('can burn less than its balance', async function () {
             var baseToken_amount = amount;
             var allowance_amount = baseToken_amount;
             var mint_amount = allowance_amount;
@@ -251,7 +548,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount.sub(burn_amount));
         });
 
-        it('other cannot burn more than its balance', async function () {
+        it('cannot burn more than its balance', async function () {
             var baseToken_amount = amount;
             var allowance_amount = baseToken_amount;
             var mint_amount = allowance_amount;
@@ -270,8 +567,9 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
                 'ERC20: transfer amount exceeds balance'
             );
         });
-    
-        it('burn decreases the totalSupply', async function () {
+
+        // balance
+        it('burn increases the bakeToken balance of user by burn amount', async function () {
             var baseToken_amount = amount;
             var allowance_amount = baseToken_amount;
             var mint_amount = allowance_amount;
@@ -280,11 +578,82 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             await this.baseToken.mint(other, baseToken_amount, { from: deployer });
             await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
             await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            var original_amount = await this.baseToken.balanceOf(other);
+
             await this.token.burn(burn_amount, { from: other });
 
-            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount.sub(burn_amount));
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(original_amount.add(burn_amount));
         });
 
+        it('burn decreases the bakeToken balance of the contract by burn amount', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            var original_amount = await this.baseToken.balanceOf(this.token.address);
+
+            await this.token.burn(burn_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(this.token.address)).to.be.bignumber.equal(original_amount.sub(burn_amount));
+        });
+
+        it('burn decreases the balance of user by burn amount', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            var original_amount = await this.token.balanceOf(other);
+
+            await this.token.burn(burn_amount, { from: other });
+
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(original_amount.sub(burn_amount));
+        });
+
+        it('burn decreases the totalSupply of the token by burn amount', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            var original_amount = await this.baseToken.balanceOf(this.token.address);
+
+            await this.token.burn(burn_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(this.token.address)).to.be.bignumber.equal(original_amount.sub(burn_amount));
+        });
+
+        // event
         it('burn emits a Burnt event', async function () {
             var baseToken_amount = amount;
             var allowance_amount = baseToken_amount;
@@ -316,95 +685,339 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
         });
     });
 
+    describe('ETHlessburn test', async function () {
+        // burner
+        it('wrapper can ETHless burn', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount;
+            var burn_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var burner = wrapper;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount).add(burn_amount).sub(burn_fee));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount.sub(burn_amount));
+            expect(await this.token.balanceOf(wrapper)).to.be.bignumber.equal(burn_fee);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount.sub(burn_amount).add(burn_fee));
+        });
+
+        it('non-wrapper can ETHless burn', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount;
+            var burn_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var burner = another;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount).add(burn_amount).sub(burn_fee));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount.sub(burn_amount));
+            expect(await this.token.balanceOf(wrapper)).to.be.bignumber.equal(burn_fee);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount.sub(burn_amount).add(burn_fee));
+        });
+
+        // amount
+        it('can ETHless burn MAX_UINT256', async function () {
+            var baseToken_amount = MAX_UINT256;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount;
+            var burn_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var burner = another;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount).add(burn_amount).sub(burn_fee));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount.sub(burn_amount));
+            expect(await this.token.balanceOf(wrapper)).to.be.bignumber.equal(burn_fee);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount.sub(burn_amount).add(burn_fee));
+        });
+
+        it('can ETHless burn 0', async function () {
+            var burn_amount = 0;
+            var burn_fee = 0;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var burner = another;
+
+            await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, 0, 0, nonce, signature, { from: burner });
+        });
+
+        it('can ETHless burn less than its balance', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount.sub(new BN('1'));
+            var burn_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var burner = another;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount).add(burn_amount).sub(burn_fee));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount.sub(burn_amount));
+            expect(await this.token.balanceOf(wrapper)).to.be.bignumber.equal(burn_fee);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount.sub(burn_amount).add(burn_fee));
+        });
+
+        it('cannot ETHless burn more than its balance', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount.add(new BN('1'));
+            var burn_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var burner = another;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            await expectRevert(
+                this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner }),
+                'ERC20Reservable: transfer amount exceeds unreserved balance'
+            );
+        });
+
+        // balance
+        it('ETHless burn increases the bakeToken balance of user by burn amount deducted by fee', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount;
+            var burn_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var burner = another;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            var original_amount = await this.baseToken.balanceOf(other);
+
+            await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(original_amount.add(burn_amount).sub(burn_fee));
+        });
+
+        it('ETHless burn decreases the bakeToken balance of the contract by burn amount deducted by fee', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount;
+            var burn_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var burner = another;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            var original_amount = await this.baseToken.balanceOf(this.token.address);
+
+            await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner });
+
+            expect(await this.baseToken.balanceOf(this.token.address)).to.be.bignumber.equal(original_amount.sub(burn_amount).add(burn_fee));
+        });
+
+        it('ETHless burn decreases the balance of user by burn amount', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount;
+            var burn_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var burner = another;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            var original_amount = await this.token.balanceOf(other);
+
+            await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner });
+
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(original_amount.sub(burn_amount));
+        });
+
+        it('ETHless burn increases the balance of wrapper by burn fee', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount;
+            var burn_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var burner = another;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            var original_amount = await this.token.balanceOf(wrapper);
+
+            await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner });
+
+            expect(await this.token.balanceOf(wrapper)).to.be.bignumber.equal(original_amount.add(burn_fee));
+        });
+
+        it('ETHless burn decreases the totalSupply of the token by burn amount', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount;
+            var burn_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var burner = another;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            var original_amount = await this.token.totalSupply();
+
+            await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner });
+
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(original_amount.sub(burn_amount).add(burn_fee));
+        });
+
+        // event
+        it('burn emits a Burnt event', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount;
+            var burn_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var burner = another;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            const receipt = await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner });
+
+            expectEvent(receipt, 'Burnt', { _burnFrom: other, _value: burn_amount.sub(burn_fee) });
+        });
+
+        it('burn emits a Transfer event', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount;
+            var burn_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var burner = another;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            const receipt = await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner });
+
+            expectEvent(receipt, 'Transfer', { from: other, to: wrapper, value: burn_fee });
+        });
+    });
+
     describe('wrapper test', async function () {
         const total = amount.add(fee);
 
         it('deployer has the default wrapper role', async function () {
             expect(await this.token.getRoleMemberCount(WRAPPER_ROLE)).to.be.bignumber.equal('1');
             expect(await this.token.getRoleMember(WRAPPER_ROLE, 0)).to.equal(deployer);
-        });
-    
-        it('wrapper can mint ETHlessly', async function () {  
-            await this.baseToken.mint(other, amount, { from: deployer });
-            await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
-    
-            var nonce = Date.now();
-    
-            var signature = sign.sign(this.token.address, other, other_privateKey, this.token.address, amount, fee, nonce);
-            await this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, amount, fee, nonce, signature, { from: deployer });
-    
-            expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(fee);
-            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.sub(fee));
-            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
-        });
-
-        it('ETHless mint emits a Mint event', async function () {
-            await this.baseToken.mint(other, total, { from: deployer });
-            await this.baseToken.increaseAllowance(this.token.address, total, { from: other });
-    
-            var nonce = Date.now();
-    
-            var signature = sign.sign(this.token.address, other, other_privateKey, this.token.address, amount, fee, nonce);
-            var receipt = await this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, amount, fee, nonce, signature, { from: deployer });
-
-            expectEvent(receipt, 'Mint', {_mintTo: other, _value: amount });
-        });
-    
-        it('another can mint ETHlessly but wrapper gets the fee', async function () {
-            await this.baseToken.mint(other, amount, { from: deployer });
-            await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
-    
-            var nonce = Date.now();
-    
-            var signature = sign.sign(this.token.address, other, other_privateKey, this.token.address, amount, fee, nonce);
-            await this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, amount, fee, nonce, signature, { from: another });
-    
-            expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(fee);
-            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.sub(fee));
-            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
-        });
-    
-        it('wrapper can burn ETHlessly', async function () {
-            await this.baseToken.mint(other, amount, { from: deployer });
-            await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
-            await this.token.mint(amount, { from: other });
-    
-            var nonce = Date.now();
-    
-            var signature = sign.sign(this.token.address, other, other_privateKey, this.token.address, amount, fee, nonce);
-            await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, amount, fee, nonce, signature, { from: deployer });
-    
-            expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(fee);
-            expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
-            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.sub(fee));
-        });
-
-        it('ETHless burn emits a Burnt event', async function () {
-            await this.baseToken.mint(other, total, { from: deployer });
-            await this.baseToken.increaseAllowance(this.token.address, total, { from: other });
-            await this.token.mint(total, { from: other });
-    
-            var nonce = Date.now();
-    
-            var signature = sign.sign(this.token.address, other, other_privateKey, this.token.address, amount, fee, nonce);
-            receipt = await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, amount, fee, nonce, signature, { from: deployer });
-
-            expectEvent(receipt, 'Burnt', { _burnFrom: other, _value: amount.sub(fee) });
-        });
-    
-        it('another can burn ETHlessly but wrapper gets the fee', async function () {
-            await this.baseToken.mint(other, amount, { from: deployer });
-            await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
-            await this.token.mint(amount, { from: other });
-    
-            var nonce = Date.now();
-    
-            var signature = sign.sign(this.token.address, other, other_privateKey, this.token.address, amount, fee, nonce);
-            await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, amount, fee, nonce, signature, { from: another });
-    
-            expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(fee);
-            expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
-            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.sub(fee));
         });
     });  
 });
