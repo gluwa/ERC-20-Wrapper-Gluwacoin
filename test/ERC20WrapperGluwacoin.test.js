@@ -244,7 +244,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = wrapper;
 
@@ -265,7 +265,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = other;
 
@@ -286,7 +286,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = other;
 
@@ -306,7 +306,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var mint_amount = new BN('0');
             var mint_fee = new BN('0');
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = other;
 
@@ -327,7 +327,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var mint_amount = allowance_amount.sub(new BN('1'));
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = other;
 
@@ -347,7 +347,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var mint_amount = allowance_amount.add(new BN('1'));
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = other;
 
@@ -366,7 +366,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = another;
 
@@ -383,7 +383,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = another;
 
@@ -400,7 +400,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = another;
 
@@ -417,7 +417,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = wrapper;
 
@@ -434,7 +434,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = wrapper;
 
@@ -445,6 +445,44 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
         });
 
+        // signature
+        it('cannot ETHless mint with a signature with used nonce', async function () {
+            var baseToken_amount = MAX_UINT256;
+            var allowance_amount = MAX_UINT256;
+            var mint_amount = amount;
+            var mint_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var minter = other;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, mint_amount, mint_fee, nonce, signature, { from: minter });
+            await expectRevert(
+                this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, mint_amount, mint_fee, nonce, signature, { from: minter }),
+                'ERC20Wrapper: the nonce has already been used for this address'
+            );
+        });
+
+        it('cannot ETHless mint with invalid signature', async function () {
+            var baseToken_amount = MAX_UINT256;
+            var allowance_amount = MAX_UINT256;
+            var mint_amount = amount;
+            var mint_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signWrapper(this.token.address, another, another_privateKey, mint_amount, mint_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var minter = other;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await expectRevert(
+                this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, mint_amount, mint_fee, nonce, signature, { from: minter }),
+                'Validate: invalid signature'
+            );
+        });
+
         // event
         it('ETHless mint emits a Mint event', async function () {
             var baseToken_amount = amount;
@@ -452,7 +490,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
 
             await this.baseToken.mint(other, baseToken_amount, { from: deployer });
             await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
@@ -468,7 +506,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
 
             await this.baseToken.mint(other, baseToken_amount, { from: deployer });
             await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
@@ -694,7 +732,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = wrapper;
 
@@ -721,7 +759,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -749,7 +787,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -773,7 +811,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var burn_amount = 0;
             var burn_fee = 0;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var burner = another;
 
             await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, 0, 0, nonce, signature, { from: burner });
@@ -786,7 +824,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var burn_amount = mint_amount.sub(new BN('1'));
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -813,7 +851,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var burn_amount = mint_amount.add(new BN('1'));
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -839,7 +877,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -865,7 +903,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -891,7 +929,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -917,7 +955,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -943,7 +981,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -962,15 +1000,67 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             expect(await this.token.totalSupply()).to.be.bignumber.equal(original_amount.sub(burn_amount).add(burn_fee));
         });
 
-        // event
-        it('burn emits a Burnt event', async function () {
+        // signature
+        it('cannot ETHless burn with a signature with used nonce', async function () {
             var baseToken_amount = amount;
             var allowance_amount = baseToken_amount;
             var mint_amount = allowance_amount;
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var burner = another;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner });
+            await expectRevert(
+                this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner }),
+                'ERC20Wrapper: the nonce has already been used for this address'
+            );
+        });
+
+        it('non-wrapper can ETHless burn', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount;
+            var burn_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signWrapper(this.token.address, another, another_privateKey, burn_amount, burn_fee, nonce);
+            var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
+            var burner = another;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            await expectRevert(
+                this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner }),
+                'Validate: invalid signature'
+            );
+        });
+
+        // event
+        it('ETHless burn emits a Burnt event', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount;
+            var burn_fee = fee;
+            var nonce = Date.now();
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -987,14 +1077,14 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             expectEvent(receipt, 'Burnt', { _burnFrom: other, _value: burn_amount.sub(burn_fee) });
         });
 
-        it('burn emits a Transfer event', async function () {
+        it('ETHless burn emits a Transfer event', async function () {
             var baseToken_amount = amount;
             var allowance_amount = baseToken_amount;
             var mint_amount = allowance_amount;
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signMint(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -1044,7 +1134,6 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     });
     /* Reservable related
     */
-
     describe('reserve test', async function () {
         it('can reserve', async function () {
             await this.baseToken.mint(other, amount, { from: deployer });
