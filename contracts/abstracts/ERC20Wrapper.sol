@@ -80,7 +80,7 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
      */
     function mint(address minter, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig) public {
         _useWrapperNonce(minter, nonce);
-        Validate.validateSignature(address(this), minter, address(this), amount, fee, nonce, sig);
+        Validate.validateWrapperSignature(address(this), minter, amount, fee, nonce, sig);
 
         __mint(minter, amount);
 
@@ -116,7 +116,7 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
      */
     function burn(address burner, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig) public {
         _useWrapperNonce(burner, nonce);
-        Validate.validateSignature(address(this), burner, address(this), amount, fee, nonce, sig);
+        Validate.validateWrapperSignature(address(this), burner, amount, fee, nonce, sig);
 
         address wrapper = getRoleMember(WRAPPER_ROLE, 0);
         _transfer(burner, wrapper, fee);
