@@ -259,8 +259,8 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
         });
     
         it('wrapper can mint ETHlessly', async function () {  
-            await this.baseToken.mint(other, total, { from: deployer });
-            await this.baseToken.increaseAllowance(this.token.address, total, { from: other });
+            await this.baseToken.mint(other, amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
     
             var nonce = Date.now();
     
@@ -268,7 +268,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             await this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, amount, fee, nonce, signature, { from: deployer });
     
             expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(fee);
-            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount);
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.sub(fee));
             expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         });
 
@@ -285,8 +285,8 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
         });
     
         it('another can mint ETHlessly but wrapper gets the fee', async function () {
-            await this.baseToken.mint(other, total, { from: deployer });
-            await this.baseToken.increaseAllowance(this.token.address, total, { from: other });
+            await this.baseToken.mint(other, amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
     
             var nonce = Date.now();
     
@@ -294,14 +294,14 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             await this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, amount, fee, nonce, signature, { from: another });
     
             expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(fee);
-            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount);
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.sub(fee));
             expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
         });
     
         it('wrapper can burn ETHlessly', async function () {
-            await this.baseToken.mint(other, total, { from: deployer });
-            await this.baseToken.increaseAllowance(this.token.address, total, { from: other });
-            await this.token.mint(total, { from: other });
+            await this.baseToken.mint(other, amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+            await this.token.mint(amount, { from: other });
     
             var nonce = Date.now();
     
@@ -310,7 +310,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
     
             expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(fee);
             expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
-            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount);
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.sub(fee));
         });
 
         it('ETHless burn emits a Burnt event', async function () {
@@ -323,13 +323,13 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             var signature = sign.sign(this.token.address, other, other_privateKey, this.token.address, amount, fee, nonce);
             receipt = await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, amount, fee, nonce, signature, { from: deployer });
 
-            expectEvent(receipt, 'Burnt', { _burnFrom: other, _value: amount });
+            expectEvent(receipt, 'Burnt', { _burnFrom: other, _value: amount.sub(fee) });
         });
     
         it('another can burn ETHlessly but wrapper gets the fee', async function () {
-            await this.baseToken.mint(other, total, { from: deployer });
-            await this.baseToken.increaseAllowance(this.token.address, total, { from: other });
-            await this.token.mint(total, { from: other });
+            await this.baseToken.mint(other, amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
+            await this.token.mint(amount, { from: other });
     
             var nonce = Date.now();
     
@@ -338,7 +338,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
     
             expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(fee);
             expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
-            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount);
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.sub(fee));
         });
     });  
 });
