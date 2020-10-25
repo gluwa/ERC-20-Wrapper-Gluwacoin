@@ -12,11 +12,7 @@ The Gluwacoin Trust proposed the standard. This repository is the official imple
 
 For more information, see [Gluwacoin](/Gluwacoin.md), [gluwacoin.com](https://gluwacoin.com), or the [original whitepaper](https://gluwacoin.com/white-paper).
 
-## Types
-
-This repository is composed of two different type of Gluwacoin: Controlled and ERC-20 Wrapper.
-
-### ERC-20 Wrapper Gluwacoin
+## ERC-20 Wrapper Gluwacoin
 
 Gluwacoin backed by another [ERC-20](https://eips.ethereum.org/EIPS/eip-20) token
 
