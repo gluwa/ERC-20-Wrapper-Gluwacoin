@@ -15,17 +15,10 @@ var sign = require('./signature');
 // Start test block
 describe('ERC20WrapperGluwacoin', function () {
     const [ deployer, other, another ] = accounts;
-    const [ deployer_privateKey, other_privateKey, another_privateKey ] = privateKeys;
 
     const name = 'ERC20WrapperGluwacoin';
     const symbol = 'WG';
     const decimals = new BN('18');
-
-    const amount = new BN('5000');
-    const fee = new BN('1');
-
-    const WRAPPER_ROLE = web3.utils.soliditySha3('WRAPPER_ROLE');
-    const RELAYER_ROLE = web3.utils.soliditySha3('RELAYER_ROLE');
 
     beforeEach(async function () {
         // Deploy a new ControlledGluwacoin contract for each test
@@ -88,165 +81,238 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
     */
     describe('mint test', async function () {
         it('other can mint', async function () {
-            await this.baseToken.mint(other, amount, { from: deployer });
-    
-            await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
-    
-            await this.token.mint(amount, { from: other });
-    
-            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
-            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-            expect(await this.token.totalSupply()).to.be.bignumber.equal(amount.toString());
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
         });
     
         it('other can mint MAX_UINT256', async function () {
-            await this.baseToken.mint(other, MAX_UINT256, { from: deployer });
+            var baseToken_amount = MAX_UINT256;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
     
-            await this.baseToken.increaseAllowance(this.token.address, MAX_UINT256, { from: other });
-    
-            await this.token.mint(MAX_UINT256, { from: other });
-    
-            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
-            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(MAX_UINT256.toString());
-            expect(await this.token.totalSupply()).to.be.bignumber.equal(MAX_UINT256.toString());
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
         });
     
         it('other can mint 0', async function () {
-            await this.token.mint(0, { from: other });
-            expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
-            expect(await this.token.totalSupply()).to.be.bignumber.equal('0');
+            var mint_amount = new BN('0');
+
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
         });
     
         it('other can mint less than allowance', async function () {
-            await this.baseToken.mint(other, amount, { from: deployer });
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount.sub(new BN('1'));
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
     
-            await this.baseToken.increaseAllowance(this.token.address, new BN('2'), { from: other });
-    
-            await this.token.mint(new BN('1'), { from: other });
-    
-            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.sub(new BN('1')));
-            expect(await this.token.balanceOf(other)).to.be.bignumber.equal('1');
-            expect(await this.token.totalSupply()).to.be.bignumber.equal('1');
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
         });
     
         it('other cannot mint more than allowance', async function () {
-            await this.baseToken.mint(other, amount, { from: deployer });
-    
-            await this.baseToken.increaseAllowance(this.token.address, new BN('1'), { from: other });
-    
+            var baseToken_amount = MAX_UINT256;
+            var allowance_amount = amount;
+            var mint_amount = allowance_amount.add(new BN('1'));
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
             await expectRevert(
-                this.token.mint(new BN('2'), { from: other }),
+                this.token.mint(mint_amount, { from: other }),
                 'ERC20: transfer amount exceeds allowance'
             );
         });
     
-        it('mint emits a Mint event', async function () {
-            await this.baseToken.mint(other, amount, { from: deployer });
-    
-            await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
-    
-            const receipt = await this.token.mint(amount, { from: other });
-    
-            expectEvent(receipt, 'Mint', { _mintTo: other, _value: amount });
-        });
-    
-        it('mint emits a Transfer event', async function () {
-            await this.baseToken.mint(other, amount, { from: deployer });
-    
-            await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
-    
-            const receipt = await this.token.mint(amount, { from: other });
-    
-            expectEvent(receipt, 'Transfer', { from: ZERO_ADDRESS, to: other, value: amount });
-        });
-    
         it('mint increases the totalSupply', async function () {
-            await this.baseToken.mint(other, amount, { from: deployer });
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
     
-            await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
-            await this.token.mint(amount, { from: other });
-    
-            expect(await this.token.totalSupply()).to.be.bignumber.equal(amount.toString());
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+        });
+
+        it('mint emits a Mint event', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+
+            const receipt = await this.token.mint(mint_amount, { from: other });
+
+            expectEvent(receipt, 'Mint', { _mintTo: other, _value: mint_amount });
+        });
+
+        it('mint emits a Transfer event', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+
+            const receipt = await this.token.mint(mint_amount, { from: other });
+
+            expectEvent(receipt, 'Transfer', { from: ZERO_ADDRESS, to: other, value: mint_amount });
         });
     });
 
     describe('burn test', async function () {
         it('other can burn', async function () {
-            await this.baseToken.mint(other, amount, { from: deployer });
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
     
-            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-            expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
     
-            await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
-    
-            await this.token.mint(amount, { from: other });
-    
-            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
-            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-            expect(await this.token.totalSupply()).to.be.bignumber.equal(amount.toString());
-    
-            await this.token.burn(amount, { from: other });
-    
-            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-            expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
-            expect(await this.token.totalSupply()).to.be.bignumber.equal('0');
+            await this.token.burn(burn_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount).add(burn_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount.sub(burn_amount));
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount.sub(burn_amount));
         });
-    
-        it('burn emits a Burnt event', async function () {
-            await this.baseToken.mint(other, amount, { from: deployer });
-    
-            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-            expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
-    
-            await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
-    
-            await this.token.mint(amount, { from: other });
-    
-            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
-            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-            expect(await this.token.totalSupply()).to.be.bignumber.equal(amount.toString());
-    
-            const receipt = await this.token.burn(amount, { from: other });
-    
-            expectEvent(receipt, 'Burnt', { _burnFrom: other, _value: amount });
+
+        it('other can burn MAX_UINT256', async function () {
+            var baseToken_amount = MAX_UINT256;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            await this.token.burn(burn_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount).add(burn_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount.sub(burn_amount));
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount.sub(burn_amount));
         });
-    
-        it('burn emits a Transfer event', async function () {
-            await this.baseToken.mint(other, amount, { from: deployer });
-    
-            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-            expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
-    
-            await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
-    
-            await this.token.mint(amount, { from: other });
-    
-            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
-            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-            expect(await this.token.totalSupply()).to.be.bignumber.equal(amount.toString());
-    
-            const receipt = await this.token.burn(amount, { from: other });
-    
-            expectEvent(receipt, 'Transfer', { from: other, to: ZERO_ADDRESS, value: amount });
+
+        it('other can burn 0', async function () {
+            await this.token.burn(0, { from: other });
+        });
+
+        it('other can burn less than its balance', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount.sub(new BN('1'));
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            await this.token.burn(burn_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount).add(burn_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount.sub(burn_amount));
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount.sub(burn_amount));
+        });
+
+        it('other cannot burn more than its balance', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount.add(new BN('1'));
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(baseToken_amount.sub(mint_amount));
+            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
+
+            await expectRevert(
+                this.token.burn(burn_amount, { from: other }),
+                'ERC20: transfer amount exceeds balance'
+            );
         });
     
         it('burn decreases the totalSupply', async function () {
-            await this.baseToken.mint(other, amount, { from: deployer });
-    
-            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-            expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
-    
-            await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
-    
-            await this.token.mint(amount, { from: other });
-    
-            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
-            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-            expect(await this.token.totalSupply()).to.be.bignumber.equal(amount.toString());
-    
-            const receipt = await this.token.burn(amount, { from: other });
-    
-            expect(await this.token.totalSupply()).to.be.bignumber.equal('0');
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+            await this.token.burn(burn_amount, { from: other });
+
+            expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount.sub(burn_amount));
+        });
+
+        it('burn emits a Burnt event', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            const receipt = await this.token.burn(burn_amount, { from: other });
+
+            expectEvent(receipt, 'Burnt', { _burnFrom: other, _value: burn_amount });
+        });
+
+        it('burn emits a Transfer event', async function () {
+            var baseToken_amount = amount;
+            var allowance_amount = baseToken_amount;
+            var mint_amount = allowance_amount;
+            var burn_amount = mint_amount;
+
+            await this.baseToken.mint(other, baseToken_amount, { from: deployer });
+            await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
+            await this.token.mint(mint_amount, { from: other });
+
+            const receipt = await this.token.burn(burn_amount, { from: other });
+
+            expectEvent(receipt, 'Transfer', { from: other, to: ZERO_ADDRESS, value: burn_amount });
         });
     });
 
