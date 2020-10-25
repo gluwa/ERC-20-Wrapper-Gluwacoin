@@ -79,14 +79,12 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
      * - the contract must have allowance for receiver's base tokens of at least `amount` + `fee`.
      */
     function mint(address minter, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig) public {
-        address wrapper = getRoleMember(WRAPPER_ROLE, 0);
-
         _useWrapperNonce(minter, nonce);
         Validate.validateSignature(address(this), minter, address(this), amount, fee, nonce, sig);
 
-        uint256 total = amount.add(fee);
-        __mint(minter, total);
+        __mint(minter, amount);
 
+        address wrapper = getRoleMember(WRAPPER_ROLE, 0);
         _transfer(minter, wrapper, fee);
     }
 
@@ -123,7 +121,7 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
         address wrapper = getRoleMember(WRAPPER_ROLE, 0);
         _transfer(burner, wrapper, fee);
 
-        __burn(burner, amount);
+        __burn(burner, amount.sub(fee));
     }
 
     function __mint(address account, uint256 amount) internal {
