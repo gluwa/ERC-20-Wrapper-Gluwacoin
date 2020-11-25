@@ -1255,30 +1255,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
                 'ERC20Reservable: insufficient unreserved balance'
             );
         });
-    
-        it('cannot reserve if not amount + fee > 0', async function () {
-            await this.baseToken.mint(other, amount, { from: deployer });
-            await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
-            await this.token.mint(amount, { from: other });
-    
-            expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
-            expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
-    
-            var executor = deployer;
-            var reserve_amount = new BN('0');
-            var reserve_fee = new BN('0');
-            var latestBlock = await time.latestBlock();
-            var expiryBlockNum = latestBlock.add(new BN('100'));
-            var nonce = Date.now();
-    
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
-    
-            await expectRevert(
-                this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer }),
-                'ERC20Reservable: invalid reserve amount'
-            );
-        });
-    
+
         it('cannot reserve if nonce is already used', async function () {
             await this.baseToken.mint(other, amount.add(amount), { from: deployer });
             await this.baseToken.increaseAllowance(this.token.address, amount.add(amount), { from: other });
