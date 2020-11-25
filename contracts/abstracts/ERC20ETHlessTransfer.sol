@@ -1,10 +1,11 @@
-pragma solidity ^0.6.2;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.6.0;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
-import "../Validate.sol";
+import "../utils/Validate.sol";
 
 /**
  * @dev Extension of {ERC20} that allows users to send ETHless transfer by hiring a transaction relayer to pay the
@@ -46,7 +47,8 @@ abstract contract ERC20ETHless is Initializable, AccessControlUpgradeSafe, ERC20
     public returns (bool success) {
         _useNonce(sender, nonce);
 
-        Validate.validateSignature(address(this), sender, recipient, amount, fee, nonce, sig);
+        bytes32 hash = keccak256(abi.encodePacked(address(this), sender, recipient, amount, fee, nonce));
+        Validate.validateSignature(hash, sender, sig);
 
         _collect(sender, fee);
         _transfer(sender, recipient, amount);

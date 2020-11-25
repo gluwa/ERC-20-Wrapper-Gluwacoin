@@ -1,4 +1,5 @@
-pragma solidity ^0.6.2;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.6.0;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
@@ -6,7 +7,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
-import "../Validate.sol";
+import "../utils/Validate.sol";
 
 /**
  * @dev Extension of {ERC20} that allows a certain ERC20 token holders to wrap the token to mint this token.
@@ -80,7 +81,9 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
      */
     function mint(address minter, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig) public {
         _useWrapperNonce(minter, nonce);
-        Validate.validateWrapperSignature(address(this), minter, amount, fee, nonce, sig);
+
+        bytes32 hash = keccak256(abi.encodePacked(address(this), minter, amount, fee, nonce));
+        Validate.validateSignature(hash, minter, sig);
 
         __mint(minter, amount);
 
@@ -116,7 +119,9 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
      */
     function burn(address burner, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig) public {
         _useWrapperNonce(burner, nonce);
-        Validate.validateWrapperSignature(address(this), burner, amount, fee, nonce, sig);
+
+        bytes32 hash = keccak256(abi.encodePacked(address(this), burner, amount, fee, nonce));
+        Validate.validateSignature(hash, burner, sig);
 
         address wrapper = getRoleMember(WRAPPER_ROLE, 0);
         _transfer(burner, wrapper, fee);

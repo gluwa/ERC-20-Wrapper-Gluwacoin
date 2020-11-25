@@ -1,10 +1,11 @@
-pragma solidity ^0.6.2;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.6.0;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
-import "../Validate.sol";
+import "../utils/Validate.sol";
 
 /**
  * @dev Extension of {ERC20} that allows users to escrow a transfer. When the fund is reserved, the sender designates
@@ -78,7 +79,8 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
         uint256 total = amount.add(fee);
         require(_unreservedBalance(sender) >= total, "ERC20Reservable: insufficient unreserved balance");
 
-        Validate.validateSignature(address(this), sender, recipient, amount, fee, nonce, sig);
+        bytes32 hash = keccak256(abi.encodePacked(address(this), sender, recipient, amount, fee, nonce));
+        Validate.validateSignature(hash, sender, sig);
 
         _reserved[sender][nonce] = Reservation(amount, fee, recipient, executor, expiryBlockNum,
             ReservationStatus.Active);
