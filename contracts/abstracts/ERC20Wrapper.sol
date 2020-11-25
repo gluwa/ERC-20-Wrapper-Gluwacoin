@@ -79,7 +79,15 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
      * - the minter must have base tokens of at least `amount` + `fee`.
      * - the contract must have allowance for receiver's base tokens of at least `amount` + `fee`.
      */
-    function mint(address minter, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig) public {
+    function mint(
+        address minter,
+        uint256 amount,
+        uint256 fee,
+        uint256 nonce,
+        bytes memory sig
+    )
+        public
+    {
         _useWrapperNonce(minter, nonce);
 
         bytes32 hash = keccak256(abi.encodePacked(address(this), minter, amount, fee, nonce));
@@ -117,7 +125,15 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
      *
      * - the burner must have tokens of at least `amount` + `fee`.
      */
-    function burn(address burner, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig) public {
+    function burn(
+        address burner,
+        uint256 amount,
+        uint256 fee,
+        uint256 nonce,
+        bytes memory sig
+    )
+        public
+    {
         _useWrapperNonce(burner, nonce);
 
         bytes32 hash = keccak256(abi.encodePacked(address(this), burner, amount, fee, nonce));
