@@ -7,7 +7,8 @@ const ERC20PresetMinterPauser = artifacts.require('ERC20PresetMinterPauserMockUp
 const ERC20WrapperGluwacoin = artifacts.require('ERC20WrapperGluwacoin');
 
 // Start test block
-contract('ERC20WrapperGluwacoin', function ([_, deployer]) {
+contract('ERC20WrapperGluwacoin Proxy', accounts => {
+    const deployer = accounts[0];
     const name = 'ERC20WrapperGluwacoin';
     const symbol = 'WG';
     const decimals = 6;
