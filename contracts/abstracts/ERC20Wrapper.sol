@@ -7,7 +7,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
-import "../utils/Validate.sol";
+import "../Validate.sol";
 
 /**
  * @dev Extension of {ERC20} that allows a certain ERC20 token holders to wrap the token to mint this token.
