@@ -26,46 +26,19 @@ Read [ERC-20 Wrapper Gluwacoin](ERC-20%20Wrapper%20Gluwacoin.md) for details.
 $ npm install
 ```
 
-#### Initializing the openzeppelin project
+#### Testing
+
 ```commandline
-$ npx oz init
+$ npx truffle test
 ```
 
-#### Linking the Contracts Ethereum Package
-
-You need this for local testing. We will use a preset of ERC20 to use as a base token for the ERC-20 Wrapper Gluwacoin.
+#### Deployment
+Create a copy of the file `2_deploy_Wrapper_Gluwacoin.js.example` under `migrations/` folder,
+and name it `2_deploy_Wrapper_Gluwacoin.js`.
+Fill-in `name`, `symbol`, `decimals`, and `baseToken`.
+Run `truffle migrate` with a name of the network you want to use.
 
 ```commandline
-$ npx oz link @openzeppelin/contracts-ethereum-package
-```
-
-#### Run a local testnet
-
-Let’s deploy an ERC20 token contract to our development network.
-Make sure to have a Ganache instance running, or start one by running:
-```commandline
-$ npx ganache-cli --deterministic
-```
-Note that the current version of Ganache does not work on `Node 14`.
-We are using `Node 12`.
-https://github.com/trufflesuite/ganache-cli/issues/732
-
-#### Deploy ERC20Wrapper token
-```commandline
-$ npx oz deploy
-Nothing to compile, all contracts are up to date.
-? Choose the kind of deployment upgradeable
-? Pick a network development
-? Pick a contract to deploy ERC20WrapperGluwacoin
-All implementations are up to date
-? Call a function to initialize the instance after creating it? Yes
-? Select which function initialize(name: string, symbol: string, decimals: uint8, token: address)
-? name: string: Gluwacoin
-? symbol: string: G
-? decimals: uint8: 18
-? token: address: [ADRESS OF THE CONTRACT]
-✓ Instance created at [ADRESS OF THE GLUWACOIN CONTRACT]
-To upgrade this instance run 'oz upgrade'
-[ADRESS OF THE GLUWACOIN CONTRACT]
+$ npx truffle migrate  --network [NETWORK NAME]
 ```
 

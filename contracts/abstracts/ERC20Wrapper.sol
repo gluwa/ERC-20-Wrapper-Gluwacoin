@@ -1,4 +1,5 @@
-pragma solidity ^0.6.2;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.6.0;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
@@ -78,9 +79,19 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
      * - the minter must have base tokens of at least `amount` + `fee`.
      * - the contract must have allowance for receiver's base tokens of at least `amount` + `fee`.
      */
-    function mint(address minter, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig) public {
+    function mint(
+        address minter,
+        uint256 amount,
+        uint256 fee,
+        uint256 nonce,
+        bytes memory sig
+    )
+        public
+    {
         _useWrapperNonce(minter, nonce);
-        Validate.validateWrapperSignature(address(this), minter, amount, fee, nonce, sig);
+
+        bytes32 hash = keccak256(abi.encodePacked(address(this), minter, amount, fee, nonce));
+        Validate.validateSignature(hash, minter, sig);
 
         __mint(minter, amount);
 
@@ -114,9 +125,19 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
      *
      * - the burner must have tokens of at least `amount` + `fee`.
      */
-    function burn(address burner, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig) public {
+    function burn(
+        address burner,
+        uint256 amount,
+        uint256 fee,
+        uint256 nonce,
+        bytes memory sig
+    )
+        public
+    {
         _useWrapperNonce(burner, nonce);
-        Validate.validateWrapperSignature(address(this), burner, amount, fee, nonce, sig);
+
+        bytes32 hash = keccak256(abi.encodePacked(address(this), burner, amount, fee, nonce));
+        Validate.validateSignature(hash, burner, sig);
 
         address wrapper = getRoleMember(WRAPPER_ROLE, 0);
         _transfer(burner, wrapper, fee);

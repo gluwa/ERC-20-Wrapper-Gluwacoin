@@ -1,4 +1,5 @@
-pragma solidity ^0.6.2;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.6.0;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/utils/Address.sol";
@@ -13,21 +14,7 @@ library Validate {
     /**
      * @dev Throws if given `sig` is an incorrect signature of the `sender`.
      */
-    function validateSignature(address contractAddress, address sender, address recipient, uint256 amount, uint256 fee,
-        uint256 nonce, bytes memory sig) internal pure returns (bool) {
-        bytes32 hash = keccak256(abi.encodePacked(contractAddress, sender, recipient, amount, fee, nonce));
-        bytes32 messageHash = hash.toEthSignedMessageHash();
-
-        address signer = messageHash.recover(sig);
-        require(signer == sender, "Validate: invalid signature");
-    }
-
-    /**
-     * @dev Throws if given `sig` is an incorrect signature of the `sender`.
-     */
-    function validateWrapperSignature(address contractAddress, address sender, uint256 amount, uint256 fee,
-        uint256 nonce, bytes memory sig) internal pure returns (bool) {
-        bytes32 hash = keccak256(abi.encodePacked(contractAddress, sender, amount, fee, nonce));
+    function validateSignature(bytes32 hash, address sender, bytes memory sig) internal pure {
         bytes32 messageHash = hash.toEthSignedMessageHash();
 
         address signer = messageHash.recover(sig);

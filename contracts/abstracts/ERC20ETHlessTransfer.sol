@@ -1,4 +1,5 @@
-pragma solidity ^0.6.2;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.6.0;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
@@ -42,11 +43,21 @@ abstract contract ERC20ETHless is Initializable, AccessControlUpgradeSafe, ERC20
      * - the `sender` must have a balance of at least the sum of `amount` and `fee`.
      * - the `nonce` is only used once per `sender`.
      */
-    function transfer(address sender, address recipient, uint256 amount, uint256 fee, uint256 nonce, bytes memory sig)
-    public returns (bool success) {
+    function transfer(
+        address sender,
+        address recipient,
+        uint256 amount,
+        uint256 fee,
+        uint256 nonce,
+        bytes memory sig
+    )
+        public
+        returns (bool success)
+    {
         _useNonce(sender, nonce);
 
-        Validate.validateSignature(address(this), sender, recipient, amount, fee, nonce, sig);
+        bytes32 hash = keccak256(abi.encodePacked(address(this), sender, recipient, amount, fee, nonce));
+        Validate.validateSignature(hash, sender, sig);
 
         _collect(sender, fee);
         _transfer(sender, recipient, amount);

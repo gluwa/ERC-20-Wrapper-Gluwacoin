@@ -1,4 +1,5 @@
-pragma solidity ^0.6.2;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.6.0;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
@@ -45,8 +46,20 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
     function __ERC20Reservable_init_unchained() internal initializer {
     }
 
-    function getReservation(address sender, uint256 nonce) public view returns (uint256 amount, uint256 fee,
-        address recipient, address executor, uint256 expiryBlockNum) {
+    function getReservation(
+        address sender,
+        uint256 nonce
+    )
+        public
+        view
+        returns (
+            uint256 amount,
+            uint256 fee,
+            address recipient,
+            address executor,
+            uint256 expiryBlockNum
+        )
+    {
         Reservation memory reservation = _reserved[sender][nonce];
 
         amount = reservation._amount;
@@ -64,21 +77,29 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
         return _unreservedBalance(account);
     }
 
-    function reserve(address sender, address recipient, address executor, uint256 amount, uint256 fee, uint256 nonce,
-        uint256 expiryBlockNum, bytes memory sig) public returns (bool success) {
-        //Reservation storage reservation = _reserved[sender][nonce];
-        //address executor = reservation._executor;
-
+    function reserve(
+        address sender,
+        address recipient,
+        address executor,
+        uint256 amount,
+        uint256 fee,
+        uint256 nonce,
+        uint256 expiryBlockNum,
+        bytes memory sig
+    )
+        public
+        returns (bool success)
+    {
         require(_reserved[sender][nonce]._expiryBlockNum == 0, "ERC20Reservable: the sender used the nonce already");
 
         require(expiryBlockNum > block.number, "ERC20Reservable: invalid block expiry number");
         require(executor != address(0), "ERC20Reservable: cannot execute from zero address");
-        require(amount > 0, "ERC20Reservable: invalid reserve amount");
 
         uint256 total = amount.add(fee);
         require(_unreservedBalance(sender) >= total, "ERC20Reservable: insufficient unreserved balance");
 
-        Validate.validateSignature(address(this), sender, recipient, amount, fee, nonce, sig);
+        bytes32 hash = keccak256(abi.encodePacked(address(this), sender, recipient, amount, fee, nonce));
+        Validate.validateSignature(hash, sender, sig);
 
         _reserved[sender][nonce] = Reservation(amount, fee, recipient, executor, expiryBlockNum,
             ReservationStatus.Active);
