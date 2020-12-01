@@ -14,6 +14,7 @@ import "../Validate.sol";
  * Holder of this token can retrieve the wrapped token by burning this token.
  */
 abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20UpgradeSafe {
+    using SafeMath for uint256;
     using Address for address;
     // base token, the token to be wrapped
     IERC20 private _token;
@@ -42,7 +43,7 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
     /**
      * @dev Returns the address of the base token.
      */
-    function token() public view returns (IERC20) {
+    function token() external view returns (IERC20) {
         return _token;
     }
 
@@ -57,7 +58,7 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
      * - the contract must have allowance for caller's base tokens of at least
      * `amount`.
      */
-    function mint(uint256 amount) public {
+    function mint(uint256 amount) external {
         __mint(_msgSender(), amount);
     }
 
@@ -86,7 +87,7 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
         uint256 nonce,
         bytes memory sig
     )
-        public
+        external
     {
         _useWrapperNonce(minter, nonce);
 
@@ -104,7 +105,7 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
      *
      * See {ERC20-_burn}.
      */
-    function burn(uint256 amount) public {
+    function burn(uint256 amount) external {
         __burn(_msgSender(), amount);
     }
 
@@ -132,7 +133,7 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
         uint256 nonce,
         bytes memory sig
     )
-        public
+        external
     {
         _useWrapperNonce(burner, nonce);
 
