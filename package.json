@@ -1,6 +1,6 @@
 {
-  "name": "ERC-20-Wrapper-Gluwacoin",
-  "version": "1.0.0",
+  "name": "@gluwa/erc-20-wrapper",
+  "version": "1.0.1",
   "description": "",
   "main": "networks.js",
   "dependencies": {
