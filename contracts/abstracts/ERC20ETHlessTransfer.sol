@@ -51,7 +51,7 @@ abstract contract ERC20ETHless is Initializable, AccessControlUpgradeSafe, ERC20
         uint256 nonce,
         bytes memory sig
     )
-        public
+        external
         returns (bool success)
     {
         _useNonce(sender, nonce);

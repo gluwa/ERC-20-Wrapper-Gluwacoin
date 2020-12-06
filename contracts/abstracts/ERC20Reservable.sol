@@ -14,6 +14,7 @@ import "../Validate.sol";
  * the fund back to the `sender`.
  */
 abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
+    using SafeMath for uint256;
     using Address for address;
 
     enum ReservationStatus {
@@ -50,7 +51,7 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
         address sender,
         uint256 nonce
     )
-        public
+        external
         view
         returns (
             uint256 amount,
@@ -69,11 +70,11 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
         expiryBlockNum = reservation._expiryBlockNum;
     }
 
-    function reservedBalanceOf(address account) public view returns (uint256 amount) {
-        return balanceOf(account) - _unreservedBalance(account);
+    function reservedBalanceOf(address account) external view returns (uint256 amount) {
+        return balanceOf(account).sub(_unreservedBalance(account));
     }
 
-    function unreservedBalanceOf(address account) public view returns (uint256 amount) {
+    function unreservedBalanceOf(address account) external view returns (uint256 amount) {
         return _unreservedBalance(account);
     }
 
@@ -87,7 +88,7 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
         uint256 expiryBlockNum,
         bytes memory sig
     )
-        public
+        external
         returns (bool success)
     {
         require(_reserved[sender][nonce]._expiryBlockNum == 0, "ERC20Reservable: the sender used the nonce already");
@@ -108,7 +109,7 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
         return true;
     }
 
-    function execute(address sender, uint256 nonce) public returns (bool success) {
+    function execute(address sender, uint256 nonce) external returns (bool success) {
         Reservation storage reservation = _reserved[sender][nonce];
 
         require(reservation._expiryBlockNum != 0, "ERC20Reservable: reservation does not exist");
@@ -134,7 +135,7 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
         return true;
     }
 
-    function reclaim(address sender, uint256 nonce) public returns (bool success) {
+    function reclaim(address sender, uint256 nonce) external returns (bool success) {
         Reservation storage reservation = _reserved[sender][nonce];
 
         require(reservation._expiryBlockNum != 0, "ERC20Reservable: reservation does not exist");
