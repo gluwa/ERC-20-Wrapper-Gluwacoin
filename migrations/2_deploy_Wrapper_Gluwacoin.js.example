@@ -1,19 +1,43 @@
-// migrations/2_deploy_Wrapper_Gluwacoin.js
+// migrations/2_deploy_wrapper_gluwacoin.usdc.js
 const { deployProxy } = require('@openzeppelin/truffle-upgrades');
 
+const ERC20TestToken = artifacts.require("ERC20TestToken");
 const ERC20WrapperGluwacoin = artifacts.require('ERC20WrapperGluwacoin');
 
-module.exports = async function (deployer) {
+module.exports = async function (deployer, network) {
     const name = '[Base Token Symbol] Gluwacoin';
     const symbol = '[Base Token Symbol]-G';
     const decimals = [Base Token Decimals];
-    const baseToken = '[Base Token Contract Address]';
 
-    const instance = await deployProxy(
-            ERC20WrapperGluwacoin,
-            [name, symbol, decimals, baseToken],
-            { from: deployer, unsafeAllowCustomTypes: true, initializer: 'initialize' }
-    );
+    if (network !== 'production') {
+        // Deploy a mock USD Coin for non-production networks
+        deployer.then(function() {
+            return ERC20TestToken.new('[Base Token Name]', '[Base Token Symbol]', decimals);
+        }).then(function(baseToken) {
+            const baseTokenAddress = baseToken.address;
 
-    console.log('Deployed', instance.address);
+            console.log('basetoken ', baseTokenAddress);
+
+            return deployProxy(
+                ERC20WrapperGluwacoin,
+                [name, symbol, decimals, baseTokenAddress],
+                { from: deployer, unsafeAllowCustomTypes: true, initializer: 'initialize' }
+            );
+        }).then(function(instance) {
+            console.log('Deployed', instance.address);
+        });
+    } else {
+        // use USD Coin contract address in production network
+        const baseTokenAddress = '[Live Base Token Address]';
+
+        console.log('basetoken ', baseTokenAddress);
+
+        const instance = await deployProxy(
+                ERC20WrapperGluwacoin,
+                [name, symbol, decimals, baseTokenAddress],
+                { from: deployer, unsafeAllowCustomTypes: true, initializer: 'initialize' }
+        );
+
+        console.log('Deployed', instance.address);
+    }
 };

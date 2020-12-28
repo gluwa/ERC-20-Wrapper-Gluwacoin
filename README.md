@@ -33,12 +33,11 @@ $ npx truffle test
 ```
 
 #### Deployment
-Create a copy of the file `2_deploy_Wrapper_Gluwacoin.js.example` under `migrations/` folder,
-and name it `2_deploy_Wrapper_Gluwacoin.js`.
+Create a copy of the file `2_deploy_wrapper_gluwacoin.js.example` under `migrations/` folder,
+and name it `2_deploy_wrapper_gluwacoin.EXAMPLE.js`.
 Fill-in `name`, `symbol`, `decimals`, and `baseToken`.
 Run `truffle migrate` with a name of the network you want to use.
 
 ```commandline
 $ npx truffle migrate  --network [NETWORK NAME]
 ```
-
