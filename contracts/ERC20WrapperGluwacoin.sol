@@ -15,7 +15,7 @@ import "./abstracts/ERC20Wrapper.sol";
  */
 contract ERC20WrapperGluwacoin is Initializable, ContextUpgradeSafe, ERC20ETHless, ERC20Reservable, ERC20Wrapper, ERC20PausableUpgradeSafe  {
     // note that `decimals` must match that of `token` or less
-    function initialize(string memory name, string memory symbol, uint8 decimals, IERC20 token) public {
+    function initialize(string memory name, string memory symbol, uint8 decimals, IERC20 token) public virtual {
         __ERC20Wrapper_init(name, symbol, decimals, token);
     }
 
