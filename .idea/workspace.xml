@@ -1,7 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8ab0e76b-ddc1-4c14-8a4d-ca08720bc0bc" name="Default Changelist" comment="" />
+    <list default="true" id="8ab0e76b-ddc1-4c14-8a4d-ca08720bc0bc" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/USD-Gluwacoin.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/USD-Gluwacoin.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/AccessControl.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/AccessControlUpgradeSafe.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/Address.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/Context.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/ContextUpgradeSafe.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/ECDSA.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/ERC20.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/ERC20Burnable.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/ERC20BurnableUpgradeSafe.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/ERC20ETHless.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/ERC20Pausable.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/ERC20PausableUpgradeSafe.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/ERC20PresetMinterPauserMockUpgradeSafe.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/ERC20PresetMinterPauserUpgradeSafe.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/ERC20Reservable.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/ERC20TestToken.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/ERC20UpgradeSafe.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/ERC20Wrapper.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/ERC20WrapperGluwacoin.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/ERC20WrapperGluwacoinMock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/EnumerableSet.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/IERC20.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/Initializable.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/Migrations.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/Pausable.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/PausableUpgradeSafe.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/SafeMath.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/contracts/Validate.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/.openzeppelin/unknown-1337.json" beforeDir="false" afterPath="$PROJECT_DIR$/.openzeppelin/unknown-1337.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/contracts/Box.sol" beforeDir="false" afterPath="$PROJECT_DIR$/contracts/Box.sol" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/contracts/ERC20WrapperGluwacoin.sol" beforeDir="false" afterPath="$PROJECT_DIR$/contracts/ERC20WrapperGluwacoin.sol" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/contracts/Migrations.sol" beforeDir="false" afterPath="$PROJECT_DIR$/contracts/Migrations.sol" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/contracts/abstracts/ERC20ETHlessTransfer.sol" beforeDir="false" afterPath="$PROJECT_DIR$/contracts/abstracts/ERC20ETHlessTransfer.sol" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/contracts/abstracts/ERC20Reservable.sol" beforeDir="false" afterPath="$PROJECT_DIR$/contracts/abstracts/ERC20Reservable.sol" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/contracts/abstracts/ERC20Wrapper.sol" beforeDir="false" afterPath="$PROJECT_DIR$/contracts/abstracts/ERC20Wrapper.sol" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/contracts/abstracts/Validate.sol" beforeDir="false" afterPath="$PROJECT_DIR$/contracts/abstracts/Validate.sol" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/contracts/mocks/ERC20PresetMinterPauserMock.sol" beforeDir="false" afterPath="$PROJECT_DIR$/contracts/mocks/ERC20PresetMinterPauserMock.sol" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/contracts/mocks/ERC20WrapperGluwacoinMock.sol" beforeDir="false" afterPath="$PROJECT_DIR$/contracts/mocks/ERC20WrapperGluwacoinMock.sol" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/migrations/1_initial_migration.js" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/1_initial_migration.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/migrations/2_deploy_Wrapper_Gluwacoin.js.example" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/2_deploy_Wrapper_Gluwacoin.js.example" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/test/.gitkeep" beforeDir="false" afterPath="$PROJECT_DIR$/test/.gitkeep" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/test/Box.proxy.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/Box.proxy.test.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/test/Box.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/Box.test.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/test/ERC20WrapperGluwacoin.proxy.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/ERC20WrapperGluwacoin.proxy.test.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/test/ERC20WrapperGluwacoin.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/ERC20WrapperGluwacoin.test.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/test/signature.js" beforeDir="false" afterPath="$PROJECT_DIR$/test/signature.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cleanroom/truffle-config.js" beforeDir="false" afterPath="$PROJECT_DIR$/truffle-config.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -11,6 +63,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="JavaScript File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -41,9 +94,9 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/cleanroom/contracts/abstracts" />
       <recent name="$PROJECT_DIR$/contracts/abstracts" />
-      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/migrations" />
       <recent name="$PROJECT_DIR$/.openzeppelin" />
     </key>
