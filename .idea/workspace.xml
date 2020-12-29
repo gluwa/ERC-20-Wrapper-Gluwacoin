@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="8ab0e76b-ddc1-4c14-8a4d-ca08720bc0bc" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="JupyterTrust" id="c8c6464e-7497-450d-a10e-e390d905b5f9" />
+  <component name="ProjectId" id="1jEpFr8ZRLoKFo0UXnZeh4Eoma4" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="add_unversioned_files" value="$PROJECT_DIR$/.env" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/cleanroom/migrations" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs_package_manager_path" value="npm" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/cleanroom/contracts/abstracts" />
+      <recent name="$PROJECT_DIR$/contracts/abstracts" />
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/migrations" />
+      <recent name="$PROJECT_DIR$/.openzeppelin" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/cleanroom/migrations" />
+      <recent name="$PROJECT_DIR$/cleanroom/contracts" />
+      <recent name="$PROJECT_DIR$/cleanroom/test" />
+      <recent name="$PROJECT_DIR$/cleanroom" />
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8ab0e76b-ddc1-4c14-8a4d-ca08720bc0bc" name="Default Changelist" comment="" />
+      <created>1603379004472</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1603379004472</updated>
+      <workItem from="1606478844816" duration="2060000" />
+      <workItem from="1606553196823" duration="586000" />
+      <workItem from="1607259634150" duration="361000" />
+      <workItem from="1607260436842" duration="112000" />
+      <workItem from="1607260582626" duration="6128000" />
+      <workItem from="1609134671179" duration="765000" />
+      <workItem from="1609136608193" duration="3401000" />
+      <workItem from="1609140563881" duration="1038000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="1028" y="346" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1609254035599">
+      <screen x="0" y="0" width="2560" height="1080" />
+    </state>
+    <state x="3588" y="346" key="#com.intellij.fileTypes.FileTypeChooser/0.0.2560.1080/2560.0.2560.1080@2560.0.2560.1080" timestamp="1606480470035" />
+    <state x="1028" y="346" key="#com.intellij.fileTypes.FileTypeChooser/2560.0.2560.1080/0.0.2560.1080@0.0.2560.1080" timestamp="1609254035599" />
+    <state x="648" y="280" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1607260509112">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="648" y="280" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1607260509112" />
+    <state x="3578" y="291" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1606490606212">
+      <screen x="2560" y="0" width="2560" height="1080" />
+    </state>
+    <state x="3578" y="291" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.2560.1080/2560.0.2560.1080@2560.0.2560.1080" timestamp="1606490606212" />
+    <state width="2518" height="305" key="GridCell.Tab.0.bottom" timestamp="1606480568148">
+      <screen x="2560" y="0" width="2560" height="1080" />
+    </state>
+    <state width="2518" height="305" key="GridCell.Tab.0.bottom/0.0.2560.1080/2560.0.2560.1080@2560.0.2560.1080" timestamp="1606480568148" />
+    <state width="2518" height="305" key="GridCell.Tab.0.center" timestamp="1606480568147">
+      <screen x="2560" y="0" width="2560" height="1080" />
+    </state>
+    <state width="2518" height="305" key="GridCell.Tab.0.center/0.0.2560.1080/2560.0.2560.1080@2560.0.2560.1080" timestamp="1606480568147" />
+    <state width="2518" height="305" key="GridCell.Tab.0.left" timestamp="1606480568146">
+      <screen x="2560" y="0" width="2560" height="1080" />
+    </state>
+    <state width="2518" height="305" key="GridCell.Tab.0.left/0.0.2560.1080/2560.0.2560.1080@2560.0.2560.1080" timestamp="1606480568146" />
+    <state width="2518" height="305" key="GridCell.Tab.0.right" timestamp="1606480568148">
+      <screen x="2560" y="0" width="2560" height="1080" />
+    </state>
+    <state width="2518" height="305" key="GridCell.Tab.0.right/0.0.2560.1080/2560.0.2560.1080@2560.0.2560.1080" timestamp="1606480568148" />
+  </component>
+</project>
