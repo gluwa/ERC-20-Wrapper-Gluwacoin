@@ -1,6 +1,6 @@
 {
   "name": "@gluwa/erc-20-wrapper",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "index.js",
   "dependencies": {
