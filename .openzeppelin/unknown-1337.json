@@ -21,8 +21,8 @@
       }
     },
     "013da52c7b82615fb3770c59eb43e5829fc933b84dcbe81d7845ffdd105582ac": {
-      "address": "0xFF6049B87215476aBf744eaA3a476cBAd46fB1cA",
-      "txHash": "0xe5ef3bcf25b1a27031aa696c2e8d0fe4a29b5e1d7ca9616c938757c99c7dfb02",
+      "address": "0xC89Ce4735882C9F0f0FE26686c53074E09B0D550",
+      "txHash": "0x76f1d07933442238b661870ca2f5e71cbfd8341cbf7fdba61aeb50747c03b6e3",
       "layout": {
         "storage": [
           {
@@ -52,7 +52,7 @@
           {
             "contract": "AccessControlUpgradeSafe",
             "label": "_roles",
-            "type": "t_mapping(t_bytes32,t_struct(RoleData)1447_storage)",
+            "type": "t_mapping(t_bytes32,t_struct(RoleData)1585_storage)",
             "src": "../@openzeppelin/contracts-ethereum-package/contracts/access/AccessControl.sol:58"
           },
           {
@@ -118,7 +118,7 @@
           {
             "contract": "ERC20Reservable",
             "label": "_reserved",
-            "type": "t_mapping(t_address,t_mapping(t_uint256,t_struct(Reservation)378_storage))",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_struct(Reservation)347_storage))",
             "src": "abstracts/ERC20Reservable.sol:36"
           },
           {
@@ -136,7 +136,7 @@
           {
             "contract": "ERC20Wrapper",
             "label": "_token",
-            "type": "t_contract(IERC20)2668",
+            "type": "t_contract(IERC20)3076",
             "src": "abstracts/ERC20Wrapper.sol:20"
           },
           {
@@ -173,7 +173,7 @@
             "contract": "ERC20WrapperGluwacoin",
             "label": "__gap",
             "type": "t_array(t_uint256)50_storage",
-            "src": "ERC20WrapperGluwacoin.sol:40"
+            "src": "Box.sol:21"
           }
         ],
         "types": {
@@ -186,13 +186,13 @@
           "t_array(t_uint256)49_storage": {
             "label": "uint256[49]"
           },
-          "t_contract(IERC20)2668": {
+          "t_contract(IERC20)3076": {
             "label": "contract IERC20"
           },
           "t_mapping(t_address,t_mapping(t_uint256,t_bool))": {
             "label": "mapping(address => mapping(uint256 => bool))"
           },
-          "t_mapping(t_address,t_mapping(t_uint256,t_struct(Reservation)378_storage))": {
+          "t_mapping(t_address,t_mapping(t_uint256,t_struct(Reservation)347_storage))": {
             "label": "mapping(address => mapping(uint256 => struct ERC20Reservable.Reservation))"
           },
           "t_mapping(t_address,t_uint256)": {
@@ -213,7 +213,7 @@
           "t_array(t_uint256)44_storage": {
             "label": "uint256[44]"
           },
-          "t_mapping(t_bytes32,t_struct(RoleData)1447_storage)": {
+          "t_mapping(t_bytes32,t_struct(RoleData)1585_storage)": {
             "label": "mapping(bytes32 => struct AccessControlUpgradeSafe.RoleData)"
           }
         }
@@ -221,7 +221,7 @@
     }
   },
   "admin": {
-    "address": "0xA586074FA4Fe3E546A132a16238abe37951D41fE",
-    "txHash": "0x58a09ca57488d8e6c4bf1c1dbbb09e4fd177a29dc0c7463057fa84a8491a80e9"
+    "address": "0xD833215cBcc3f914bD1C9ece3EE7BF8B14f841bb",
+    "txHash": "0xc92419ea3a292efd44967ff91e69cf2e33d642d0a5e7a3f6e8f640a56364546a"
   }
 }
