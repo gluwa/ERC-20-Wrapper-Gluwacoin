@@ -28,6 +28,12 @@ $ npm install
 
 #### Testing
 
+Run a local development network
+```commandline
+$ npx ganache-cli --deterministic
+```
+
+Run test scripts
 ```commandline
 $ npx truffle test
 ```
