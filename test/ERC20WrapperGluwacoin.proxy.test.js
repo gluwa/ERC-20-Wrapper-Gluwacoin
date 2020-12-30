@@ -3,7 +3,6 @@ const { expect } = require('chai');
 const { deployProxy, upgradeProxy } = require('@openzeppelin/truffle-upgrades');
 
 // Load compiled artifacts
-const ERC20PresetMinterPauser = artifacts.require('ERC20PresetMinterPauserMockUpgradeSafe');
 const ERC20WrapperGluwacoin = artifacts.require('ERC20WrapperGluwacoin');
 
 // Start test block
@@ -12,14 +11,13 @@ contract('ERC20WrapperGluwacoin Proxy', accounts => {
     const name = 'ERC20WrapperGluwacoin';
     const symbol = 'WG';
     const decimals = 6;
+    const baseTokenAddress = '0xfB0aaA0432112779d9AC483D9d5E3961ecE18eec';
 
     beforeEach(async function () {
-        // Deploy a new ERC20 contract for each test
-        this.baseToken = await ERC20PresetMinterPauser.new('ERC20', 'E2', { from: deployer });
         // Deploy a new ERC20WrapperGluwacoin contract for each test
         this.token = await deployProxy(
                 ERC20WrapperGluwacoin,
-                [name, symbol, decimals, this.baseToken.address],
+                [name, symbol, decimals, baseTokenAddress],
                 { from: deployer, unsafeAllowCustomTypes: true, initializer: 'initialize' }
             );
     });
@@ -28,7 +26,7 @@ contract('ERC20WrapperGluwacoin Proxy', accounts => {
         expect(await this.token.name()).to.equal(name);
         expect(await this.token.symbol()).to.equal(symbol);
         expect((await this.token.decimals()).toString()).to.equal(decimals.toString());
-        expect(await this.token.token()).to.equal(this.baseToken.address);
+        expect(await this.token.token()).to.equal(baseTokenAddress);
     });
 
     it('retrieve returns a value previously initialized after an upgrade', async function () {
@@ -38,6 +36,6 @@ contract('ERC20WrapperGluwacoin Proxy', accounts => {
         expect(await newToken.name()).to.equal(name);
         expect(await newToken.symbol()).to.equal(symbol);
         expect((await newToken.decimals()).toString()).to.equal(decimals.toString());
-        expect(await newToken.token()).to.equal(this.baseToken.address);
+        expect(await newToken.token()).to.equal(baseTokenAddress);
     });
 });

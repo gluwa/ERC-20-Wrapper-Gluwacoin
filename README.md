@@ -28,9 +28,18 @@ $ npm install
 
 #### Testing
 
+Run a local development network
+```commandline
+$ npx ganache-cli --deterministic
+```
+
+Run test scripts
 ```commandline
 $ npx truffle test
 ```
+
+#### Usage
+Refer to `contracts/ExampleCoin.sol` for example.
 
 #### Deployment
 Create a copy of the file `2_deploy_wrapper_gluwacoin.js.example` under `migrations/` folder,

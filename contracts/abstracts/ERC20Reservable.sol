@@ -5,7 +5,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
-import "../Validate.sol";
+import "./Validate.sol";
 
 /**
  * @dev Extension of {ERC20} that allows users to escrow a transfer. When the fund is reserved, the sender designates

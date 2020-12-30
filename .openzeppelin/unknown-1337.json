@@ -1,9 +1,28 @@
 {
   "manifestVersion": "3.1",
   "impls": {
+    "a65cdfa308566facef6065beb9e631bc7782c0699e2093fd7f5bc24c50583bce": {
+      "address": "0xA57B8a5584442B467b4689F1144D269d096A3daF",
+      "txHash": "0xc19387bfc9ac46d3804f7761c24e2f38f36b16fe91b82b07514218c851a7990d",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Box",
+            "label": "value",
+            "type": "t_uint256",
+            "src": "Box.sol:6"
+          }
+        ],
+        "types": {
+          "t_uint256": {
+            "label": "uint256"
+          }
+        }
+      }
+    },
     "013da52c7b82615fb3770c59eb43e5829fc933b84dcbe81d7845ffdd105582ac": {
-      "address": "0xD90F8B6bB742D20C184753e4c9622bcC9Ca21132",
-      "txHash": "0x7eb81cc38aeaf57ec51759ad052a9a34303473cbdf549d7878cd07f443729471",
+      "address": "0xC89Ce4735882C9F0f0FE26686c53074E09B0D550",
+      "txHash": "0x76f1d07933442238b661870ca2f5e71cbfd8341cbf7fdba61aeb50747c03b6e3",
       "layout": {
         "storage": [
           {
@@ -99,7 +118,7 @@
           {
             "contract": "ERC20Reservable",
             "label": "_reserved",
-            "type": "t_mapping(t_address,t_mapping(t_uint256,t_struct(Reservation)390_storage))",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_struct(Reservation)347_storage))",
             "src": "abstracts/ERC20Reservable.sol:36"
           },
           {
@@ -154,7 +173,7 @@
             "contract": "ERC20WrapperGluwacoin",
             "label": "__gap",
             "type": "t_array(t_uint256)50_storage",
-            "src": "ERC20WrapperGluwacoin.sol:40"
+            "src": "Box.sol:21"
           }
         ],
         "types": {
@@ -173,7 +192,7 @@
           "t_mapping(t_address,t_mapping(t_uint256,t_bool))": {
             "label": "mapping(address => mapping(uint256 => bool))"
           },
-          "t_mapping(t_address,t_mapping(t_uint256,t_struct(Reservation)390_storage))": {
+          "t_mapping(t_address,t_mapping(t_uint256,t_struct(Reservation)347_storage))": {
             "label": "mapping(address => mapping(uint256 => struct ERC20Reservable.Reservation))"
           },
           "t_mapping(t_address,t_uint256)": {
@@ -202,7 +221,7 @@
     }
   },
   "admin": {
-    "address": "0x6EeEa5B4349cd8Ad1E91Aa8cED649EEb33A41907",
-    "txHash": "0x1705b93980536e115738a49d27ee0b4cf1fdf3ec500cd7d8cf9aa223ab988575"
+    "address": "0xD833215cBcc3f914bD1C9ece3EE7BF8B14f841bb",
+    "txHash": "0xc92419ea3a292efd44967ff91e69cf2e33d642d0a5e7a3f6e8f640a56364546a"
   }
 }
