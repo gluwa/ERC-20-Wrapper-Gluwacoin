@@ -21,8 +21,8 @@
       }
     },
     "013da52c7b82615fb3770c59eb43e5829fc933b84dcbe81d7845ffdd105582ac": {
-      "address": "0xC89Ce4735882C9F0f0FE26686c53074E09B0D550",
-      "txHash": "0x76f1d07933442238b661870ca2f5e71cbfd8341cbf7fdba61aeb50747c03b6e3",
+      "address": "0x9b1f7F645351AF3631a656421eD2e40f2802E6c0",
+      "txHash": "0x0b4d3799fc4dc9ed3789d8fde0b2052cddf81f6644f3feb8edebb2f7848dbd66",
       "layout": {
         "storage": [
           {
@@ -52,7 +52,7 @@
           {
             "contract": "AccessControlUpgradeSafe",
             "label": "_roles",
-            "type": "t_mapping(t_bytes32,t_struct(RoleData)1585_storage)",
+            "type": "t_mapping(t_bytes32,t_struct(RoleData)1653_storage)",
             "src": "../@openzeppelin/contracts-ethereum-package/contracts/access/AccessControl.sol:58"
           },
           {
@@ -118,7 +118,7 @@
           {
             "contract": "ERC20Reservable",
             "label": "_reserved",
-            "type": "t_mapping(t_address,t_mapping(t_uint256,t_struct(Reservation)347_storage))",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_struct(Reservation)423_storage))",
             "src": "abstracts/ERC20Reservable.sol:36"
           },
           {
@@ -136,7 +136,7 @@
           {
             "contract": "ERC20Wrapper",
             "label": "_token",
-            "type": "t_contract(IERC20)3076",
+            "type": "t_contract(IERC20)2874",
             "src": "abstracts/ERC20Wrapper.sol:20"
           },
           {
@@ -186,13 +186,13 @@
           "t_array(t_uint256)49_storage": {
             "label": "uint256[49]"
           },
-          "t_contract(IERC20)3076": {
+          "t_contract(IERC20)2874": {
             "label": "contract IERC20"
           },
           "t_mapping(t_address,t_mapping(t_uint256,t_bool))": {
             "label": "mapping(address => mapping(uint256 => bool))"
           },
-          "t_mapping(t_address,t_mapping(t_uint256,t_struct(Reservation)347_storage))": {
+          "t_mapping(t_address,t_mapping(t_uint256,t_struct(Reservation)423_storage))": {
             "label": "mapping(address => mapping(uint256 => struct ERC20Reservable.Reservation))"
           },
           "t_mapping(t_address,t_uint256)": {
@@ -213,7 +213,7 @@
           "t_array(t_uint256)44_storage": {
             "label": "uint256[44]"
           },
-          "t_mapping(t_bytes32,t_struct(RoleData)1585_storage)": {
+          "t_mapping(t_bytes32,t_struct(RoleData)1653_storage)": {
             "label": "mapping(bytes32 => struct AccessControlUpgradeSafe.RoleData)"
           }
         }
@@ -221,7 +221,7 @@
     }
   },
   "admin": {
-    "address": "0xD833215cBcc3f914bD1C9ece3EE7BF8B14f841bb",
-    "txHash": "0xc92419ea3a292efd44967ff91e69cf2e33d642d0a5e7a3f6e8f640a56364546a"
+    "address": "0x67B5656d60a809915323Bf2C40A8bEF15A152e3e",
+    "txHash": "0xa7f57f00a66e887c963edfdfc4f3f60cc64f048490a221244de68730ee33e93d"
   }
 }
