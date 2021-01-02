@@ -3,7 +3,7 @@ const { accounts, privateKeys, contract, web3 } = require('@openzeppelin/test-en
 const { expect } = require('chai');
 
 // Import utilities from Test Helpers
-const { BN, constants, expectEvent, expectRevert, time } = require('@openzeppelin/test-helpers');
+const { BN, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
 
 // Load compiled artifacts
 const ERC20PresetMinterPauser = contract.fromArtifact('ERC20PresetMinterPauserMockUpgradeSafe');
@@ -14,7 +14,8 @@ var sign = require('./signature');
 // Start test block
 describe('ERC20WrapperGluwacoin_Reservable', function () {
     const [ deployer, other, another ] = accounts;
-    const [ other_privateKey, another_privateKey ] = privateKeys;
+    // `deployer_privateKey` is unused but required to get correct keys for other and another
+    const [ deployer_privateKey, other_privateKey, another_privateKey ] = privateKeys;
 
     const name = 'ERC20WrapperGluwacoin';
     const symbol = 'WG';
@@ -35,7 +36,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
         await this.token.mint(amount, { from: other });
         expect(await this.baseToken.balanceOf(other)).to.be.bignumber.equal('0');
-        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.toString());
+        expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount);
         expect(await this.token.balanceOf(another)).to.be.bignumber.equal('0');
     });
 
@@ -47,13 +48,13 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             expect(await this.token.getRoleMemberCount(RELAYER_ROLE)).to.be.bignumber.equal('1');
             expect(await this.token.getRoleMember(RELAYER_ROLE, 0)).to.equal(deployer);
         });
-    
+
         it('relayer can send ETHless transfer', async function () {
             var nonce = Date.now();
             var signature = sign.sign(this.token.address, other, other_privateKey, another, amount.sub(fee), fee, nonce);
-    
+
             await this.token.transfer(other, another, amount.sub(fee), fee, nonce, signature, { from: deployer });
-    
+
             expect(await this.token.balanceOf(deployer)).to.be.bignumber.equal(fee);
             expect(await this.token.balanceOf(other)).to.be.bignumber.equal('0');
             expect(await this.token.balanceOf(another)).to.be.bignumber.equal(amount.sub(fee));
@@ -108,11 +109,11 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
         it('cannot send ETHless transfer more than balance', async function () {
             var nonce = Date.now();
             var signature = sign.sign(this.token.address, other, other_privateKey, another, amount, fee, nonce);
-    
+
             await expectRevert(
                 this.token.transfer(other, another, amount, fee, nonce, signature, { from: deployer }),
                 'ERC20Reservable: transfer amount exceeds unreserved balance'
             );
         });
-    });  
+    });
 });
