@@ -21,8 +21,8 @@
       }
     },
     "a927d5ee83af7f80649e185d0612523ebd19a107830c557d448fd87d85ad723f": {
-      "address": "0x26b4AFb60d6C903165150C6F0AA14F8016bE4aec",
-      "txHash": "0x97cc162a4462b128c06b996815803bf1de0f872c5f9e74deb6419a0c57ca8abe",
+      "address": "0xCfEB869F69431e42cdB54A4F4f105C19C080A601",
+      "txHash": "0x527f9bea2161c510833624eeede7027a1991c2bb59065379b19e2f7c11cb0b4a",
       "layout": {
         "storage": [
           {
@@ -52,7 +52,7 @@
           {
             "contract": "AccessControlUpgradeSafe",
             "label": "_roles",
-            "type": "t_mapping(t_bytes32,t_struct(RoleData)1729_storage)",
+            "type": "t_mapping(t_bytes32,t_struct(RoleData)1653_storage)",
             "src": "../@openzeppelin/contracts-ethereum-package/contracts/access/AccessControl.sol:58"
           },
           {
@@ -136,7 +136,7 @@
           {
             "contract": "ERC20Wrapper",
             "label": "_token",
-            "type": "t_contract(IERC20)3220",
+            "type": "t_contract(IERC20)2874",
             "src": "abstracts/ERC20Wrapper.sol:20"
           },
           {
@@ -173,7 +173,7 @@
             "contract": "ERC20WrapperGluwacoin",
             "label": "__gap",
             "type": "t_array(t_uint256)50_storage",
-            "src": "ERC20WrapperGluwacoin.sol:40"
+            "src": "Box.sol:21"
           },
           {
             "contract": "ExampleCoin",
@@ -192,7 +192,7 @@
           "t_array(t_uint256)49_storage": {
             "label": "uint256[49]"
           },
-          "t_contract(IERC20)3220": {
+          "t_contract(IERC20)2874": {
             "label": "contract IERC20"
           },
           "t_mapping(t_address,t_mapping(t_uint256,t_bool))": {
@@ -219,15 +219,15 @@
           "t_array(t_uint256)44_storage": {
             "label": "uint256[44]"
           },
-          "t_mapping(t_bytes32,t_struct(RoleData)1729_storage)": {
+          "t_mapping(t_bytes32,t_struct(RoleData)1653_storage)": {
             "label": "mapping(bytes32 => struct AccessControlUpgradeSafe.RoleData)"
           }
         }
       }
     },
     "013da52c7b82615fb3770c59eb43e5829fc933b84dcbe81d7845ffdd105582ac": {
-      "address": "0xFC628dd79137395F3C9744e33b1c5DE554D94882",
-      "txHash": "0xb45863e29da1102c3ddfc08b6e3562f37406d680b29d242c866cc472f76bf1eb",
+      "address": "0x0290FB167208Af455bB137780163b7B7a9a10C16",
+      "txHash": "0x84428e523ea43998a25b844d8f4fbba4643ab4f131b4358d0e4b21c98a8cc6e1",
       "layout": {
         "storage": [
           {
@@ -257,7 +257,7 @@
           {
             "contract": "AccessControlUpgradeSafe",
             "label": "_roles",
-            "type": "t_mapping(t_bytes32,t_struct(RoleData)1729_storage)",
+            "type": "t_mapping(t_bytes32,t_struct(RoleData)1653_storage)",
             "src": "../@openzeppelin/contracts-ethereum-package/contracts/access/AccessControl.sol:58"
           },
           {
@@ -341,7 +341,7 @@
           {
             "contract": "ERC20Wrapper",
             "label": "_token",
-            "type": "t_contract(IERC20)3220",
+            "type": "t_contract(IERC20)2874",
             "src": "abstracts/ERC20Wrapper.sol:20"
           },
           {
@@ -378,7 +378,7 @@
             "contract": "ERC20WrapperGluwacoin",
             "label": "__gap",
             "type": "t_array(t_uint256)50_storage",
-            "src": "ERC20WrapperGluwacoin.sol:40"
+            "src": "Box.sol:21"
           }
         ],
         "types": {
@@ -391,7 +391,7 @@
           "t_array(t_uint256)49_storage": {
             "label": "uint256[49]"
           },
-          "t_contract(IERC20)3220": {
+          "t_contract(IERC20)2874": {
             "label": "contract IERC20"
           },
           "t_mapping(t_address,t_mapping(t_uint256,t_bool))": {
@@ -418,7 +418,7 @@
           "t_array(t_uint256)44_storage": {
             "label": "uint256[44]"
           },
-          "t_mapping(t_bytes32,t_struct(RoleData)1729_storage)": {
+          "t_mapping(t_bytes32,t_struct(RoleData)1653_storage)": {
             "label": "mapping(bytes32 => struct AccessControlUpgradeSafe.RoleData)"
           }
         }
@@ -426,7 +426,7 @@
     }
   },
   "admin": {
-    "address": "0x630589690929E9cdEFDeF0734717a9eF3Ec7Fcfe",
-    "txHash": "0xeb5283bd911be0e552f4dd32fddaea5a0e4567e0a7ea4acfc3688b42c64a58a8"
+    "address": "0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B",
+    "txHash": "0x5346ce7f409dbcf6aabacd760a068581a6e1e3a05a7cdc78876fd261df45b3a5"
   }
 }
