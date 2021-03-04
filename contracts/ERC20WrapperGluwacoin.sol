@@ -31,7 +31,7 @@ contract ERC20WrapperGluwacoin is Initializable, ContextUpgradeSafe, ERC20Wrappe
     function __ERC20WrapperGluwacoin_init_unchained() internal initializer {
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal override (ERC20Wrapper, ERC20Reservable) {
+    function _beforeTokenTransfer(address from, address to, uint256 amount) internal override (ERC20UpgradeSafe, ERC20Wrapper, ERC20Reservable) {
         ERC20Wrapper._beforeTokenTransfer(from, to, amount);
     } 
 
