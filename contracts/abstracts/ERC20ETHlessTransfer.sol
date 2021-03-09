@@ -43,16 +43,8 @@ abstract contract ERC20ETHless is Initializable, AccessControlUpgradeSafe, ERC20
      * - the `sender` must have a balance of at least the sum of `amount` and `fee`.
      * - the `nonce` is only used once per `sender`.
      */
-    function transfer(
-        address sender,
-        address recipient,
-        uint256 amount,
-        uint256 fee,
-        uint256 nonce,
-        bytes memory sig
-    )
-        external
-        returns (bool success)
+    function transfer(address sender, address recipient, uint256 amount, uint256 fee, uint256 nonce, bytes calldata  sig)
+        external returns (bool success)
     {
         _useNonce(sender, nonce);
 

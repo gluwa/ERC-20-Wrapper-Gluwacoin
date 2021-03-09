@@ -1,4 +1,4 @@
-pragma solidity ^0.6.2;
+pragma solidity ^0.6.0;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
@@ -39,5 +39,5 @@ contract ERC20WrapperGluwacoinMock is Initializable, ERC20WrapperGluwacoin {
     }
 
 
-    uint256[50] private __gap;
+    uint256[44] private __gap;
 }

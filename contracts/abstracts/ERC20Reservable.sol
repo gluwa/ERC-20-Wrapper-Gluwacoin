@@ -47,12 +47,7 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
     function __ERC20Reservable_init_unchained() internal initializer {
     }
 
-    function getReservation(
-        address sender,
-        uint256 nonce
-    )
-        external
-        view
+    function getReservation(address sender, uint256 nonce) external view
         returns (
             uint256 amount,
             uint256 fee,
@@ -86,10 +81,9 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
         uint256 fee,
         uint256 nonce,
         uint256 expiryBlockNum,
-        bytes memory sig
+        bytes calldata sig
     )
-        external
-        returns (bool success)
+        external returns (bool success)
     {
         require(_reserved[sender][nonce]._expiryBlockNum == 0, "ERC20Reservable: the sender used the nonce already");
 
@@ -164,5 +158,5 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
         super._beforeTokenTransfer(from, to, amount);
     }
 
-    uint256[50] private __gap;
+    uint256[44] private __gap;
 }
