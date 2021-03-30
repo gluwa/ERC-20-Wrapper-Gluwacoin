@@ -12,6 +12,7 @@ import "./Validate.sol";
  * gas fee for them. The relayer gets paid in this ERC20 token for `fee`.
  */
 abstract contract ERC20ETHless is Initializable, AccessControlUpgradeSafe, ERC20UpgradeSafe {
+    using SafeMath for uint256;
     using Address for address;
 
     mapping (address => mapping (uint256 => bool)) private _usedNonces;
@@ -46,6 +47,8 @@ abstract contract ERC20ETHless is Initializable, AccessControlUpgradeSafe, ERC20
     function transfer(address sender, address recipient, uint256 amount, uint256 fee, uint256 nonce, bytes calldata  sig)
         external returns (bool success)
     {
+        uint256 senderBalance = balanceOf(sender);
+        require(senderBalance >= amount.add(fee), "ERC20ETHless: the balance is not sufficient");
         _useNonce(sender, nonce);
 
         bytes32 hash = keccak256(abi.encodePacked(address(this), sender, recipient, amount, fee, nonce));

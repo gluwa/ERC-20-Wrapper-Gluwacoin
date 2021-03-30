@@ -4,7 +4,7 @@ pragma solidity ^0.6.0;
 import "@openzeppelin/contracts-ethereum-package/contracts/GSN/Context.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
-import "./abstracts/ERC20ETHlessTransfer.sol";
+import "./abstracts/ERC20ETHless.sol";
 import "./abstracts/ERC20Reservable.sol";
 import "./abstracts/ERC20Wrapper.sol";
 
@@ -15,7 +15,7 @@ import "./abstracts/ERC20Wrapper.sol";
 contract ERC20WrapperGluwacoin is Initializable, ContextUpgradeSafe, ERC20Wrapper, ERC20ETHless, ERC20Reservable   {
     // note that `decimals` must match that of `token` or less
     function initialize(string memory name, string memory symbol, uint8 decimals, IERC20 token) public virtual {
-        __ERC20Wrapper_init(name, symbol, decimals, token);
+        __ERC20WrapperGluwacoin_init(name, symbol, decimals, token);
     }
 
     function __ERC20WrapperGluwacoin_init(string memory name, string memory symbol, uint8 decimals, IERC20 token)
@@ -33,7 +33,7 @@ contract ERC20WrapperGluwacoin is Initializable, ContextUpgradeSafe, ERC20Wrappe
 
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override (ERC20UpgradeSafe, ERC20Wrapper, ERC20Reservable) {
         ERC20Wrapper._beforeTokenTransfer(from, to, amount);
-    } 
+    }
 
 
     uint256[44] private __gap;

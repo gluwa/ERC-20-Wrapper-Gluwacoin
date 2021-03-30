@@ -22,9 +22,6 @@ contract ERC20PresetMinterPauserMockUpgradeSafe is Initializable, ERC20PresetMin
     }
 
     function __ERC20PresetMinterPauserMock_init_unchained(string memory name, string memory symbol) internal initializer {
-
-
-
     }
 
 
