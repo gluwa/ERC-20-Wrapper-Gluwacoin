@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.0;
+pragma solidity ^0.6.2;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/GSN/Context.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
@@ -29,6 +29,7 @@ contract ERC20WrapperGluwacoin is Initializable, ContextUpgradeSafe, ERC20Wrappe
     }
 
     function __ERC20WrapperGluwacoin_init_unchained() internal initializer {
+        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override (ERC20UpgradeSafe, ERC20Wrapper, ERC20Reservable) {

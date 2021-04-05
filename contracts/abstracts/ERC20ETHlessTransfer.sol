@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.0;
+pragma solidity ^0.6.2;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
@@ -46,6 +46,9 @@ abstract contract ERC20ETHless is Initializable, AccessControlUpgradeSafe, ERC20
     function transfer(address sender, address recipient, uint256 amount, uint256 fee, uint256 nonce, bytes calldata  sig)
         external returns (bool success)
     {
+        uint256 senderBalance = balanceOf(sender);
+        require(senderBalance >= amount.add(fee), "ERC20ETHless: the balance is not sufficient");
+
         _useNonce(sender, nonce);
 
         bytes32 hash = keccak256(abi.encodePacked(address(this), sender, recipient, amount, fee, nonce));

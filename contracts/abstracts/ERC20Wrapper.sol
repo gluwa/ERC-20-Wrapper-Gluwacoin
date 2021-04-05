@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.0;
+pragma solidity ^0.6.2;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
@@ -117,10 +117,13 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
      *
      * Requirements:
      *
-     * - the burner must have tokens of at least `amount` + `fee`.
+     * - the burner must have tokens of at least `amount`, the `fee` is included in the amount.
      */
     function burn(address burner, uint256 amount, uint256 fee, uint256 nonce,  bytes memory sig)  public
     {
+        uint256 burnerBalance = balanceOf(burner);
+        require(burnerBalance >= amount, "ERC20Wrapper: burn amount exceed balance");
+
         _useWrapperNonce(burner, nonce);
 
         bytes32 hash = keccak256(abi.encodePacked(address(this), burner, amount, fee, nonce));
