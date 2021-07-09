@@ -865,7 +865,7 @@ describe('ExampleCoin_Wrapper', function () {
 
             await expectRevert(
                 this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner }),
-                'ERC20Reservable: transfer amount exceeds unreserved balance'
+                'ERC20Wrapper: burn amount exceed balance -- Reason given: ERC20Wrapper: burn amount exceed balance.'
             );
         });
 
@@ -1023,7 +1023,7 @@ describe('ExampleCoin_Wrapper', function () {
             await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner });
             await expectRevert(
                 this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner }),
-                'ERC20Wrapper: the nonce has already been used for this address'
+                'ERC20Wrapper: burn amount exceed balance -- Reason given: ERC20Wrapper: burn amount exceed balance.'
             );
         });
 
@@ -1811,7 +1811,7 @@ describe('ExampleCoin_Reservable', function () {
     
             await expectRevert(
                 this.token.transfer(other, another, amount, fee, nonce, signature, { from: deployer }),
-                'ERC20Reservable: transfer amount exceeds unreserved balance'
+                'ERC20ETHless: the balance is not sufficient -- Reason given: ERC20ETHless: the balance is not sufficient.'
             );
         });
     });  

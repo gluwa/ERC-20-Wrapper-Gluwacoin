@@ -822,7 +822,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
 
             await expectRevert(
                 this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner }),
-                'ERC20Reservable: transfer amount exceeds unreserved balance'
+                'ERC20Wrapper: burn amount exceed balance -- Reason given: ERC20Wrapper: burn amount exceed balance.'
             );
         });
 
@@ -977,9 +977,11 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             expect(await this.token.balanceOf(other)).to.be.bignumber.equal(mint_amount);
             expect(await this.token.totalSupply()).to.be.bignumber.equal(mint_amount);
 
-            await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner });
+            var temp = BigInt(amount) / BigInt(2);
+
+            await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, temp, burn_fee, nonce, signature, { from: burner });
             await expectRevert(
-                this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner }),
+                this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, temp, burn_fee, nonce, signature, { from: burner }),
                 'ERC20Wrapper: the nonce has already been used for this address'
             );
         });

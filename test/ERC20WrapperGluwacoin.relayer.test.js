@@ -74,22 +74,27 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
         // signature
         it('cannot use another user\'s signature', async function () {
             var nonce = Date.now();
-            var signature = sign.sign(this.token.address, other, another_privateKey, another, amount.sub(fee), fee, nonce);
+
+            var temp = BigInt(amount) / BigInt(2);
+            var signature = sign.sign(this.token.address, other, another_privateKey, another,temp - BigInt(fee), fee, nonce);
 
             await expectRevert(
-                this.token.transfer(other, another, amount, fee, nonce, signature, { from: deployer }),
+                this.token.transfer(other, another, temp, fee, nonce, signature, { from: deployer }),
                 'Validate: invalid signature'
             );
         });
 
         it('cannot use signature again', async function () {
             var nonce = Date.now();
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, amount.sub(fee), fee, nonce);
 
-            await this.token.transfer(other, another, amount.sub(fee), fee, nonce, signature, { from: deployer });
+            var temp = BigInt(amount) / BigInt(2);
+            var signature = sign.sign(this.token.address, other, other_privateKey, another, temp-BigInt(fee), fee, nonce);
+
+
+            await this.token.transfer(other, another, temp - BigInt(fee), fee, nonce, signature, { from: deployer });
 
             await expectRevert(
-                this.token.transfer(other, another, amount, fee, nonce, signature, { from: deployer }),
+                this.token.transfer(other, another, temp, fee, nonce, signature, { from: deployer }),
                 'ERC20ETHless: the nonce has already been used for this address'
             );
         });
@@ -112,7 +117,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
 
             await expectRevert(
                 this.token.transfer(other, another, amount, fee, nonce, signature, { from: deployer }),
-                'ERC20Reservable: transfer amount exceeds unreserved balance'
+                'ERC20ETHless: the balance is not sufficient -- Reason given: ERC20ETHless: the balance is not sufficient.'
             );
         });
     });

@@ -16,26 +16,29 @@ describe('ERC20WrapperGluwacoin', function () {
     const name = 'ERC20WrapperGluwacoin';
     const symbol = 'WG';
     const decimals = new BN('18');
+   
 
     beforeEach(async function () {
         // Deploy a new ControlledGluwacoin contract for each test
         this.baseToken = await ERC20PresetMinterPauser.new('Gluwacoin', 'GC', { from: deployer });
         // Deploy a new ERC20WrapperGluwacoin contract for each test
-        this.token = await ERC20WrapperGluwacoin.new(name, symbol, decimals, this.baseToken.address, { from: deployer });
+        this.token = await ERC20WrapperGluwacoin.new(name, symbol, decimals, this.baseToken.address, { from: deployer });       
     });
 
     /* ERC20
     */
     describe('mint test', async function () {
-        it('token name is ' + name, async function () {
+        
+
+        it('token name is ERC20WrapperGluwacoin', async function () {
             expect(await this.token.name()).to.equal(name);
         });
 
-        it('token symbol is ' + symbol, async function () {
+        it('token symbol is WG', async function () {
             expect(await this.token.symbol()).to.equal(symbol);
         });
 
-        it('token decimals are ' + decimals.toString(), async function () {
+        it('token decimals are 18', async function () {
             expect(await this.token.decimals()).to.be.bignumber.equal(decimals);
         });
 
