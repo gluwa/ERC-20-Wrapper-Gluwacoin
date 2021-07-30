@@ -1,16 +1,15 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.2;
+pragma solidity ^0.8.6;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/presets/ERC20PresetMinterPauser.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract ERC20PresetMinterPauserMockUpgradeSafe is Initializable, ERC20PresetMinterPauserUpgradeSafe {
+contract ERC20PresetMinterPauserMockUpgradeSafe is Initializable, ERC20PresetMinterPauserUpgradeable {
 
-    constructor(string memory name, string memory symbol) public payable {
-        __ERC20PresetMinterPauserMock_init(name, symbol);
-    }
+ 
 
     function __ERC20PresetMinterPauserMock_init(string memory name, string memory symbol) internal initializer {
+        __ERC20PresetMinterPauserMock_init(name, symbol);
         __Context_init_unchained();
         __AccessControl_init_unchained();
         __ERC20_init_unchained(name, symbol);

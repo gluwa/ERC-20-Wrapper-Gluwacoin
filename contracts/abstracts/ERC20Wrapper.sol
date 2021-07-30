@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.2;
+pragma solidity ^0.8.6;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "../libs/GluwacoinModel.sol";
 
 import "./Validate.sol";
 
@@ -13,9 +13,8 @@ import "./Validate.sol";
  * @dev Extension of {ERC20} that allows a certain ERC20 token holders to wrap the token to mint this token.
  * Holder of this token can retrieve the wrapped token by burning this token.
  */
-abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20UpgradeSafe {
-    using SafeMath for uint256;
-    using Address for address;
+abstract contract ERC20Wrapper is Initializable, AccessControlEnumerableUpgradeable, ERC20Upgradeable {
+    using AddressUpgradeable for address;
     // base token, the token to be wrapped
     IERC20 private _token;
 
@@ -27,15 +26,15 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
     event Mint(address indexed _mintTo, uint256 _value);
     event Burnt(address indexed _burnFrom, uint256 _value);
 
-    function __ERC20Wrapper_init(string memory name, string memory symbol, uint8 decimals, IERC20 token) internal
+    function __ERC20Wrapper_init(string memory name, string memory symbol,IERC20 token) internal
     initializer {
         __Context_init_unchained();
+        __AccessControlEnumerable_init();
         __ERC20_init_unchained(name, symbol);
-        __ERC20Wrapper_init_unchained(decimals, token);
+        __ERC20Wrapper_init_unchained(token);
     }
 
-    function __ERC20Wrapper_init_unchained(uint8 decimals, IERC20 token) internal virtual initializer {
-        _setupDecimals(decimals);
+    function __ERC20Wrapper_init_unchained(IERC20 token) internal virtual initializer {
         _setupToken(token);
         _setupRole(WRAPPER_ROLE, _msgSender());
     }
@@ -84,7 +83,7 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
     {
         _useWrapperNonce(minter, nonce);
 
-        bytes32 hash = keccak256(abi.encodePacked(address(this), minter, amount, fee, nonce));
+        bytes32 hash = keccak256(abi.encodePacked(GluwacoinModel.SigDomain.Mint, block.chainid, address(this), minter, amount, fee, nonce));
         Validate.validateSignature(hash, minter, sig);
 
         __mint(minter, amount);
@@ -126,13 +125,13 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
 
         _useWrapperNonce(burner, nonce);
 
-        bytes32 hash = keccak256(abi.encodePacked(address(this), burner, amount, fee, nonce));
+        bytes32 hash = keccak256(abi.encodePacked(GluwacoinModel.SigDomain.Burn, block.chainid, address(this), burner, amount, fee, nonce));
         Validate.validateSignature(hash, burner, sig);
 
         address wrapper = getRoleMember(WRAPPER_ROLE, 0);
         _transfer(burner, wrapper, fee);
 
-        __burn(burner, amount.sub(fee));
+        __burn(burner, amount - fee);
     }
 
     function __mint(address account, uint256 amount) internal {
@@ -169,9 +168,9 @@ abstract contract ERC20Wrapper is Initializable, AccessControlUpgradeSafe, ERC20
         _usedNonces[signer][nonce] = true;
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override (ERC20UpgradeSafe) {
+    function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override (ERC20Upgradeable) {
         super._beforeTokenTransfer(from, to, amount);
     }
 
-    uint256[44] private __gap;
+    uint256[50] private __gap;
 }

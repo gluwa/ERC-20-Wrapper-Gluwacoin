@@ -13,7 +13,7 @@ import "./abstracts/ERC20Wrapper.sol";
  * @dev Extension of {Gluwacoin} that allows a certain ERC20 token holders to wrap the token to mint this token.
  * Holder of this token can retrieve the wrapped token by burning this token.
  */
-contract ERC20WrapperGluwacoin is
+contract ERC20WrapperGluwacoinV1 is
     Initializable,
     ContextUpgradeable,
     ERC20Wrapper,
@@ -57,6 +57,31 @@ contract ERC20WrapperGluwacoin is
     ) internal override(ERC20Upgradeable, ERC20Wrapper, ERC20Reservable) {
         ERC20Wrapper._beforeTokenTransfer(from, to, amount);
         ERC20Reservable._beforeTokenTransfer(from, to, amount);
+    }
+
+    string public newRole;
+
+    enum SigDomainV2 {
+        /*0*/
+        Nothing,
+        /*1*/
+        Burn,
+        /*2*/
+        Mint,
+        /*3*/
+        Transfer,
+        /*4*/
+        Reserve,
+        /*5*/
+        Withdraw
+    }
+
+    function getChainId() external view returns (uint256) {
+        return block.chainid;
+    }
+
+    function setNewRole(string calldata role) external {
+        newRole = role; 
     }
 
     uint256[50] private __gap;

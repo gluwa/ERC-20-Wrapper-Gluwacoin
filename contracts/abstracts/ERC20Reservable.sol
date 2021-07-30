@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.2;
+pragma solidity ^0.8.6;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "../libs/GluwacoinModel.sol";
 
 import "./Validate.sol";
 
@@ -13,11 +13,11 @@ import "./Validate.sol";
  * a `fee`. If the `reserve` gets expired without getting executed, the `sender` or the `executor` can `reclaim`
  * the fund back to the `sender`.
  */
-abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
-    using SafeMath for uint256;
-    using Address for address;
+abstract contract ERC20Reservable is Initializable, ERC20Upgradeable {
+    using AddressUpgradeable for address;
 
     enum ReservationStatus {
+        Draft,
         Active,
         Reclaimed,
         Completed
@@ -49,24 +49,14 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
 
     function getReservation(address sender, uint256 nonce) external view
         returns (
-            uint256 amount,
-            uint256 fee,
-            address recipient,
-            address executor,
-            uint256 expiryBlockNum
+            Reservation memory
         )
     {
-        Reservation memory reservation = _reserved[sender][nonce];
-
-        amount = reservation._amount;
-        fee = reservation._fee;
-        recipient = reservation._recipient;
-        executor = reservation._executor;
-        expiryBlockNum = reservation._expiryBlockNum;
+        return _reserved[sender][nonce];        
     }
 
     function reservedBalanceOf(address account) external view returns (uint256 amount) {
-        return balanceOf(account).sub(_unreservedBalance(account));
+        return balanceOf(account) - _unreservedBalance(account);
     }
 
     function unreservedBalanceOf(address account) external view returns (uint256 amount) {
@@ -90,15 +80,15 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
         require(expiryBlockNum > block.number, "ERC20Reservable: invalid block expiry number");
         require(executor != address(0), "ERC20Reservable: cannot execute from zero address");
 
-        uint256 total = amount.add(fee);
+        uint256 total = amount + fee;
         require(_unreservedBalance(sender) >= total, "ERC20Reservable: insufficient unreserved balance");
 
-        bytes32 hash = keccak256(abi.encodePacked(address(this), sender, recipient, amount, fee, nonce));
+        bytes32 hash = keccak256(abi.encodePacked(GluwacoinModel.SigDomain.Reserve, block.chainid, address(this), sender, recipient, amount, fee, nonce, expiryBlockNum));
         Validate.validateSignature(hash, sender, sig);
 
         _reserved[sender][nonce] = Reservation(amount, fee, recipient, executor, expiryBlockNum,
             ReservationStatus.Active);
-        _totalReserved[sender] = _totalReserved[sender].add(total);
+        _totalReserved[sender] = _totalReserved[sender] + total;
 
         return true;
     }
@@ -118,10 +108,10 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
         address recipient = reservation._recipient;
         uint256 fee = reservation._fee;
         uint256 amount = reservation._amount;
-        uint256 total = amount.add(fee);
+        uint256 total = amount + fee;
 
         _reserved[sender][nonce]._status = ReservationStatus.Completed;
-        _totalReserved[sender] = _totalReserved[sender].sub(total);
+        _totalReserved[sender] = _totalReserved[sender] - total;
 
         _transfer(sender, executor, fee);
         _transfer(sender, recipient, amount);
@@ -141,16 +131,16 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
             "ERC20Reservable: invalid reservation status to reclaim");
 
         _reserved[sender][nonce]._status = ReservationStatus.Reclaimed;
-        _totalReserved[sender] = _totalReserved[sender].sub(reservation._amount).sub(reservation._fee);
+        _totalReserved[sender] = _totalReserved[sender] - reservation._amount - reservation._fee;
 
         return true;
     }
 
     function _unreservedBalance(address sender) internal view returns (uint256 amount) {
-        return balanceOf(sender).sub(_totalReserved[sender]);
+        return balanceOf(sender) - _totalReserved[sender];
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override (ERC20UpgradeSafe) {
+    function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override (ERC20Upgradeable) {
         if (from != address(0)) {
             require(_unreservedBalance(from) >= amount, "ERC20Reservable: transfer amount exceeds unreserved balance");
         }
@@ -158,5 +148,5 @@ abstract contract ERC20Reservable is Initializable, ERC20UpgradeSafe {
         super._beforeTokenTransfer(from, to, amount);
     }
 
-    uint256[44] private __gap;
+    uint256[50] private __gap;
 }

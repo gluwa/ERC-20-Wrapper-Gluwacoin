@@ -30,7 +30,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
         // Deploy a new ControlledGluwacoin contract for each test
         this.baseToken = await ERC20PresetMinterPauser.new('Gluwacoin', 'GC', { from: deployer });
         // Deploy a new ERC20WrapperGluwacoin contract for each test
-        this.token = await ERC20WrapperGluwacoin.new(name, symbol, decimals, this.baseToken.address, { from: deployer });
+        this.token = await ERC20WrapperGluwacoin.new(name, symbol, this.baseToken.address, { from: deployer });
         // Prepare Gluwacoins
         await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });
@@ -45,6 +45,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     describe('ETHless test', async function () {
         // relayer role-related
         it('deployer has the default relayer role', async function () {
+            console.info("temp " + await this.token.getRoleMemberCount(RELAYER_ROLE));
             expect(await this.token.getRoleMemberCount(RELAYER_ROLE)).to.be.bignumber.equal('1');
             expect(await this.token.getRoleMember(RELAYER_ROLE, 0)).to.equal(deployer);
         });

@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.2;
+pragma solidity ^0.8.6;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "../libs/GluwacoinModel.sol";
 
 import "./Validate.sol";
 
@@ -11,8 +12,8 @@ import "./Validate.sol";
  * @dev Extension of {ERC20} that allows users to send ETHless transfer by hiring a transaction relayer to pay the
  * gas fee for them. The relayer gets paid in this ERC20 token for `fee`.
  */
-abstract contract ERC20ETHless is Initializable, AccessControlUpgradeSafe, ERC20UpgradeSafe {
-    using Address for address;
+abstract contract ERC20ETHless is Initializable, AccessControlEnumerableUpgradeable, ERC20Upgradeable {
+    using AddressUpgradeable for address;
 
     mapping (address => mapping (uint256 => bool)) private _usedNonces;
 
@@ -22,6 +23,7 @@ abstract contract ERC20ETHless is Initializable, AccessControlUpgradeSafe, ERC20
     function __ERC20ETHless_init(string memory name, string memory symbol) internal
     initializer {
         __ERC20_init_unchained(name, symbol);
+        __AccessControlEnumerable_init();
         __ERC20ETHless_init_unchained();
     }
 
@@ -47,11 +49,11 @@ abstract contract ERC20ETHless is Initializable, AccessControlUpgradeSafe, ERC20
         external returns (bool success)
     {
         uint256 senderBalance = balanceOf(sender);
-        require(senderBalance >= amount.add(fee), "ERC20ETHless: the balance is not sufficient");
+        require(senderBalance >= (amount + fee), "ERC20ETHless: the balance is not sufficient");
 
         _useNonce(sender, nonce);
 
-        bytes32 hash = keccak256(abi.encodePacked(address(this), sender, recipient, amount, fee, nonce));
+        bytes32 hash = keccak256(abi.encodePacked(GluwacoinModel.SigDomain.Transfer, block.chainid, address(this), sender, recipient, amount, fee, nonce));
         Validate.validateSignature(hash, sender, sig);
 
         _collect(sender, fee);
