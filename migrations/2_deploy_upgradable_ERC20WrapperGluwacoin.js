@@ -37,7 +37,7 @@ module.exports = async function (deployer, network) {
                 ERC20WrapperGluwacoin,
                 [name, symbol, rinkeby_baseTokenAddress],
                 {deployer, initializer: 'initialize' }
-        );
+        );        
 
         console.log('Deployed', instance.address);
         console.log('token ' + (await instance.token()));

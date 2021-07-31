@@ -49,10 +49,23 @@ abstract contract ERC20Reservable is Initializable, ERC20Upgradeable {
 
     function getReservation(address sender, uint256 nonce) external view
         returns (
-            Reservation memory
+            uint256 amount,
+            uint256 fee,
+            address recipient,
+            address executor,
+            uint256 expiryBlockNum,
+            ReservationStatus status
         )
     {
-        return _reserved[sender][nonce];        
+        
+        Reservation storage reservation = _reserved[sender][nonce];
+
+        amount = reservation._amount;
+        fee = reservation._fee;
+        recipient = reservation._recipient;
+        executor = reservation._executor;
+        expiryBlockNum = reservation._expiryBlockNum;      
+        status = reservation._status;
     }
 
     function reservedBalanceOf(address account) external view returns (uint256 amount) {

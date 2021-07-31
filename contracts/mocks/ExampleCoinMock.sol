@@ -26,7 +26,4 @@ contract ExampleCoinMock is Initializable, ExampleCoin {
         __ERC20Wrapper_init_unchained(token);
         __ERC20WrapperGluwacoin_init_unchained();
     }
-
-
-    uint256[44] private __gap;
 }

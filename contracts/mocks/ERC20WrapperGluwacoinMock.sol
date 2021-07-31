@@ -10,7 +10,7 @@ contract ERC20WrapperGluwacoinMock is Initializable, ERC20WrapperGluwacoin {
         string memory name,
         string memory symbol,
         IERC20 token
-    ) public {
+    ) {
         __ERC20WrapperGluwacoinMock_init(name, symbol, token);
     }
 
@@ -18,14 +18,15 @@ contract ERC20WrapperGluwacoinMock is Initializable, ERC20WrapperGluwacoin {
         string memory name,
         string memory symbol,
         IERC20 token
-    ) internal initializer {
+    ) internal {
         __Context_init_unchained();
         __ERC20_init_unchained(name, symbol);
         __ERC20ETHless_init_unchained();
         __ERC20Reservable_init_unchained();
         __ERC20Wrapper_init_unchained(token);
         __ERC20WrapperGluwacoin_init_unchained();
-    }
+    } 
+
 
     function __ERC20Wrapper_init_unchained(
         IERC20 token
@@ -33,7 +34,6 @@ contract ERC20WrapperGluwacoinMock is Initializable, ERC20WrapperGluwacoin {
         _setupToken(token);
         _setupRole(WRAPPER_ROLE, _msgSender());
     }
-
 
     uint256[50] private __gap;
 }

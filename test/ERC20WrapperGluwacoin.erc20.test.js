@@ -39,7 +39,7 @@ describe('ERC20WrapperGluwacoin', function () {
         });
 
         it('token decimals are 6', async function () {
-            expect(await this.token.decimals()).to.be.bignumber.equal(decimals);
+            expect(await this.token.decimals()).to.be.bignumber.equal(decimals.toString());
         });
 
         it('initial balance is 0', async function () {

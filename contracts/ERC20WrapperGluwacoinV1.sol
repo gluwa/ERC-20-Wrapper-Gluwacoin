@@ -74,15 +74,15 @@ contract ERC20WrapperGluwacoinV1 is
         Reserve,
         /*5*/
         Withdraw
-    }
-
-    function getChainId() external view returns (uint256) {
-        return block.chainid;
-    }
+    }    
 
     function setNewRole(string calldata role) external {
         newRole = role; 
     }
 
-    uint256[50] private __gap;
+    function getNewChainId() external view returns (uint256) {
+        return block.chainid + 100;
+    }
+
+    uint256[49] private __gap;
 }

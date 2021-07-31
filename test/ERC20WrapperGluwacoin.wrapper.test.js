@@ -105,7 +105,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
             await this.baseToken.mint(other, baseToken_amount, { from: deployer });
             await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
             await expectRevert(
-                this.token.mint(mint_amount, { from: minter }),
+                await this.token.mint(mint_amount, { from: minter }),
                 'ERC20: transfer amount exceeds allowance'
             );
         });
