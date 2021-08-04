@@ -8,9 +8,9 @@ contract ExampleCoinMock is Initializable, ExampleCoin {
 
     constructor(
         string memory name,
-        string memory symbol,        
+        string memory symbol,
         IERC20 token
-    ) public {
+    )  {
         __ExampleCoinMock_init(name, symbol, token);
     }
 
@@ -26,4 +26,6 @@ contract ExampleCoinMock is Initializable, ExampleCoin {
         __ERC20Wrapper_init_unchained(token);
         __ERC20WrapperGluwacoin_init_unchained();
     }
+
+
 }

@@ -22,6 +22,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     const decimals = new BN('18');
 
     const amount = new BN('5000');
+    const amountHalf = new BN('2500');
     const fee = new BN('1');
 
     const RELAYER_ROLE = web3.utils.soliditySha3('RELAYER_ROLE');
@@ -51,7 +52,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
 
         it('relayer can send ETHless transfer', async function () {
             var nonce = Date.now();
-            var signature = sign.signWrapper(3,1,this.token.address, other, other_privateKey, another, amount.sub(fee), fee, nonce);
+            var signature = sign.signTransfer(3,1,this.token.address, other, other_privateKey, another, amount.sub(fee), fee, nonce);
 
             await this.token.transfer(other, another, amount.sub(fee), fee, nonce, signature, { from: deployer });
 
@@ -62,7 +63,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
 
         it('non-relayer can send ETHless transfer', async function () {
             var nonce = Date.now();
-            var signature = sign.signWrapper(3,1,this.token.address, other, other_privateKey, another, amount.sub(fee), fee, nonce);
+            var signature = sign.signTransfer(3,1,this.token.address, other, other_privateKey, another, amount.sub(fee), fee, nonce);
 
             await this.token.transfer(other, another, amount.sub(fee), fee, nonce, signature, { from: other });
 
@@ -75,11 +76,11 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
         it('cannot use another user\'s signature', async function () {
             var nonce = Date.now();
 
-            var temp = BigInt(amount) / BigInt(2);
-            var signature = sign.signWrapper(3,1,this.token.address, other, another_privateKey, another,temp - BigInt(fee), fee, nonce);
+            
+            var signature = sign.signTransfer(3,1,this.token.address, other, another_privateKey, another, amount.sub(fee), fee, nonce);
 
             await expectRevert(
-                 await this.token.transfer(other, another, temp, fee, nonce, signature, { from: deployer }),
+                 this.token.transfer(other, another, amount.sub(fee), fee, nonce, signature, { from: deployer }),
                 'Validate: invalid signature'
             );
         });
@@ -87,14 +88,13 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
         it('cannot use signature again', async function () {
             var nonce = Date.now();
 
-            var temp = BigInt(amount) / BigInt(2);
-            var signature = sign.signWrapper(3,1,this.token.address, other, other_privateKey, another, temp-BigInt(fee), fee, nonce);
+            var signature = sign.signTransfer(3,1,this.token.address, other, other_privateKey, another, amountHalf.sub(fee), fee, nonce);
 
 
-            await this.token.transfer(other, another, temp - BigInt(fee), fee, nonce, signature, { from: deployer });
+            await this.token.transfer(other, another, amountHalf.sub(fee), fee, nonce, signature, { from: deployer });
 
             await expectRevert(
-                await this.token.transfer(other, another, temp, fee, nonce, signature, { from: deployer }),
+                 this.token.transfer(other, another, amountHalf.sub(fee), fee, nonce, signature, { from: deployer }),
                 'ERC20ETHless: the nonce has already been used for this address'
             );
         });
@@ -102,7 +102,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
         // event
         it('Two Transfer events are emitted', async function () {
             var nonce = Date.now();
-            var signature = sign.signWrapper(3,1,this.token.address, other, other_privateKey, another, amount.sub(fee), fee, nonce);
+            var signature = sign.signTransfer(3,1,this.token.address, other, other_privateKey, another, amount.sub(fee), fee, nonce);
 
             const receipt = await this.token.transfer(other, another, amount.sub(fee), fee, nonce, signature, { from: deployer });
 
@@ -113,10 +113,10 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
         // balance
         it('cannot send ETHless transfer more than balance', async function () {
             var nonce = Date.now();
-            var signature = sign.signWrapper(3,1,this.token.address, other, other_privateKey, another, amount, fee, nonce);
+            var signature = sign.signTransfer(3,1,this.token.address, other, other_privateKey, another, amount, fee, nonce);
 
             await expectRevert(
-                await this.token.transfer(other, another, amount, fee, nonce, signature, { from: deployer }),
+                this.token.transfer(other, another, amount, fee, nonce, signature, { from: deployer }),
                 'ERC20ETHless: the balance is not sufficient -- Reason given: ERC20ETHless: the balance is not sufficient.'
             );
         });

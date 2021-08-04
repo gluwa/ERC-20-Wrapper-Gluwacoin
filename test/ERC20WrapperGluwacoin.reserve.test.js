@@ -74,7 +74,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var signature = sign.sign(4, 1, this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce, expiryBlockNum);
     
             await expectRevert(
-                await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer }),
+                this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer }),
                 'ERC20Reservable: invalid block expiry number'
             );
         });
@@ -175,7 +175,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
             await expectRevert(
-                await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer }),
+                this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer }),
                 'ERC20Reservable: the sender used the nonce already'
             );
         });
@@ -325,8 +325,8 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             await time.advanceBlockTo(expiryBlockNum.add(new BN('1')));
     
             await expectRevert(
-                await this.token.execute(other, nonce, { from: deployer }),
-                'ERC20Reservable: reservation has expired and cannot be executed'
+                 this.token.execute(other, nonce, { from: deployer }),
+                'ERC20Reservable: reservation has expired and cannot be executed'                
             );
         });
     

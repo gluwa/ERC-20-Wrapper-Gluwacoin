@@ -10,11 +10,11 @@ contract ERC20PresetMinterPauserMockUpgradeSafe is Initializable, ERC20PresetMin
         string memory name,
         string memory symbol
     ) {
-        __ERC20PresetMinterPauserMock_init(name, symbol);
+        initialize(name, symbol);
     }
  
 
-    function __ERC20PresetMinterPauserMock_init(string memory name, string memory symbol) internal {
+    function initialize(string memory name, string memory symbol) public override initializer {
         __Context_init_unchained();
         __AccessControl_init_unchained();
         __ERC20_init_unchained(name, symbol);

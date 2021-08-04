@@ -148,8 +148,8 @@ describe('ExampleCoin_Wrapper', function () {
             await this.baseToken.mint(other, baseToken_amount, { from: deployer });
             await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
             await expectRevert(
-                await this.token.mint(mint_amount, { from: minter }),
-                'revert ERC20: transfer amount exceeds allowance'
+                this.token.mint(mint_amount, { from: minter }),
+                'ERC20: transfer amount exceeds allowance'
             );
         });
 
@@ -244,7 +244,7 @@ describe('ExampleCoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(2, 1, this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce,expiryBlockNum);
+            var signature = sign.signWrapper(2, 1, this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = wrapper;
 
@@ -471,7 +471,7 @@ describe('ExampleCoin_Wrapper', function () {
             var mint_amount = amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(2, 1, this.token.address, another, another_privateKey, mint_amount, mint_fee, nonce,expiryBlockNum);
+            var signature = sign.signWrapper(2, 1, this.token.address, another, another_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = other;
 
@@ -732,7 +732,7 @@ describe('ExampleCoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(2, 1, this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(1, 1, this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = wrapper;
 
@@ -811,7 +811,7 @@ describe('ExampleCoin_Wrapper', function () {
             var burn_amount = 0;
             var burn_fee = 0;
             var nonce = Date.now();
-            var signature = sign.signWrapper(1, 1, this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce,expiryBlockNum);
+            var signature = sign.signWrapper(1, 1, this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var burner = another;
 
             await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, 0, 0, nonce, signature, { from: burner });
@@ -1426,7 +1426,7 @@ describe('ExampleCoin_Reservable', function () {
             await time.advanceBlockTo(expiryBlockNum.add(new BN('1')));
     
             await expectRevert(
-                await this.token.execute(other, nonce, { from: deployer }),
+                this.token.execute(other, nonce, { from: deployer }),
                 'ERC20Reservable: reservation has expired and cannot be executed'
             );
         });
@@ -1585,7 +1585,7 @@ describe('ExampleCoin_Reservable', function () {
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
             await expectRevert(
-                await this.token.reclaim(other, nonce, { from: other }),
+                 this.token.reclaim(other, nonce, { from: other }),
                 'ERC20Reservable: reservation has not expired or you are not the executor and cannot be reclaimed'
             );
         });
@@ -1610,7 +1610,7 @@ describe('ExampleCoin_Reservable', function () {
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
             await expectRevert(
-                await this.token.reclaim(other, nonce, { from: another }),
+                 this.token.reclaim(other, nonce, { from: another }),
                 'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
             );
         });
@@ -1637,7 +1637,7 @@ describe('ExampleCoin_Reservable', function () {
             await time.advanceBlockTo(expiryBlockNum.add(new BN('1')));
     
             await expectRevert(
-                await this.token.reclaim(other, nonce, { from: another }),
+                 this.token.reclaim(other, nonce, { from: another }),
                 'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
             );
         });
@@ -1645,7 +1645,7 @@ describe('ExampleCoin_Reservable', function () {
         it('executor cannot reclaim from no reservation', async function () {
             var nonce = Date.now();
             await expectRevert(
-                await this.token.reclaim(other, nonce, { from: deployer }),
+                this.token.reclaim(other, nonce, { from: deployer }),
                 'ERC20Reservable: reservation does not exist'
             );
         });
@@ -1653,7 +1653,7 @@ describe('ExampleCoin_Reservable', function () {
         it('sender cannot reclaim from no reservation', async function () {
             var nonce = Date.now();
             await expectRevert(
-                await this.token.reclaim(other, nonce, { from: other }),
+                this.token.reclaim(other, nonce, { from: other }),
                 'ERC20Reservable: reservation does not exist'
             );
         });
@@ -1661,7 +1661,7 @@ describe('ExampleCoin_Reservable', function () {
         it('receiver cannot reclaim from no reservation', async function () {
             var nonce = Date.now();
             await expectRevert(
-                await this.token.reclaim(other, nonce, { from: another }),
+                 this.token.reclaim(other, nonce, { from: another }),
                 'ERC20Reservable: reservation does not exist'
             );
         });
@@ -1812,7 +1812,7 @@ describe('ExampleCoin_Reservable', function () {
             var signature = sign.signTransfer(3,1, this.token.address, other, other_privateKey, another, amount, fee, nonce);
     
             await expectRevert(
-                await this.token.transfer(other, another, amount, fee, nonce, signature, { from: deployer }),
+                 this.token.transfer(other, another, amount, fee, nonce, signature, { from: deployer }),
                 'ERC20ETHless: the balance is not sufficient -- Reason given: ERC20ETHless: the balance is not sufficient.'
             );
         });
