@@ -56,7 +56,7 @@ contract ERC20WrapperGluwacoin is
         uint256 amount
     ) internal override(ERC20Upgradeable, ERC20Wrapper, ERC20Reservable) {
         ERC20Wrapper._beforeTokenTransfer(from, to, amount);
-        //ERC20Reservable._beforeTokenTransfer(from, to, amount);
+        ERC20Reservable._beforeTokenTransfer(from, to, amount);
     }
 
     uint256[50] private __gap;

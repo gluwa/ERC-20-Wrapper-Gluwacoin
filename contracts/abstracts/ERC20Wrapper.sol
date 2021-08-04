@@ -9,7 +9,6 @@ import "../libs/GluwacoinModel.sol";
 
 import "./Validate.sol";
 
-import "@nomiclabs/buidler/console.sol";
 
 /**
  * @dev Extension of {ERC20} that allows a certain ERC20 token holders to wrap the token to mint this token.
@@ -72,18 +71,12 @@ abstract contract ERC20Wrapper is Initializable, AccessControlEnumerableUpgradea
     {
         _useWrapperNonce(minter, nonce);
 
-        console.log("check signature ", block.chainid);
-        console.log("check signature ", address(this));    
         bytes32 hash = keccak256(abi.encodePacked(GluwacoinModel.SigDomain.Mint, block.chainid, address(this), minter, amount, fee, nonce));
         Validate.validateSignature(hash, minter, sig);
 
-        console.log("start minter ");
         __mint(minter, amount);
 
-        console.log("start minter check wrapper ");
-
         address wrapper = getRoleMember(WRAPPER_ROLE, 0);
-        console.log("start minter ", wrapper);
 
         _transfer(minter, wrapper, fee);
     }
