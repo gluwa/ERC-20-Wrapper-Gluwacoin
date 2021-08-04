@@ -10,8 +10,7 @@ const PrivateKeyProvider = require("truffle-privatekey-provider");
 const { BN } = require('@openzeppelin/test-helpers');
 
 const Web3 = require('web3');
-const privateOwner = "CB3E4E029686C9ECCE2F286BA041D02E3DC33DA63510E19BE70F4A975FF90DB4";
-const privateSender = "34BF8DADBC9AE6A8E54CC9FB838D6C4CC41618827D6A42F1D8157524C60D9D7E";
+const  {deployer, privateOwner, privateSender} = require("../secret");
 
 
 const provider = new HDWalletProvider(privateSender, "https://rinkeby.infura.io/v3/" + INFURA_API_KEY);
