@@ -1,11 +1,12 @@
+const { web3 } = require('@openzeppelin/test-helpers/src/setup');
 const { deployProxy } = require('@openzeppelin/truffle-upgrades');
-
 
 const ERC20WrapperGluwacoin = artifacts.require('ERC20WrapperGluwacoin');
 
+
 module.exports = async function (deployer, network) {
-    const name = 'XSDC-1';
-    const symbol = 'XSDC-1';
+    const name = 'USDC Gluwacoin';
+    const symbol = 'USDC-G';
     const decimals = 6;
     const rinkeby_baseTokenAddress = '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b';
     
@@ -28,7 +29,7 @@ module.exports = async function (deployer, network) {
         }).then(function(instance) {
             console.log('Deployed', instance.address);
         });
-    } else {
+    } else if (network == "rinkeby") {
         // use USD Coin contract address in remote network
 
         console.log('basetoken ', rinkeby_baseTokenAddress);
@@ -40,6 +41,7 @@ module.exports = async function (deployer, network) {
         );        
 
         console.log('Deployed', instance.address);
-        console.log('token ' + (await instance.token()));
+        console.log('token ' + (await instance.token()));       
+
     }
 };
