@@ -47,6 +47,20 @@ abstract contract ERC20Wrapper is Initializable, AccessControlEnumerableUpgradea
         return _token;
     }
 
+    /**
+     * @dev Creates `amount` tokens to the caller, transferring base tokens from the caller to the contract.
+     *
+     * See {ERC20-_mint} and {ERC20-allowance}.
+     *
+     * Requirements:
+     *
+     * - the caller must have base tokens of at least `amount`.
+     * - the contract must have allowance for caller's base tokens of at least
+     * `amount`.
+     */
+    function mint(uint256 amount) external {
+        __mint(_msgSender(), amount);
+    }
    
 
     /**
@@ -79,23 +93,16 @@ abstract contract ERC20Wrapper is Initializable, AccessControlEnumerableUpgradea
         address wrapper = getRoleMember(WRAPPER_ROLE, 0);
 
         _transfer(minter, wrapper, fee);
-    }
+    }    
 
-     /**
-     * @dev Creates `amount` tokens to the caller, transferring base tokens from the caller to the contract.
+    /**
+     * @dev Destroys `amount` tokens from the caller, transferring base tokens from the contract to the caller.
      *
-     * See {ERC20-_mint} and {ERC20-allowance}.
-     *
-     * Requirements:
-     *
-     * - the caller must have base tokens of at least `amount`.
-     * - the contract must have allowance for caller's base tokens of at least
-     * `amount`.
+     * See {ERC20-_burn}.
      */
-    function mint(uint256 amount) external {
-        __mint(_msgSender(), amount);
-    }
-   
+    function burn(uint256 amount) external {
+        __burn(_msgSender(), amount);
+    }   
 
     /**
      * @dev `burn` but with `burner`, `fee`, `nonce`, and `sig` as extra parameters.
@@ -128,16 +135,8 @@ abstract contract ERC20Wrapper is Initializable, AccessControlEnumerableUpgradea
         _transfer(burner, wrapper, fee);
 
         __burn(burner, amount - fee);
-    }
-
-    /**
-     * @dev Destroys `amount` tokens from the caller, transferring base tokens from the contract to the caller.
-     *
-     * See {ERC20-_burn}.
-     */
-    function burn(uint256 amount) external {
-        __burn(_msgSender(), amount);
-    }
+    } 
+    
 
     function __mint(address account, uint256 amount) internal {
         require(_token.transferFrom(account, address(this), amount), "ERC20Wrapper: could not deposit base tokens");
