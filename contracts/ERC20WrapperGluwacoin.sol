@@ -42,6 +42,7 @@ contract ERC20WrapperGluwacoin is
         __ERC20_init_unchained(name, symbol);
         __ERC20ETHless_init_unchained();
         __ERC20Reservable_init_unchained();
+        __AccessControlEnumerable_init_unchained();
         __ERC20Wrapper_init_unchained(token);
         __ERC20WrapperGluwacoin_init_unchained();
     }

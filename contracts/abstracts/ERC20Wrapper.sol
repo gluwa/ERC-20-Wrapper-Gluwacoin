@@ -27,16 +27,16 @@ abstract contract ERC20Wrapper is Initializable, AccessControlEnumerableUpgradea
     event Mint(address indexed _mintTo, uint256 _value);
     event Burnt(address indexed _burnFrom, uint256 _value);
 
-    function __ERC20Wrapper_init(string memory name, string memory symbol,IERC20 token) internal
+    function __ERC20Wrapper_init(string memory name, string memory symbol,IERC20 baseToken) internal
     initializer {
         __Context_init_unchained();
-        __AccessControlEnumerable_init();
+        __AccessControlEnumerable_init_unchained();
         __ERC20_init_unchained(name, symbol);
-        __ERC20Wrapper_init_unchained(token);
+        __ERC20Wrapper_init_unchained(baseToken);
     }
 
-    function __ERC20Wrapper_init_unchained(IERC20 token) internal virtual initializer {
-        _setupToken(token);
+    function __ERC20Wrapper_init_unchained(IERC20 baseToken) internal virtual initializer {
+        _setupToken(baseToken);
         _setupRole(WRAPPER_ROLE, _msgSender());
     }
 
