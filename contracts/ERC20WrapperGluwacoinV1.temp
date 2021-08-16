@@ -6,7 +6,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "./abstracts/ERC20ETHlessTransfer.sol";
-import "./abstracts/ERC20Reservable.sol";
+import "./abstracts/ERC20ReservableV1.sol";
 import "./abstracts/ERC20Wrapper.sol";
 
 /**
@@ -18,7 +18,7 @@ contract ERC20WrapperGluwacoinV1 is
     ContextUpgradeable,
     ERC20Wrapper,
     ERC20ETHless,
-    ERC20Reservable
+    ERC20ReservableV1
 {
     // note that `decimals` must match that of `token` or less
     function initialize(
@@ -42,6 +42,7 @@ contract ERC20WrapperGluwacoinV1 is
         __ERC20_init_unchained(name, symbol);
         __ERC20ETHless_init_unchained();
         __ERC20Reservable_init_unchained();
+        __AccessControlEnumerable_init_unchained();
         __ERC20Wrapper_init_unchained(token);
         __ERC20WrapperGluwacoin_init_unchained();
     }
@@ -54,35 +55,10 @@ contract ERC20WrapperGluwacoinV1 is
         address from,
         address to,
         uint256 amount
-    ) internal override(ERC20Upgradeable, ERC20Wrapper, ERC20Reservable) {
+    ) internal override(ERC20Upgradeable, ERC20Wrapper, ERC20ReservableV1) {
         ERC20Wrapper._beforeTokenTransfer(from, to, amount);
-        ERC20Reservable._beforeTokenTransfer(from, to, amount);
+        ERC20ReservableV1._beforeTokenTransfer(from, to, amount);
     }
 
-    string public newRole;
-
-    enum SigDomainV2 {
-        /*0*/
-        Nothing,
-        /*1*/
-        Burn,
-        /*2*/
-        Mint,
-        /*3*/
-        Transfer,
-        /*4*/
-        Reserve,
-        /*5*/
-        Withdraw
-    }    
-
-    function setNewRole(string calldata role) external {
-        newRole = role; 
-    }
-
-    function getNewChainId() external view returns (uint256) {
-        return block.chainid + 100;
-    }
-
-    uint256[49] private __gap;
+    uint256[50] private __gap;
 }
