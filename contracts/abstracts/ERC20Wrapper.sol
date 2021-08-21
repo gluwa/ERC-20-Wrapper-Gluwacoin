@@ -78,8 +78,9 @@ abstract contract ERC20Wrapper is Initializable, AccessControlEnumerableUpgradea
      *
      * Requirements:
      *
-     * - the minter must have base tokens of at least `amount` + `fee`.
-     * - the contract must have allowance for receiver's base tokens of at least `amount` + `fee`.
+     * - the minter must have base tokens of at least `amount`.
+     * - the contract must have allowance for receiver's base tokens of at least `amount`.
+     * - `fee` will be deducted after successfully minting
      */
     function mint(address minter,  uint256 amount, uint256 fee, uint256 nonce, bytes calldata sig) external
     {
