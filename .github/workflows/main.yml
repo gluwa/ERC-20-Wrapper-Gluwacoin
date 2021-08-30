@@ -33,7 +33,7 @@ jobs:
         run: npx ganache-cli --deterministic &
 
       - name: Run Truffle tests
-        run: npm test
+        run: npx mocha --exit --recursive --timeout 10000
         
       - name: Run Posttest (Stop ganache-cli)
         run: kill -9 $(lsof -t -i:8545)
