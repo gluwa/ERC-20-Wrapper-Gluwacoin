@@ -82,8 +82,7 @@ module.exports = {
   },
 
   mocha: {
-    enableTimeouts: false,
-    before_timeout: 120000 // Here is 2min but can be whatever timeout is suitable for you.
+    timeout: 100000
   },
 
   // Configure your compilers
