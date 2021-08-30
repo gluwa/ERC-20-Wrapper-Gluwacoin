@@ -29,7 +29,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
         // Deploy a new ControlledGluwacoin contract for each test
         this.baseToken = await ERC20PresetMinterPauser.new('Gluwacoin', 'GC', { from: deployer });
         // Deploy a new ERC20WrapperGluwacoin contract for each test
-        this.token = await ERC20WrapperGluwacoin.new(name, symbol, decimals, this.baseToken.address, { from: deployer });
+        this.token = await ERC20WrapperGluwacoin.new(name, symbol, this.baseToken.address, { from: deployer });
     });
     /* Reservable related
     */
@@ -49,7 +49,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -71,7 +71,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock;
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum);
     
             await expectRevert(
                 this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer }),
@@ -94,7 +94,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum);
     
             await expectRevert(
                 this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer }),
@@ -117,7 +117,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum);
     
             await expectRevert(
                 this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer }),
@@ -140,14 +140,14 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, send_amount, fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, send_amount, fee, nonce, expiryBlockNum);
     
             await this.token.reserve(other, another, executor, send_amount, fee, nonce, expiryBlockNum, signature, { from: deployer });
     
             send_amount = send_amount2;
             nonce = Date.now();
     
-            signature = sign.sign(this.token.address, other, other_privateKey, another, send_amount, fee, nonce);
+            signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, send_amount, fee, nonce, expiryBlockNum);
     
             await expectRevert(
                 this.token.reserve(other, another, executor, send_amount, fee, nonce, expiryBlockNum, signature, { from: deployer }),
@@ -170,7 +170,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -196,7 +196,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, dummy_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, dummy_amount, reserve_fee, nonce, expiryBlockNum);
     
             await expectRevert(
                 this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer }),
@@ -219,7 +219,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -249,7 +249,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -271,7 +271,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -293,7 +293,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -318,15 +318,15 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
             await time.advanceBlockTo(expiryBlockNum.add(new BN('1')));
     
             await expectRevert(
-                this.token.execute(other, nonce, { from: deployer }),
-                'ERC20Reservable: reservation has expired and cannot be executed'
+                 this.token.execute(other, nonce, { from: deployer }),
+                'ERC20Reservable: reservation has expired and cannot be executed'                
             );
         });
     
@@ -345,7 +345,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -372,7 +372,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -409,7 +409,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -431,7 +431,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -455,7 +455,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -479,7 +479,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -504,7 +504,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -529,7 +529,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -582,7 +582,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
 
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
 
             expect(await this.token.reservedBalanceOf(other)).to.be.bignumber.equal('0');
     
@@ -605,7 +605,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
 
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             expect(await this.token.unreservedBalanceOf(other)).to.be.bignumber.equal(await this.token.balanceOf(other));
     
@@ -631,7 +631,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
 
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
 
             expect(await this.token.reservedBalanceOf(other)).to.be.bignumber.equal('0');
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
@@ -656,7 +656,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
 
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
 
             expect(await this.token.reservedBalanceOf(other)).to.be.bignumber.equal('0');
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });

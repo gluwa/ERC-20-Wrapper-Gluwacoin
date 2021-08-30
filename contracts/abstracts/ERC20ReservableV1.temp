@@ -13,7 +13,7 @@ import "./Validate.sol";
  * a `fee`. If the `reserve` gets expired without getting executed, the `sender` or the `executor` can `reclaim`
  * the fund back to the `sender`.
  */
-abstract contract ERC20Reservable is Initializable, ERC20Upgradeable {
+abstract contract ERC20ReservableV1 is Initializable, ERC20Upgradeable {
     using AddressUpgradeable for address;
 
     enum ReservationStatus {

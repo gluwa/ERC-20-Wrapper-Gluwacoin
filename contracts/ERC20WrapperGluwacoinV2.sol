@@ -13,13 +13,14 @@ import "./abstracts/ERC20Wrapper.sol";
  * @dev Extension of {Gluwacoin} that allows a certain ERC20 token holders to wrap the token to mint this token.
  * Holder of this token can retrieve the wrapped token by burning this token.
  */
-contract ERC20WrapperGluwacoin is
+contract ERC20WrapperGluwacoinV2 is
     Initializable,
     ContextUpgradeable,
     ERC20Wrapper,
     ERC20ETHless,
     ERC20Reservable
 {
+    string constant public UPGRADED_CONTEXT = "Variable is upgraded";
     // note that `decimals` must match that of `token` or less
     function initialize(
         string memory name,
@@ -28,9 +29,9 @@ contract ERC20WrapperGluwacoin is
     ) public virtual {
         __ERC20WrapperGluwacoin_init(name, symbol, token);
     }
-
+    // upgrade decimal 6=>10
     function decimals() public pure override returns (uint8) {
-        return 6;
+        return 10;
     }
 
     function __ERC20WrapperGluwacoin_init(
@@ -59,6 +60,8 @@ contract ERC20WrapperGluwacoin is
         ERC20Wrapper._beforeTokenTransfer(from, to, amount);
         ERC20Reservable._beforeTokenTransfer(from, to, amount);
     }
-
+    function __beforeUpgrade()public view returns(string memory){
+        return "New function is updgared"; 
+    }
     uint256[50] private __gap;
 }

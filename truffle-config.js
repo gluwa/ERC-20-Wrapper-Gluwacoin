@@ -23,7 +23,10 @@
 //
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
+// const PrivateKeyProvider = require("truffle-privatekey-provider");
+// const privKeyrinkeby = require("./secret");
 
+// const INFURA_API_KEY = "05aa70b19b7543f5bf120cbeb0a50dda";
 module.exports = {
   /**
    * Networks define how you connect to your ethereum client and let you set the
@@ -43,10 +46,14 @@ module.exports = {
     // options below to some value.
     //
     development: {
-        host: "127.0.0.1",     // Localhost (default: none)
-        port: 8545,            // Standard Ethereum port (default: none)
-        network_id: "*",       // Any network (default: none)
+     host: "127.0.0.1",     // Localhost (default: none)
+     port: 7545,            // Standard Ethereum port (default: none)
+     network_id: "5777",       // Any network (default: none)
     },
+    // rinkeby: {
+    //   provider: () => new PrivateKeyProvider(privKeyrinkeby, "https://rinkeby.infura.io/v3/" + INFURA_API_KEY),
+    //   network_id: '4',
+    // },
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port
@@ -54,7 +61,7 @@ module.exports = {
     // gas: 8500000,           // Gas sent with each transaction (default: ~6700000)
     // gasPrice: 20000000000,  // 20 gwei (in wei) (default: 100 gwei)
     // from: <address>,        // Account to send txs from (default: accounts[0])
-    // websockets: true        // Enable EventEmitter interface for web3 (default: false)
+    // websocket: true        // Enable EventEmitter interface for web3 (default: false)
     // },
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
@@ -76,21 +83,31 @@ module.exports = {
 
   // Set default mocha options here, use special reporters etc.
   mocha: {
-    // timeout: 100000
+      timeout: 100000
   },
 
   // Configure your compilers
   compilers: {
     solc: {
-      version: "^0.6.0",    // Fetch exact version from solc-bin (default: truffle's version)
+      version: "^0.8.6",    // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
-      // settings: {          // See the solidity docs for advice about optimization and evmVersion
-      //  optimizer: {
-      //    enabled: false,
-      //    runs: 200
-      //  },
-      //  evmVersion: "byzantium"
-      // }
+      settings: {          // See the solidity docs for advice about optimization and evmVersion
+        optimizer: {
+          enabled: true,
+          runs: 15
+        },
+        // version: "0.5.1",    // Fetch exact version from solc-bin (default: truffle's version)
+        // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
+        // settings: {          // See the solidity docs for advice about optimization and evmVersion
+        //  optimizer: {
+        //    enabled: false,
+        //    runs: 200
+        //  },
+        //  evmVersion: "byzantium"
+        // }
+      }
     }
-  }
+  },
+  plugins: ["solidity-coverage"]
+
 };

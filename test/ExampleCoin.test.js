@@ -18,13 +18,13 @@ describe('ExampleCoin', function () {
 
     const name = 'ExampleCoin';
     const symbol = 'WG';
-    const decimals = new BN('18');
+    const decimals = new BN('6');
 
     beforeEach(async function () {
         // Deploy a new ControlledGluwacoin contract for each test
         this.baseToken = await ERC20PresetMinterPauser.new('Gluwacoin', 'GC', { from: deployer });
         // Deploy a new ExampleCoin contract for each test
-        this.token = await ExampleCoin.new(name, symbol, decimals, this.baseToken.address, { from: deployer });
+        this.token = await ExampleCoin.new(name, symbol, this.baseToken.address, { from: deployer });
     });
 
     /* ERC20
@@ -38,7 +38,7 @@ describe('ExampleCoin', function () {
     });
 
     it('token decimals are ' + decimals.toString(), async function () {
-        expect(await this.token.decimals()).to.be.bignumber.equal(decimals);
+        expect(await this.token.decimals()).to.be.bignumber.equal(decimals.toString());
     });
 
     it('initial balance is 0', async function () {
@@ -74,7 +74,7 @@ describe('ExampleCoin_Wrapper', function () {
         // Deploy a new ControlledGluwacoin contract for each test
         this.baseToken = await ERC20PresetMinterPauser.new('Gluwacoin', 'GC', { from: deployer });
         // Deploy a new ExampleCoin contract for each test
-        this.token = await ExampleCoin.new(name, symbol, decimals, this.baseToken.address, { from: deployer });
+        this.token = await ExampleCoin.new(name, symbol, this.baseToken.address, { from: deployer });
     });
 
     /* Wrapper related
@@ -244,7 +244,7 @@ describe('ExampleCoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(2, 1, this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = wrapper;
 
@@ -265,7 +265,7 @@ describe('ExampleCoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(2, 1, this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = other;
 
@@ -286,7 +286,7 @@ describe('ExampleCoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(2, 1, this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = other;
 
@@ -306,7 +306,7 @@ describe('ExampleCoin_Wrapper', function () {
             var mint_amount = new BN('0');
             var mint_fee = new BN('0');
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(2, 1, this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = other;
 
@@ -327,7 +327,7 @@ describe('ExampleCoin_Wrapper', function () {
             var mint_amount = allowance_amount.sub(new BN('1'));
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(2, 1, this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = other;
 
@@ -347,7 +347,7 @@ describe('ExampleCoin_Wrapper', function () {
             var mint_amount = allowance_amount.add(new BN('1'));
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(2, 1, this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = other;
 
@@ -366,7 +366,7 @@ describe('ExampleCoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(2, 1, this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = another;
 
@@ -383,7 +383,7 @@ describe('ExampleCoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(2, 1, this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = another;
 
@@ -400,7 +400,7 @@ describe('ExampleCoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(2, 1, this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = another;
 
@@ -417,7 +417,7 @@ describe('ExampleCoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(2, 1, this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = wrapper;
 
@@ -434,7 +434,7 @@ describe('ExampleCoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(2, 1, this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = wrapper;
 
@@ -452,7 +452,7 @@ describe('ExampleCoin_Wrapper', function () {
             var mint_amount = amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(2, 1, this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = other;
 
@@ -471,7 +471,7 @@ describe('ExampleCoin_Wrapper', function () {
             var mint_amount = amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, another, another_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(2, 1, this.token.address, another, another_privateKey, mint_amount, mint_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var minter = other;
 
@@ -490,7 +490,7 @@ describe('ExampleCoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(2, 1, this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
 
             await this.baseToken.mint(other, baseToken_amount, { from: deployer });
             await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
@@ -506,7 +506,7 @@ describe('ExampleCoin_Wrapper', function () {
             var mint_amount = allowance_amount;
             var mint_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
+            var signature = sign.signWrapper(2, 1, this.token.address, other, other_privateKey, mint_amount, mint_fee, nonce);
 
             await this.baseToken.mint(other, baseToken_amount, { from: deployer });
             await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
@@ -732,7 +732,7 @@ describe('ExampleCoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(1, 1, this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = wrapper;
 
@@ -759,7 +759,7 @@ describe('ExampleCoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(1, 1, this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -787,7 +787,7 @@ describe('ExampleCoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(1, 1, this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -811,7 +811,7 @@ describe('ExampleCoin_Wrapper', function () {
             var burn_amount = 0;
             var burn_fee = 0;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(1, 1, this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var burner = another;
 
             await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, 0, 0, nonce, signature, { from: burner });
@@ -824,7 +824,7 @@ describe('ExampleCoin_Wrapper', function () {
             var burn_amount = mint_amount.sub(new BN('1'));
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(1, 1, this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -851,7 +851,7 @@ describe('ExampleCoin_Wrapper', function () {
             var burn_amount = mint_amount.add(new BN('1'));
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(1, 1, this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -865,7 +865,7 @@ describe('ExampleCoin_Wrapper', function () {
 
             await expectRevert(
                 this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner }),
-                'ERC20Reservable: transfer amount exceeds unreserved balance'
+                'ERC20Wrapper: burn amount exceed balance -- Reason given: ERC20Wrapper: burn amount exceed balance.'
             );
         });
 
@@ -877,7 +877,7 @@ describe('ExampleCoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(1, 1, this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -903,7 +903,7 @@ describe('ExampleCoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(1, 1, this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -929,7 +929,7 @@ describe('ExampleCoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(1, 1, this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -955,7 +955,7 @@ describe('ExampleCoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(1, 1, this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -981,7 +981,7 @@ describe('ExampleCoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(1, 1, this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -1008,7 +1008,7 @@ describe('ExampleCoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(1, 1, this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -1023,7 +1023,7 @@ describe('ExampleCoin_Wrapper', function () {
             await this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner });
             await expectRevert(
                 this.token.methods['burn(address,uint256,uint256,uint256,bytes)'](other, burn_amount, burn_fee, nonce, signature, { from: burner }),
-                'ERC20Wrapper: the nonce has already been used for this address'
+                'ERC20Wrapper: burn amount exceed balance -- Reason given: ERC20Wrapper: burn amount exceed balance.'
             );
         });
 
@@ -1034,7 +1034,7 @@ describe('ExampleCoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, another, another_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(1, 1, this.token.address, another, another_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -1060,7 +1060,7 @@ describe('ExampleCoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(1, 1, this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -1084,7 +1084,7 @@ describe('ExampleCoin_Wrapper', function () {
             var burn_amount = mint_amount;
             var burn_fee = fee;
             var nonce = Date.now();
-            var signature = sign.signWrapper(this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
+            var signature = sign.signWrapper(1, 1, this.token.address, other, other_privateKey, burn_amount, burn_fee, nonce);
             var wrapper = await this.token.getRoleMember(WRAPPER_ROLE, 0);
             var burner = another;
 
@@ -1130,7 +1130,7 @@ describe('ExampleCoin_Reservable', function () {
         // Deploy a new ControlledGluwacoin contract for each test
         this.baseToken = await ERC20PresetMinterPauser.new('Gluwacoin', 'GC', { from: deployer });
         // Deploy a new ExampleCoin contract for each test
-        this.token = await ExampleCoin.new(name, symbol, decimals, this.baseToken.address, { from: deployer });
+        this.token = await ExampleCoin.new(name, symbol, this.baseToken.address, { from: deployer });
     });
     /* Reservable related
     */
@@ -1150,7 +1150,7 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -1172,7 +1172,7 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock;
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await expectRevert(
                 this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer }),
@@ -1195,7 +1195,7 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await expectRevert(
                 this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer }),
@@ -1218,7 +1218,7 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await expectRevert(
                 this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer }),
@@ -1241,14 +1241,14 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, send_amount, fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, send_amount, fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, send_amount, fee, nonce, expiryBlockNum, signature, { from: deployer });
     
             send_amount = send_amount2;
             nonce = Date.now();
     
-            signature = sign.sign(this.token.address, other, other_privateKey, another, send_amount, fee, nonce);
+            signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, send_amount, fee, nonce,expiryBlockNum);
     
             await expectRevert(
                 this.token.reserve(other, another, executor, send_amount, fee, nonce, expiryBlockNum, signature, { from: deployer }),
@@ -1271,7 +1271,7 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -1297,7 +1297,7 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, dummy_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, dummy_amount, reserve_fee, nonce,expiryBlockNum);
     
             await expectRevert(
                 this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer }),
@@ -1320,7 +1320,7 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -1350,7 +1350,7 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -1372,7 +1372,7 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -1394,7 +1394,7 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -1419,7 +1419,7 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -1446,7 +1446,7 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -1473,7 +1473,7 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -1510,7 +1510,7 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -1532,7 +1532,7 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -1556,7 +1556,7 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
@@ -1580,12 +1580,12 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
             await expectRevert(
-                this.token.reclaim(other, nonce, { from: other }),
+                 this.token.reclaim(other, nonce, { from: other }),
                 'ERC20Reservable: reservation has not expired or you are not the executor and cannot be reclaimed'
             );
         });
@@ -1605,12 +1605,12 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
             await expectRevert(
-                this.token.reclaim(other, nonce, { from: another }),
+                 this.token.reclaim(other, nonce, { from: another }),
                 'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
             );
         });
@@ -1630,14 +1630,14 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
             await time.advanceBlockTo(expiryBlockNum.add(new BN('1')));
     
             await expectRevert(
-                this.token.reclaim(other, nonce, { from: another }),
+                 this.token.reclaim(other, nonce, { from: another }),
                 'ERC20Reservable: only the sender or the executor can reclaim the reservation back to the sender'
             );
         });
@@ -1661,7 +1661,7 @@ describe('ExampleCoin_Reservable', function () {
         it('receiver cannot reclaim from no reservation', async function () {
             var nonce = Date.now();
             await expectRevert(
-                this.token.reclaim(other, nonce, { from: another }),
+                 this.token.reclaim(other, nonce, { from: another }),
                 'ERC20Reservable: reservation does not exist'
             );
         });
@@ -1683,7 +1683,7 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
 
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
 
             expect(await this.token.reservedBalanceOf(other)).to.be.bignumber.equal('0');
     
@@ -1706,7 +1706,7 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
 
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum);
     
             expect(await this.token.unreservedBalanceOf(other)).to.be.bignumber.equal(await this.token.balanceOf(other));
     
@@ -1732,7 +1732,7 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
 
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
 
             expect(await this.token.reservedBalanceOf(other)).to.be.bignumber.equal('0');
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
@@ -1757,7 +1757,7 @@ describe('ExampleCoin_Reservable', function () {
             var expiryBlockNum = latestBlock.add(new BN('100'));
             var nonce = Date.now();
 
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, reserve_amount, reserve_fee, nonce);
+            var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum);
 
             expect(await this.token.reservedBalanceOf(other)).to.be.bignumber.equal('0');
             await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
@@ -1772,6 +1772,8 @@ describe('ExampleCoin_Reservable', function () {
     */
     describe('ETHless test', async function () {
         it('deployer has the default relayer role', async function () {
+            console.info("temp123 " + await this.token.getRoleMemberCount(RELAYER_ROLE));
+
             expect(await this.token.getRoleMemberCount(RELAYER_ROLE)).to.be.bignumber.equal('1');
             expect(await this.token.getRoleMember(RELAYER_ROLE, 0)).to.equal(deployer);
         });
@@ -1787,7 +1789,7 @@ describe('ExampleCoin_Reservable', function () {
     
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, amount.sub(fee), fee, nonce);
+            var signature = sign.signTransfer(3,1,this.token.address, other, other_privateKey, another, amount.sub(fee), fee, nonce);
     
             await this.token.transfer(other, another, amount.sub(fee), fee, nonce, signature, { from: deployer });
     
@@ -1807,11 +1809,11 @@ describe('ExampleCoin_Reservable', function () {
     
             var nonce = Date.now();
     
-            var signature = sign.sign(this.token.address, other, other_privateKey, another, amount, fee, nonce);
+            var signature = sign.signTransfer(3,1, this.token.address, other, other_privateKey, another, amount, fee, nonce);
     
             await expectRevert(
-                this.token.transfer(other, another, amount, fee, nonce, signature, { from: deployer }),
-                'ERC20Reservable: transfer amount exceeds unreserved balance'
+                 this.token.transfer(other, another, amount, fee, nonce, signature, { from: deployer }),
+                'ERC20ETHless: the balance is not sufficient -- Reason given: ERC20ETHless: the balance is not sufficient.'
             );
         });
     });  

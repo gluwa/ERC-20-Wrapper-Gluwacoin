@@ -6,19 +6,19 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "./abstracts/ERC20ETHlessTransfer.sol";
-import "./abstracts/ERC20Reservable.sol";
+import "./abstracts/ERC20ReservableV1.sol";
 import "./abstracts/ERC20Wrapper.sol";
 
 /**
  * @dev Extension of {Gluwacoin} that allows a certain ERC20 token holders to wrap the token to mint this token.
  * Holder of this token can retrieve the wrapped token by burning this token.
  */
-contract ERC20WrapperGluwacoin is
+contract ERC20WrapperGluwacoinV1 is
     Initializable,
     ContextUpgradeable,
     ERC20Wrapper,
     ERC20ETHless,
-    ERC20Reservable
+    ERC20ReservableV1
 {
     // note that `decimals` must match that of `token` or less
     function initialize(
@@ -55,9 +55,9 @@ contract ERC20WrapperGluwacoin is
         address from,
         address to,
         uint256 amount
-    ) internal override(ERC20Upgradeable, ERC20Wrapper, ERC20Reservable) {
+    ) internal override(ERC20Upgradeable, ERC20Wrapper, ERC20ReservableV1) {
         ERC20Wrapper._beforeTokenTransfer(from, to, amount);
-        ERC20Reservable._beforeTokenTransfer(from, to, amount);
+        ERC20ReservableV1._beforeTokenTransfer(from, to, amount);
     }
 
     uint256[50] private __gap;

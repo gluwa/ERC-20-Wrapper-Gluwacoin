@@ -1,16 +1,20 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.0;
+pragma solidity ^0.8.6;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/presets/ERC20PresetMinterPauser.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/presets/ERC20PresetMinterPauserUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract ERC20PresetMinterPauserMockUpgradeSafe is Initializable, ERC20PresetMinterPauserUpgradeSafe {
+contract ERC20PresetMinterPauserMockUpgradeSafe is Initializable, ERC20PresetMinterPauserUpgradeable {
 
-    constructor(string memory name, string memory symbol) public payable {
-        __ERC20PresetMinterPauserMock_init(name, symbol);
+    constructor(
+        string memory name,
+        string memory symbol
+    ) {
+        initialize(name, symbol);
     }
+ 
 
-    function __ERC20PresetMinterPauserMock_init(string memory name, string memory symbol) internal initializer {
+    function initialize(string memory name, string memory symbol) public override initializer {
         __Context_init_unchained();
         __AccessControl_init_unchained();
         __ERC20_init_unchained(name, symbol);
@@ -18,13 +22,6 @@ contract ERC20PresetMinterPauserMockUpgradeSafe is Initializable, ERC20PresetMin
         __Pausable_init_unchained();
         __ERC20Pausable_init_unchained();
         __ERC20PresetMinterPauser_init_unchained(name, symbol);
-        __ERC20PresetMinterPauserMock_init_unchained(name, symbol);
-    }
-
-    function __ERC20PresetMinterPauserMock_init_unchained(string memory name, string memory symbol) internal initializer {
-
-
-
     }
 
 
