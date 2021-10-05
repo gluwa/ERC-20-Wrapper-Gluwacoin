@@ -23,6 +23,9 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - name: Generate .env file
+        run: echo ${{ secrets.ENV_FILE }} > .env
+
       - name: Disable migration upgrade script
         run: mv migrations/3_upgrade_ERC20WrapperGluwacoin.js migrations/3_upgrade_ERC20WrapperGluwacoin.js_
 
