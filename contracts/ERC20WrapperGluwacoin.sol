@@ -29,6 +29,7 @@ contract ERC20WrapperGluwacoin is
         __ERC20WrapperGluwacoin_init(name, symbol, token);
     }
 
+    // @dev A placeholder value. Replace to match the decimals of your target (wrapped) token.
     function decimals() public pure override returns (uint8) {
         return 6;
     }
