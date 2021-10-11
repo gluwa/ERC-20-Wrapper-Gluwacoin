@@ -50,7 +50,8 @@ Run `truffle migrate` with a name of the network you want to use.
 ```commandline
 $ npx truffle migrate  --network [NETWORK NAME]
 ```
-Replace the number of decimals in ERC20WrapperGluwacoin.sol to match the decimals of your target (wrapped) token.
+
+Replace the number of decimals in ERC20WrapperGluwacoin.sol to match the decimals of your target (wrapped) token:
 ```commandline
 function decimals() public pure override returns (uint8) {
         return 6;
