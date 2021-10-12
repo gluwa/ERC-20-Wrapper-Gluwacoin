@@ -9,9 +9,10 @@ contract ERC20WrapperGluwacoinMock is Initializable, ERC20WrapperGluwacoin {
     constructor(
         string memory name,
         string memory symbol,
+        uint8 decimals_,
         IERC20 token
     )  {
-        ERC20WrapperGluwacoin.initialize(name, symbol, token);
+        ERC20WrapperGluwacoin.initialize(name, symbol, decimals_, token);
         __ERC20Wrapper_init_unchained(token);
     }
 

@@ -20,25 +20,30 @@ contract ERC20WrapperGluwacoin is
     ERC20ETHless,
     ERC20Reservable
 {
+    uint8 private _decimals;
+
     // note that `decimals` must match that of `token` or less
     function initialize(
         string memory name,
         string memory symbol,
+        uint8 decimals_,
         IERC20 token
     ) public virtual {
-        __ERC20WrapperGluwacoin_init(name, symbol, token);
+        __ERC20WrapperGluwacoin_init(name, symbol, decimals_, token);
     }
 
     // @dev A placeholder value. Replace to match the decimals of your target (wrapped) token.
-    function decimals() public pure override returns (uint8) {
-        return 6;
+    function decimals() public view override virtual returns (uint8) {
+        return _decimals;
     }
 
     function __ERC20WrapperGluwacoin_init(
         string memory name,
         string memory symbol,
+        uint8 decimals_,
         IERC20 token
     ) internal initializer {
+        _decimals = decimals_;
         __Context_init_unchained();
         __ERC20_init_unchained(name, symbol);
         __ERC20ETHless_init_unchained();

@@ -14,6 +14,10 @@ contract ExampleCoinMock is Initializable, ExampleCoin {
         __ExampleCoinMock_init(name, symbol, token);
     }
 
+    function decimals() public pure override returns (uint8) {
+        return 6;
+    }
+
     function __ExampleCoinMock_init(
         string memory name,
         string memory symbol,
