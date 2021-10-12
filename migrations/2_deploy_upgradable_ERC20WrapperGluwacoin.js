@@ -36,7 +36,7 @@ module.exports = async function (deployer, network) {
 
         const instance = await deployProxy(
                 ERC20WrapperGluwacoin,
-                [name, symbol, rinkeby_baseTokenAddress],
+                [name, symbol, decimals, rinkeby_baseTokenAddress],
                 {deployer, initializer: 'initialize' }
         );        
 

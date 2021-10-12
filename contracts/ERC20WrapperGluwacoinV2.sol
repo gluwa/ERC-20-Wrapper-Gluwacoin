@@ -20,6 +20,7 @@ contract ERC20WrapperGluwacoinV2 is
     ERC20ETHless,
     ERC20Reservable
 {
+    uint8 private _decimals;
     string constant public UPGRADED_CONTEXT = "Variable is upgraded";
     // note that `decimals` must match that of `token` or less
     function initialize(

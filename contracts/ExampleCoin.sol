@@ -7,12 +7,19 @@ import "./ERC20WrapperGluwacoin.sol";
  * @dev Example usage of {ERC20WrapperGluwacoin}.
  */
 contract ExampleCoin is ERC20WrapperGluwacoin  {
+    uint8 private _decimals;
+
     // note that `decimals` must match that of `token` or less
-    function initialize(string memory name, string memory symbol, IERC20 token) public override {
-        __ExampleCoin_init(name, symbol,token);
+    function initialize(string memory name, string memory symbol, uint8 decimals_, IERC20 token) public override {
+        __ExampleCoin_init(name, symbol, decimals_, token);
+        _decimals = decimals_;
     }
 
-    function __ExampleCoin_init(string memory name, string memory symbol, IERC20 token)
+    function decimals() public view override virtual returns (uint8) {
+        return _decimals;
+    }
+
+    function __ExampleCoin_init(string memory name, string memory symbol, uint8 decimals_, IERC20 token)
     internal initializer {
         __Context_init_unchained();
         __ERC20_init_unchained(name, symbol);
