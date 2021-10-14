@@ -171,11 +171,7 @@ abstract contract ERC20Wrapper is Initializable, AccessControlEnumerableUpgradea
     function _useWrapperNonce(address signer, uint256 nonce) private {
         require(!_usedNonces[signer][nonce], "ERC20Wrapper: the nonce has already been used for this address");
         _usedNonces[signer][nonce] = true;
-    }
-
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override (ERC20Upgradeable) {
-        super._beforeTokenTransfer(from, to, amount);
-    }
+    }    
 
     uint256[50] private __gap;
 }
