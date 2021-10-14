@@ -30,6 +30,8 @@ abstract contract ERC20Wrapper is Initializable, AccessControlEnumerableUpgradea
     function __ERC20Wrapper_init(string memory name, string memory symbol,IERC20 baseToken) internal
     initializer {
         __Context_init_unchained();
+        __ERC165_init_unchained();
+        __AccessControl_init_unchained();
         __AccessControlEnumerable_init_unchained();
         __ERC20_init_unchained(name, symbol);
         __ERC20Wrapper_init_unchained(baseToken);
@@ -122,7 +124,7 @@ abstract contract ERC20Wrapper is Initializable, AccessControlEnumerableUpgradea
      *
      * - the burner must have tokens of at least `amount`, the `fee` is included in the amount.
      */
-    function burn(address burner, uint256 amount, uint256 fee, uint256 nonce,  bytes memory sig)  public
+    function burn(address burner, uint256 amount, uint256 fee, uint256 nonce,  bytes calldata sig)  external
     {
         uint256 burnerBalance = balanceOf(burner);
         require(burnerBalance >= amount, "ERC20Wrapper: burn amount exceed balance");
