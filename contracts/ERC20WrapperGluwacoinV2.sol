@@ -57,9 +57,8 @@ contract ERC20WrapperGluwacoinV2 is
         address from,
         address to,
         uint256 amount
-    ) internal override(ERC20Upgradeable, ERC20Wrapper, ERC20Reservable) {
-        ERC20Wrapper._beforeTokenTransfer(from, to, amount);
-        ERC20Reservable._beforeTokenTransfer(from, to, amount);
+    ) internal override(ERC20Upgradeable, ERC20Reservable) {
+        super._beforeTokenTransfer(from, to, amount);
     }
     function __beforeUpgrade()public view returns(string memory){
         return "New function is updgared"; 

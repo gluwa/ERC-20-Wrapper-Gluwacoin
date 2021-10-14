@@ -4,6 +4,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../ERC20WrapperGluwacoin.sol";
 
+
 contract ERC20WrapperGluwacoinMock is Initializable, ERC20WrapperGluwacoin {
 
     constructor(
@@ -22,7 +23,7 @@ contract ERC20WrapperGluwacoinMock is Initializable, ERC20WrapperGluwacoin {
     ) internal override {
         _setupToken(token);
         _setupRole(WRAPPER_ROLE, _msgSender());
-    }
+    }   
 
     uint256[50] private __gap;
 }
