@@ -43,6 +43,7 @@ contract ERC20WrapperGluwacoin is
         uint8 decimals_,
         IERC20 token
     ) internal initializer {
+        _decimals = decimals_;
         __Context_init_unchained();
         __ERC20_init_unchained(name, symbol);
         __ERC20ETHless_init_unchained();
