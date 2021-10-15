@@ -3,8 +3,8 @@ pragma solidity ^0.8.6;
 
 import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "../libs/GluwacoinModel.sol";
 
@@ -19,9 +19,9 @@ abstract contract ERC20Wrapper is
     AccessControlEnumerableUpgradeable,
     ERC20Upgradeable
 {    
-    using SafeERC20 for IERC20;
+    using SafeERC20Upgradeable for IERC20Upgradeable;
     // base token, the token to be wrapped
-    IERC20 private _token;
+    IERC20Upgradeable private _token;
 
     mapping(address => mapping(uint256 => bool)) private _usedNonces;
 
@@ -34,7 +34,7 @@ abstract contract ERC20Wrapper is
     function __ERC20Wrapper_init(
         string memory name,
         string memory symbol,
-        IERC20 baseToken
+        IERC20Upgradeable baseToken
     ) internal initializer {
         __Context_init_unchained();
         __ERC165_init_unchained();
@@ -44,7 +44,7 @@ abstract contract ERC20Wrapper is
         __ERC20Wrapper_init_unchained(baseToken);
     }
 
-    function __ERC20Wrapper_init_unchained(IERC20 baseToken)
+    function __ERC20Wrapper_init_unchained(IERC20Upgradeable baseToken)
         internal
         virtual
         initializer
@@ -56,7 +56,7 @@ abstract contract ERC20Wrapper is
     /**
      * @dev Returns the address of the base token.
      */
-    function token() external view returns (IERC20) {
+    function token() external view returns (IERC20Upgradeable) {
         return _token;
     }
 
@@ -204,7 +204,7 @@ abstract contract ERC20Wrapper is
      * applications that interact with token contracts will not expect
      * {token} to ever change, and may work incorrectly if it does.
      */
-    function _setupToken(IERC20 token_) internal {
+    function _setupToken(IERC20Upgradeable token_) internal {
         _token = token_;
     }
 

@@ -12,7 +12,7 @@ contract ERC20WrapperGluwacoinMock is Initializable, ERC20WrapperGluwacoin {
         string memory name,
         string memory symbol,
         uint8 decimals_,
-        IERC20 token
+        IERC20Upgradeable token
     )  {
         ERC20WrapperGluwacoin.initialize(name, symbol, decimals_, token);
         __ERC20Wrapper_init_unchained(token);
@@ -20,7 +20,7 @@ contract ERC20WrapperGluwacoinMock is Initializable, ERC20WrapperGluwacoin {
 
 
     function __ERC20Wrapper_init_unchained(
-        IERC20 token
+        IERC20Upgradeable token
     ) internal override {
         _setupToken(token);
         _setupRole(WRAPPER_ROLE, _msgSender());

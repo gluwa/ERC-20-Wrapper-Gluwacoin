@@ -21,15 +21,17 @@ contract ERC20WrapperGluwacoinV2 is
     ERC20Reservable
 {
     uint8 private _decimals;
-    string constant public UPGRADED_CONTEXT = "Variable is upgraded";
+    string public constant UPGRADED_CONTEXT = "Variable is upgraded";
+
     // note that `decimals` must match that of `token` or less
     function initialize(
         string memory name,
         string memory symbol,
-        IERC20 token
+        IERC20Upgradeable token
     ) public virtual {
         __ERC20WrapperGluwacoin_init(name, symbol, token);
     }
+
     // upgrade decimal 6=>10
     function decimals() public pure override returns (uint8) {
         return 10;
@@ -38,12 +40,12 @@ contract ERC20WrapperGluwacoinV2 is
     function __ERC20WrapperGluwacoin_init(
         string memory name,
         string memory symbol,
-        IERC20 token
+        IERC20Upgradeable token
     ) internal initializer {
         __Context_init_unchained();
         __ERC165_init_unchained();
         __AccessControl_init_unchained();
-        __AccessControlEnumerable_init_unchained();        
+        __AccessControlEnumerable_init_unchained();
         __ERC20_init_unchained(name, symbol);
         __ERC20ETHless_init_unchained();
         __ERC20Reservable_init_unchained();
@@ -63,8 +65,10 @@ contract ERC20WrapperGluwacoinV2 is
     ) internal override(ERC20Upgradeable, ERC20Reservable) {
         super._beforeTokenTransfer(from, to, amount);
     }
-    function __beforeUpgrade()public view returns(string memory){
-        return "New function is updgared"; 
+
+    function __beforeUpgrade() public view returns (string memory) {
+        return "New function is updgared";
     }
+
     uint256[50] private __gap;
 }

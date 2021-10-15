@@ -1,8 +1,8 @@
 {
   "manifestVersion": "3.2",
   "admin": {
-    "address": "0xA385cf7d1cDeC0bDdBa54998500767A7357c6b8B",
-    "txHash": "0x474ac0333e9b38cb306d1b1436ea72881d3e1a4b18dd7d4384174ed8ac350cd4"
+    "address": "0x9f640449D75A06A0D7809070DcEA7574F737F8B0",
+    "txHash": "0x743f347c26df7c88e0f34cfeca453c5df73584a27960cd4b3877a2c9fc2c3cb9"
   },
   "proxies": [
     {
@@ -1398,6 +1398,36 @@
     {
       "address": "0xf82d09941A610b4A4AC7f2b55Be9898DF9B76F11",
       "txHash": "0xff71cf72e01740833c52c686db8a3633f793b18d5fc7bc34e6cd4c9bd2188de4",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xE0f213e4EC1Da0048573C5bA51269655D5969498",
+      "txHash": "0x4d8365e59231edef0644dc7f32b83dbbe957ff99c3d8a5bd19364755035c4353",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x6c576f158E60923a332dC500237A51fc2a880DF1",
+      "txHash": "0xf3196103b3c283c54f4204fe9ffe18f3750c178cfe8e850d30598220fc00e104",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x4c5A64Ff877E9a663706aA0A597b0B6ACF228a3C",
+      "txHash": "0x9c5a49af814f6f4a6a844823434572711bb8aab837fbe0adbb30d6e9b9a0772b",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x33Af710aBF194acd82E5E42Aa8b582219CEd4972",
+      "txHash": "0x67c70d3e264652cc21febee322b8387edc8a6e9239fb7d5b1972ea55a4199a6b",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x8b27cE502d183BD0Cec8e1aF616B0c01e66726f9",
+      "txHash": "0xe77df2f83bee4d9cbecd89cb5630bac1af9ad11908b7acc0322b1baef37581ea",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x2Cb2Ff32766B0a27252C9FFb70b3B673fC873c77",
+      "txHash": "0xc3c3be0d949a73d1df33de50452203463ac0c8db4b2d5a11d38367e8e2c1ac40",
       "kind": "transparent"
     }
   ],
@@ -12344,8 +12374,8 @@
       }
     },
     "7733af70f76962ac3c107f38b74a9506c826e05e6c0ddbe9bd284e29fc60dc4a": {
-      "address": "0xD61995050331eBeFD00686d2E90c53463392d3B2",
-      "txHash": "0x5428f295567cc609191cb211931fd2a08ed245107fb4580a457533617249f08b",
+      "address": "0xC5e7f656526816E4fa2de910FD619203b9E834b0",
+      "txHash": "0xb1c4049a2abc5864071e8a97011fc85b9f0ac47a5971c05e0c18133a9064cdf3",
       "layout": {
         "storage": [
           {
@@ -12387,7 +12417,7 @@
           {
             "contract": "AccessControlEnumerableUpgradeable",
             "label": "_roleMembers",
-            "type": "t_mapping(t_bytes32,t_struct(AddressSet)6443_storage)",
+            "type": "t_mapping(t_bytes32,t_struct(AddressSet)6667_storage)",
             "src": "../@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol:33"
           },
           {
@@ -12435,7 +12465,7 @@
           {
             "contract": "ERC20Wrapper",
             "label": "_token",
-            "type": "t_contract(IERC20)6748",
+            "type": "t_contract(IERC20Upgradeable)5056",
             "src": "abstracts/ERC20Wrapper.sol:28"
           },
           {
@@ -12490,7 +12520,7 @@
             "contract": "ERC20WrapperGluwacoinV2",
             "label": "__gap",
             "type": "t_array(t_uint256)50_storage",
-            "src": "ERC20WrapperGluwacoinV2.sol:109"
+            "src": "ERC20WrapperGluwacoinV2.sol:113"
           }
         ],
         "types": {
@@ -12562,8 +12592,8 @@
           "t_bool": {
             "label": "bool"
           },
-          "t_contract(IERC20)6748": {
-            "label": "contract IERC20"
+          "t_contract(IERC20Upgradeable)5056": {
+            "label": "contract IERC20Upgradeable"
           },
           "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
             "label": "mapping(address => mapping(address => uint256))"
@@ -12574,22 +12604,22 @@
           "t_array(t_uint256)45_storage": {
             "label": "uint256[45]"
           },
-          "t_mapping(t_bytes32,t_struct(AddressSet)6443_storage)": {
+          "t_mapping(t_bytes32,t_struct(AddressSet)6667_storage)": {
             "label": "mapping(bytes32 => struct EnumerableSetUpgradeable.AddressSet)"
           },
           "t_bytes32": {
             "label": "bytes32"
           },
-          "t_struct(AddressSet)6443_storage": {
+          "t_struct(AddressSet)6667_storage": {
             "label": "struct EnumerableSetUpgradeable.AddressSet",
             "members": [
               {
                 "label": "_inner",
-                "type": "t_struct(Set)6172_storage"
+                "type": "t_struct(Set)6396_storage"
               }
             ]
           },
-          "t_struct(Set)6172_storage": {
+          "t_struct(Set)6396_storage": {
             "label": "struct EnumerableSetUpgradeable.Set",
             "members": [
               {
@@ -12634,8 +12664,8 @@
       }
     },
     "a8271b9fc5d1b689e0612f904bec33b916908f899ef76dd1020053ec8bafcf3f": {
-      "address": "0x7628DBa36D651531B229b08A70A4411E68a3d51d",
-      "txHash": "0xfaaaa07d00147ae95e7a03534b8f64c428174dff8327b952a8b89d5bc272471c",
+      "address": "0x6B04d82D65Cc91E5fde109Ab88E53Bc0700943B7",
+      "txHash": "0x9876b01d9aa676acfc16d6b1999019d74695865a5b17c7f6d87116f2611f22c5",
       "layout": {
         "storage": [
           {
@@ -12677,7 +12707,7 @@
           {
             "contract": "AccessControlEnumerableUpgradeable",
             "label": "_roleMembers",
-            "type": "t_mapping(t_bytes32,t_struct(AddressSet)6443_storage)",
+            "type": "t_mapping(t_bytes32,t_struct(AddressSet)6667_storage)",
             "src": "../@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol:33"
           },
           {
@@ -12725,7 +12755,7 @@
           {
             "contract": "ERC20Wrapper",
             "label": "_token",
-            "type": "t_contract(IERC20)6748",
+            "type": "t_contract(IERC20Upgradeable)5056",
             "src": "abstracts/ERC20Wrapper.sol:28"
           },
           {
@@ -12858,8 +12888,8 @@
           "t_bool": {
             "label": "bool"
           },
-          "t_contract(IERC20)6748": {
-            "label": "contract IERC20"
+          "t_contract(IERC20Upgradeable)5056": {
+            "label": "contract IERC20Upgradeable"
           },
           "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
             "label": "mapping(address => mapping(address => uint256))"
@@ -12870,22 +12900,22 @@
           "t_array(t_uint256)45_storage": {
             "label": "uint256[45]"
           },
-          "t_mapping(t_bytes32,t_struct(AddressSet)6443_storage)": {
+          "t_mapping(t_bytes32,t_struct(AddressSet)6667_storage)": {
             "label": "mapping(bytes32 => struct EnumerableSetUpgradeable.AddressSet)"
           },
           "t_bytes32": {
             "label": "bytes32"
           },
-          "t_struct(AddressSet)6443_storage": {
+          "t_struct(AddressSet)6667_storage": {
             "label": "struct EnumerableSetUpgradeable.AddressSet",
             "members": [
               {
                 "label": "_inner",
-                "type": "t_struct(Set)6172_storage"
+                "type": "t_struct(Set)6396_storage"
               }
             ]
           },
-          "t_struct(Set)6172_storage": {
+          "t_struct(Set)6396_storage": {
             "label": "struct EnumerableSetUpgradeable.Set",
             "members": [
               {
