@@ -22,7 +22,7 @@ contract ERC20WrapperGluwacoin is
 {
     uint8 private _decimals;
 
-    /// @dev that `decimals` must match that of `token` 
+    /// @dev `decimals` must match that of `token`
     function initialize(
         string memory name,
         string memory symbol,
@@ -45,15 +45,20 @@ contract ERC20WrapperGluwacoin is
     ) internal initializer {
         _decimals = decimals_;
         __Context_init_unchained();
+        __ERC165_init_unchained();
+        __AccessControl_init_unchained();
+        __AccessControlEnumerable_init_unchained();
         __ERC20_init_unchained(name, symbol);
+        __ERC20Wrapper_init_unchained(token);
         __ERC20ETHless_init_unchained();
         __ERC20Reservable_init_unchained();
-        __AccessControlEnumerable_init_unchained();
-        __ERC20Wrapper_init_unchained(token);
         __ERC20WrapperGluwacoin_init_unchained(decimals_);
     }
 
-    function __ERC20WrapperGluwacoin_init_unchained(uint8 decimals_) internal initializer {
+    function __ERC20WrapperGluwacoin_init_unchained(uint8 decimals_)
+        internal
+        initializer
+    {
         _decimals = decimals_;
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }

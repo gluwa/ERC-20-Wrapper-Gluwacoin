@@ -1,4 +1,4 @@
-
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.6;
 
 import "./ERC20WrapperGluwacoin.sol";
@@ -22,10 +22,13 @@ contract ExampleCoin is ERC20WrapperGluwacoin  {
     function __ExampleCoin_init(string memory name, string memory symbol, IERC20 token)
     internal initializer {
         __Context_init_unchained();
+        __ERC165_init_unchained();
+        __AccessControl_init_unchained();
+        __AccessControlEnumerable_init_unchained();
         __ERC20_init_unchained(name, symbol);
         __ERC20ETHless_init_unchained();
         __ERC20Reservable_init_unchained();
-        __ERC20Wrapper_init_unchained(token);
+        __ERC20Wrapper_init_unchained(token);     
         __ERC20WrapperGluwacoin_init_unchained(_decimals);
     }
 }

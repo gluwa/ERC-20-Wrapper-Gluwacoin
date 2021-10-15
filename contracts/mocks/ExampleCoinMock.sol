@@ -24,6 +24,9 @@ contract ExampleCoinMock is Initializable, ExampleCoin {
         IERC20 token
     ) internal initializer {
         __Context_init_unchained();
+        __ERC165_init_unchained();
+        __AccessControl_init_unchained();
+        __AccessControlEnumerable_init_unchained();        
         __ERC20_init_unchained(name, symbol);
         __ERC20ETHless_init_unchained();
         __ERC20Reservable_init_unchained();
