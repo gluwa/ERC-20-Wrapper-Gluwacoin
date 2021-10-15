@@ -14,8 +14,7 @@ import "./Validate.sol";
  * the fund back to the `sender`.
  */
 abstract contract ERC20Reservable is Initializable, ERC20Upgradeable {
-    using AddressUpgradeable for address;
-
+        
     enum ReservationStatus {
         Draft,
         Active,
@@ -42,6 +41,7 @@ abstract contract ERC20Reservable is Initializable, ERC20Upgradeable {
         internal
         initializer
     {
+        __Context_init_unchained();
         __ERC20_init_unchained(name, symbol);
         __ERC20Reservable_init_unchained();
     }

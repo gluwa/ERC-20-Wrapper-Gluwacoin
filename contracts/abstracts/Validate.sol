@@ -7,8 +7,7 @@ import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 /**
  * @dev Signature verification
  */
-library Validate {
-    using AddressUpgradeable for address;
+library Validate {    
     using ECDSAUpgradeable for bytes32;
 
     /**

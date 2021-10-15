@@ -1772,8 +1772,6 @@ describe('ExampleCoin_Reservable', function () {
     */
     describe('ETHless test', async function () {
         it('deployer has the default relayer role', async function () {
-            console.info("temp123 " + await this.token.getRoleMemberCount(RELAYER_ROLE));
-
             expect(await this.token.getRoleMemberCount(RELAYER_ROLE)).to.be.bignumber.equal('1');
             expect(await this.token.getRoleMember(RELAYER_ROLE, 0)).to.equal(deployer);
         });
