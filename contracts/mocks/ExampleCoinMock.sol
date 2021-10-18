@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.6;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -9,7 +10,7 @@ contract ExampleCoinMock is Initializable, ExampleCoin {
     constructor(
         string memory name,
         string memory symbol,
-        IERC20 token
+        IERC20Upgradeable token
     )  {
         __ExampleCoinMock_init(name, symbol, token);
     }
@@ -21,7 +22,7 @@ contract ExampleCoinMock is Initializable, ExampleCoin {
     function __ExampleCoinMock_init(
         string memory name,
         string memory symbol,
-        IERC20 token
+        IERC20Upgradeable token
     ) internal initializer {
         __Context_init_unchained();
         __ERC165_init_unchained();

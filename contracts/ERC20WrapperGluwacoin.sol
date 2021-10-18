@@ -4,7 +4,6 @@ pragma solidity ^0.8.6;
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-
 import "./abstracts/ERC20ETHlessTransfer.sol";
 import "./abstracts/ERC20Reservable.sol";
 import "./abstracts/ERC20Wrapper.sol";
@@ -27,7 +26,7 @@ contract ERC20WrapperGluwacoin is
         string memory name,
         string memory symbol,
         uint8 decimals_,
-        IERC20 token
+        IERC20Upgradeable token
     ) public virtual {
         __ERC20WrapperGluwacoin_init(name, symbol, decimals_, token);
     }
@@ -41,7 +40,7 @@ contract ERC20WrapperGluwacoin is
         string memory name,
         string memory symbol,
         uint8 decimals_,
-        IERC20 token
+        IERC20Upgradeable token
     ) internal initializer {
         _decimals = decimals_;
         __Context_init_unchained();

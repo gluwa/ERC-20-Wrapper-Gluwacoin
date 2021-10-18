@@ -16,9 +16,7 @@ abstract contract ERC20ETHless is
     Initializable,
     AccessControlEnumerableUpgradeable,
     ERC20Upgradeable
-{
-    using AddressUpgradeable for address;
-
+{  
     mapping(address => mapping(uint256 => bool)) private _usedNonces;
 
     // collects transaction relay fee
@@ -28,6 +26,7 @@ abstract contract ERC20ETHless is
         internal
         initializer
     {        
+        __Context_init_unchained(); 
         __ERC165_init_unchained();
         __AccessControl_init_unchained();
         __AccessControlEnumerable_init_unchained();
