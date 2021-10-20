@@ -10,7 +10,7 @@ contract ExampleCoin is ERC20WrapperGluwacoin  {
     uint8 private _decimals;
 
     // note that `decimals` must match that of `token` or less
-    function initialize(string memory name, string memory symbol, uint8 decimals_, IERC20Upgradeable token) public override {
+    function initialize(string memory name, string memory symbol, uint8 decimals_, IERC20Upgradeable token) public {
         __ExampleCoin_init(name, symbol, token);
         _decimals = decimals_;
     }
@@ -29,6 +29,6 @@ contract ExampleCoin is ERC20WrapperGluwacoin  {
         __ERC20ETHless_init_unchained();
         __ERC20Reservable_init_unchained();
         __ERC20Wrapper_init_unchained(token);     
-        __ERC20WrapperGluwacoin_init_unchained(_decimals);
+        __ERC20WrapperGluwacoin_init_unchained(_decimals, _msgSender());
     }
 }

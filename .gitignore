@@ -364,5 +364,5 @@ package-lock.json
 *.iml
 *.ipr
 secret
-.openzeppelin/unknown-1337.json
 coverage.json
+.openzeppelin/unknown-*.json

@@ -32,7 +32,7 @@ contract ExampleCoinMock is Initializable, ExampleCoin {
         __ERC20ETHless_init_unchained();
         __ERC20Reservable_init_unchained();
         __ERC20Wrapper_init_unchained(token);
-        __ERC20WrapperGluwacoin_init_unchained(6);
+        __ERC20WrapperGluwacoin_init_unchained(6, _msgSender());
     }
 
 
