@@ -12,7 +12,7 @@ import "./abstracts/ERC20Wrapper.sol";
  * @dev Extension of {Gluwacoin} that allows a certain ERC20 token holders to wrap the token to mint this token.
  * Holder of this token can retrieve the wrapped token by burning this token.
  */
-contract ERC20WrapperGluwacoin is
+contract ERC20WrapperGluwacoinSandboxMock is
     Initializable,
     ContextUpgradeable,
     ERC20Wrapper,
@@ -26,10 +26,13 @@ contract ERC20WrapperGluwacoin is
         string memory name,
         string memory symbol,
         uint8 decimals_,
-        address admin,
         IERC20Upgradeable token
     ) public virtual {
-        __ERC20WrapperGluwacoin_init(name, symbol, decimals_, admin, token);
+        __ERC20WrapperGluwacoin_init(name, symbol, decimals_, token);
+    }
+
+    function initializeNewV2() public virtual {
+        _decimals = 6;
     }
 
     /// @notice Return a number of decimals of the token
@@ -41,7 +44,6 @@ contract ERC20WrapperGluwacoin is
         string memory name,
         string memory symbol,
         uint8 decimals_,
-        address admin,
         IERC20Upgradeable token
     ) internal initializer {
         _decimals = decimals_;
@@ -53,15 +55,15 @@ contract ERC20WrapperGluwacoin is
         __ERC20Wrapper_init_unchained(token);
         __ERC20ETHless_init_unchained();
         __ERC20Reservable_init_unchained();
-        __ERC20WrapperGluwacoin_init_unchained(decimals_, admin);
+        __ERC20WrapperGluwacoin_init_unchained(decimals_);
     }
 
-    function __ERC20WrapperGluwacoin_init_unchained(
-        uint8 decimals_,
-        address admin
-    ) internal initializer {
+    function __ERC20WrapperGluwacoin_init_unchained(uint8 decimals_)
+        internal
+        initializer
+    {
         _decimals = decimals_;
-        _setupRole(DEFAULT_ADMIN_ROLE, admin);
+        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
     function _beforeTokenTransfer(
@@ -72,5 +74,5 @@ contract ERC20WrapperGluwacoin is
         super._beforeTokenTransfer(from, to, amount);
     }
 
-    uint256[50] private __gap;
+    uint256[49] private __gap;
 }

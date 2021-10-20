@@ -14,7 +14,7 @@ contract ERC20WrapperGluwacoinMock is Initializable, ERC20WrapperGluwacoin {
         uint8 decimals_,
         IERC20Upgradeable token
     )  {
-        ERC20WrapperGluwacoin.initialize(name, symbol, decimals_, token);
+        ERC20WrapperGluwacoin.initialize(name, symbol, decimals_, _msgSender(), token);
         __ERC20Wrapper_init_unchained(token);
     }
 
