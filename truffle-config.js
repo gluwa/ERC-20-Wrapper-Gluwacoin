@@ -25,7 +25,7 @@
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 // const PrivateKeyProvider = require("truffle-privatekey-provider");
 // const privKeyrinkeby = require("./secret");
-// const INFURA_API_KEY = "05aa70b19b7543f5bf120cbeb0a50dda";
+// const INFURA_API_KEY = require("./infuraAPI");
 
 module.exports = {
   /**
