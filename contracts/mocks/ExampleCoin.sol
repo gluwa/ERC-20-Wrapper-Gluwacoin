@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.6;
 
-import "./ERC20WrapperGluwacoin.sol";
+import "../ERC20WrapperGluwacoin.sol";
 
 /**
  * @dev Example usage of {ERC20WrapperGluwacoin}.

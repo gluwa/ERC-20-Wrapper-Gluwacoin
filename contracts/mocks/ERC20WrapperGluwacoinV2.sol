@@ -4,15 +4,16 @@ pragma solidity ^0.8.6;
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "./abstracts/ERC20ETHlessTransfer.sol";
-import "./abstracts/ERC20Reservable.sol";
-import "./abstracts/ERC20Wrapper.sol";
+
+import "../abstracts/ERC20ETHlessTransfer.sol";
+import "../abstracts/ERC20Reservable.sol";
+import "../abstracts/ERC20Wrapper.sol";
 
 /**
  * @dev Extension of {Gluwacoin} that allows a certain ERC20 token holders to wrap the token to mint this token.
  * Holder of this token can retrieve the wrapped token by burning this token.
  */
-contract ERC20WrapperGluwacoinSandboxMock is
+contract ERC20WrapperGluwacoinV2 is
     Initializable,
     ContextUpgradeable,
     ERC20Wrapper,
@@ -20,49 +21,40 @@ contract ERC20WrapperGluwacoinSandboxMock is
     ERC20Reservable
 {
     uint8 private _decimals;
+    string public constant UPGRADED_CONTEXT = "Variable is upgraded";
 
-    /// @dev `decimals` must match that of `token`
+    // note that `decimals` must match that of `token` or less
     function initialize(
         string memory name,
         string memory symbol,
-        uint8 decimals_,
         IERC20Upgradeable token
     ) public virtual {
-        __ERC20WrapperGluwacoin_init(name, symbol, decimals_, token);
+        __ERC20WrapperGluwacoin_init(name, symbol, token);
     }
 
-    function initializeNewV2() public virtual {
-        _decimals = 6;
-    }
-
-    /// @notice Return a number of decimals of the token
-    function decimals() public view virtual override returns (uint8) {
-        return _decimals;
+    // upgrade decimal 6=>10
+    function decimals() public pure override returns (uint8) {
+        return 10;
     }
 
     function __ERC20WrapperGluwacoin_init(
         string memory name,
         string memory symbol,
-        uint8 decimals_,
         IERC20Upgradeable token
     ) internal initializer {
-        _decimals = decimals_;
         __Context_init_unchained();
         __ERC165_init_unchained();
         __AccessControl_init_unchained();
         __AccessControlEnumerable_init_unchained();
         __ERC20_init_unchained(name, symbol);
-        __ERC20Wrapper_init_unchained(token);
         __ERC20ETHless_init_unchained();
         __ERC20Reservable_init_unchained();
-        __ERC20WrapperGluwacoin_init_unchained(decimals_);
+        __AccessControlEnumerable_init_unchained();
+        __ERC20Wrapper_init_unchained(token);
+        __ERC20WrapperGluwacoin_init_unchained();
     }
 
-    function __ERC20WrapperGluwacoin_init_unchained(uint8 decimals_)
-        internal
-        initializer
-    {
-        _decimals = decimals_;
+    function __ERC20WrapperGluwacoin_init_unchained() internal initializer {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
@@ -74,5 +66,9 @@ contract ERC20WrapperGluwacoinSandboxMock is
         super._beforeTokenTransfer(from, to, amount);
     }
 
-    uint256[49] private __gap;
+    function __beforeUpgrade() public view returns (string memory) {
+        return "New function is updgared";
+    }
+
+    uint256[50] private __gap;
 }
