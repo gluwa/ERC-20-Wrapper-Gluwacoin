@@ -10,7 +10,6 @@ import "../libs/GluwacoinModel.sol";
 
 import "./Validate.sol";
 
-
 /**
  * @dev Extension of {ERC20} that allows a certain ERC20 token holders to wrap the token to mint this token.
  * Holder of this token can retrieve the wrapped token by burning this token.
@@ -75,7 +74,6 @@ abstract contract ERC20Wrapper is
     function mint(uint256 amount) external {
         __mint(_msgSender(), amount);
     }
-   
 
     /**
      * @dev `mint` but with `minter`, `fee`, `nonce`, and `sig` as extra parameters.
@@ -123,7 +121,7 @@ abstract contract ERC20Wrapper is
         address wrapper = getRoleMember(WRAPPER_ROLE, 0);
 
         _transfer(minter, wrapper, fee);
-    }    
+    }
 
     /**
      * @dev Destroys `amount` tokens from the caller, transferring base tokens from the contract to the caller.
@@ -132,7 +130,7 @@ abstract contract ERC20Wrapper is
      */
     function burn(uint256 amount) external {
         __burn(_msgSender(), amount);
-    }   
+    }
 
     /**
      * @dev `burn` but with `burner`, `fee`, `nonce`, and `sig` as extra parameters.
@@ -218,10 +216,6 @@ abstract contract ERC20Wrapper is
             "ERC20Wrapper: the nonce has already been used for this address"
         );
         _usedNonces[signer][nonce] = true;
-    }
-
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override (ERC20Upgradeable) {
-        super._beforeTokenTransfer(from, to, amount);
     }
 
     uint256[50] private __gap;

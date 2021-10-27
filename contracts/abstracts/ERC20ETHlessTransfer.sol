@@ -31,7 +31,6 @@ abstract contract ERC20ETHless is
         __AccessControl_init_unchained();
         __AccessControlEnumerable_init_unchained();
         __ERC20_init_unchained(name, symbol);
-        __AccessControlEnumerable_init_unchained();
         __ERC20ETHless_init_unchained();
     }
 
