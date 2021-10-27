@@ -19,11 +19,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
 
     const name = 'ERC20WrapperGluwacoin';
     const symbol = 'WG';
-<<<<<<< HEAD
-    const decimals = new BN('18');
-=======
     const decimals = new BN('6');
->>>>>>> master
 
     const amount = new BN('5000');
     const amountHalf = new BN('2500');
@@ -35,11 +31,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
         // Deploy a new ControlledGluwacoin contract for each test
         this.baseToken = await ERC20PresetMinterPauser.new('Gluwacoin', 'GC', { from: deployer });
         // Deploy a new ERC20WrapperGluwacoin contract for each test
-<<<<<<< HEAD
-        this.token = await ERC20WrapperGluwacoin.new(name, symbol, this.baseToken.address, { from: deployer });
-=======
         this.token = await ERC20WrapperGluwacoin.new(name, symbol, decimals, this.baseToken.address, { from: deployer });
->>>>>>> master
         // Prepare Gluwacoins
         await this.baseToken.mint(other, amount, { from: deployer });
         await this.baseToken.increaseAllowance(this.token.address, amount, { from: other });

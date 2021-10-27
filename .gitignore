@@ -3,7 +3,6 @@
 .DS_Store
 .AppleDouble
 .LSOverride
-.env
 
 # Icon must end with two \r
 Icon
@@ -365,8 +364,6 @@ package-lock.json
 *.iml
 *.ipr
 secret
-<<<<<<< HEAD
-=======
 coverage.json
 .openzeppelin/unknown-*.json
->>>>>>> master
+infuraAPI

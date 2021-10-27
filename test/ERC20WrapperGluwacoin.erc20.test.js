@@ -1,11 +1,4 @@
 // Load dependencies
-<<<<<<< HEAD
-const { accounts, contract } = require('@openzeppelin/test-environment');
-const { expect } = require('chai');
-
-// Import utilities from Test Helpers
-const { BN } = require('@openzeppelin/test-helpers');
-=======
 const { accounts, privateKeys, contract } = require('@openzeppelin/test-environment');
 const { expect } = require('chai');
 
@@ -13,7 +6,6 @@ const { expect } = require('chai');
 const { BN, expectRevert, time } = require('@openzeppelin/test-helpers');
 
 var sign = require('./signature');
->>>>>>> master
 
 // Load compiled artifacts
 const ERC20PresetMinterPauser = contract.fromArtifact('ERC20PresetMinterPauserMockUpgradeSafe');
@@ -21,11 +13,7 @@ const ERC20WrapperGluwacoin = contract.fromArtifact('ERC20WrapperGluwacoinMock')
 
 // Start test block
 describe('ERC20WrapperGluwacoin', function () {
-<<<<<<< HEAD
-    const [ deployer, other, another ] = accounts;
-=======
     const [ deployer, other, another, user1 ] = accounts;
->>>>>>> master
 
     const name = 'ERC20WrapperGluwacoin';
     const symbol = 'WG';
@@ -36,11 +24,7 @@ describe('ERC20WrapperGluwacoin', function () {
         // Deploy a new ControlledGluwacoin contract for each test
         this.baseToken = await ERC20PresetMinterPauser.new('Gluwacoin', 'GC', { from: deployer });
         // Deploy a new ERC20WrapperGluwacoin contract for each test
-<<<<<<< HEAD
-        this.token = await ERC20WrapperGluwacoin.new(name, symbol, this.baseToken.address, { from: deployer });       
-=======
         this.token = await ERC20WrapperGluwacoin.new(name, symbol, decimals, this.baseToken.address, { from: deployer });       
->>>>>>> master
     });
 
     /* ERC20
@@ -78,8 +62,6 @@ describe('ERC20WrapperGluwacoin', function () {
             expect(await this.token.token()).to.equal(this.baseToken.address);
         });
     });
-<<<<<<< HEAD
-=======
 
     describe('beforeTokenTransfer verification', async function () {
         const amount = new BN('5000');
@@ -265,5 +247,4 @@ describe('ERC20WrapperGluwacoin', function () {
         });
 
     });
->>>>>>> master
 });

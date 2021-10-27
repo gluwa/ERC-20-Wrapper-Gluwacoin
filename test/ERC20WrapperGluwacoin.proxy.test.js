@@ -21,11 +21,7 @@ contract('ERC20WrapperGluwacoin Proxy', accounts => {
         // Deploy a new ERC20WrapperGluwacoin contract for each test
         this.token = await deployProxy(
                 ERC20WrapperGluwacoin,
-<<<<<<< HEAD
-                [name, symbol, baseTokenAddress],
-=======
                 [name, symbol, decimals, deployer, baseTokenAddress],
->>>>>>> master
                 { from: deployer, unsafeAllowCustomTypes: true, initializer: 'initialize' }
             );
     });

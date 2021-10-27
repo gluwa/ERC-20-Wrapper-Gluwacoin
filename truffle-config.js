@@ -25,12 +25,8 @@
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 // const PrivateKeyProvider = require("truffle-privatekey-provider");
 // const privKeyrinkeby = require("./secret");
-<<<<<<< HEAD
-=======
-// const INFURA_API_KEY = "05aa70b19b7543f5bf120cbeb0a50dda";
->>>>>>> master
+// const INFURA_API_KEY = require("./infuraAPI");
 
-// const INFURA_API_KEY = "05aa70b19b7543f5bf120cbeb0a50dda";
 module.exports = {
   /**
    * Networks define how you connect to your ethereum client and let you set the
@@ -58,15 +54,12 @@ module.exports = {
     //   provider: () => new PrivateKeyProvider(privKeyrinkeby, "https://rinkeby.infura.io/v3/" + INFURA_API_KEY),
     //   network_id: '4',
     // },
-<<<<<<< HEAD
-=======
     // mainnet: {
     //   provider: () => new PrivateKeyProvider(privKeyrinkeby, "https://mainnet.infura.io/v3/" + INFURA_API_KEY),
     //   gasPrice: 62000000000,
     //   gas: 3221975,
     //   network_id: '1',
     // },
->>>>>>> master
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port

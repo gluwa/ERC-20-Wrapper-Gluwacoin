@@ -2,20 +2,11 @@
 pragma solidity ^0.8.6;
 
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/ECDSAUpgradeable.sol";
-<<<<<<< HEAD
-import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
-=======
->>>>>>> master
 
 /**
  * @dev Signature verification
  */
-<<<<<<< HEAD
-library Validate {
-    using AddressUpgradeable for address;
-=======
 library Validate {    
->>>>>>> master
     using ECDSAUpgradeable for bytes32;
 
     /**

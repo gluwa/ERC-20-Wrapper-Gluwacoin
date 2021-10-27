@@ -14,12 +14,7 @@ import "./Validate.sol";
  * the fund back to the `sender`.
  */
 abstract contract ERC20Reservable is Initializable, ERC20Upgradeable {
-<<<<<<< HEAD
-    using AddressUpgradeable for address;
-
-=======
         
->>>>>>> master
     enum ReservationStatus {
         Draft,
         Active,
@@ -51,12 +46,6 @@ abstract contract ERC20Reservable is Initializable, ERC20Upgradeable {
         __ERC20Reservable_init_unchained();
     }
 
-<<<<<<< HEAD
-    function __ERC20Reservable_init_unchained() internal initializer {
-    }
-
-    function getReservation(address sender, uint256 nonce) external view
-=======
     function __ERC20Reservable_init_unchained() internal initializer {}
 
     /// @notice Retrieve a reserved record
@@ -71,7 +60,6 @@ abstract contract ERC20Reservable is Initializable, ERC20Upgradeable {
     function getReservation(address sender, uint256 nonce)
         external
         view
->>>>>>> master
         returns (
             uint256 amount,
             uint256 fee,
@@ -81,23 +69,12 @@ abstract contract ERC20Reservable is Initializable, ERC20Upgradeable {
             ReservationStatus status
         )
     {
-<<<<<<< HEAD
-        
-=======
->>>>>>> master
         Reservation storage reservation = _reserved[sender][nonce];
 
         amount = reservation._amount;
         fee = reservation._fee;
         recipient = reservation._recipient;
         executor = reservation._executor;
-<<<<<<< HEAD
-        expiryBlockNum = reservation._expiryBlockNum;      
-        status = reservation._status;
-    }
-
-    function reservedBalanceOf(address account) external view returns (uint256 amount) {
-=======
         expiryBlockNum = reservation._expiryBlockNum;
         status = reservation._status;
     }
@@ -110,7 +87,6 @@ abstract contract ERC20Reservable is Initializable, ERC20Upgradeable {
         view
         returns (uint256 amount)
     {
->>>>>>> master
         return balanceOf(account) - _unreservedBalance(account);
     }
 
@@ -144,24 +120,6 @@ abstract contract ERC20Reservable is Initializable, ERC20Upgradeable {
         uint256 nonce,
         uint256 expiryBlockNum,
         bytes calldata sig
-<<<<<<< HEAD
-    )
-        external returns (bool success)
-    {
-        require(_reserved[sender][nonce]._expiryBlockNum == 0, "ERC20Reservable: the sender used the nonce already");
-
-        require(expiryBlockNum > block.number, "ERC20Reservable: invalid block expiry number");
-        require(executor != address(0), "ERC20Reservable: cannot execute from zero address");
-
-        uint256 total = amount + fee;
-        require(_unreservedBalance(sender) >= total, "ERC20Reservable: insufficient unreserved balance");
-
-        bytes32 hash = keccak256(abi.encodePacked(GluwacoinModel.SigDomain.Reserve, block.chainid, address(this), sender, recipient, executor, amount, fee, nonce, expiryBlockNum));
-        Validate.validateSignature(hash, sender, sig);
-
-        _reserved[sender][nonce] = Reservation(amount, fee, recipient, executor, expiryBlockNum,
-            ReservationStatus.Active);
-=======
     ) external returns (bool success) {
         require(
             _reserved[sender][nonce]._expiryBlockNum == 0,
@@ -207,7 +165,6 @@ abstract contract ERC20Reservable is Initializable, ERC20Upgradeable {
             expiryBlockNum,
             ReservationStatus.Active
         );
->>>>>>> master
         _totalReserved[sender] = _totalReserved[sender] + total;
 
         return true;
@@ -286,25 +243,14 @@ abstract contract ERC20Reservable is Initializable, ERC20Upgradeable {
         );
 
         _reserved[sender][nonce]._status = ReservationStatus.Reclaimed;
-<<<<<<< HEAD
-        _totalReserved[sender] = _totalReserved[sender] - reservation._amount - reservation._fee;
-=======
         _totalReserved[sender] =
             _totalReserved[sender] -
             reservation._amount -
             reservation._fee;
->>>>>>> master
 
         return true;
     }
 
-<<<<<<< HEAD
-    function _unreservedBalance(address sender) internal view returns (uint256 amount) {
-        return balanceOf(sender) - _totalReserved[sender];
-    }
-
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override (ERC20Upgradeable) {
-=======
     function _unreservedBalance(address sender)
         internal
         view
@@ -318,7 +264,6 @@ abstract contract ERC20Reservable is Initializable, ERC20Upgradeable {
         address to,
         uint256 amount
     ) internal virtual override(ERC20Upgradeable) {
->>>>>>> master
         if (from != address(0)) {
             require(
                 _unreservedBalance(from) >= amount,
