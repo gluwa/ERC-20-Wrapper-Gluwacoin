@@ -365,3 +365,8 @@ package-lock.json
 *.iml
 *.ipr
 secret
+<<<<<<< HEAD
+=======
+coverage.json
+.openzeppelin/unknown-*.json
+>>>>>>> master

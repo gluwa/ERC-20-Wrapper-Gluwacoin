@@ -20,7 +20,7 @@ describe('ERC20WrapperGluwacoin_Wrapper', function () {
 
     const name = 'ERC20WrapperGluwacoin';
     const symbol = 'WG';
-    const decimals = new BN('18');
+    const decimals = new BN('6');
 
     const amount = new BN('5000');
     const fee = new BN('1');

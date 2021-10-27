@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+// SPDX-License-Identifier: MIT
+>>>>>>> master
 pragma solidity ^0.8.6;
 
 library GluwacoinModel {   

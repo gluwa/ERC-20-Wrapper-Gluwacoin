@@ -3,7 +3,12 @@ pragma solidity ^0.8.6;
 
 import "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+<<<<<<< HEAD
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+=======
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+>>>>>>> master
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "../libs/GluwacoinModel.sol";
 
@@ -14,12 +19,21 @@ import "./Validate.sol";
  * @dev Extension of {ERC20} that allows a certain ERC20 token holders to wrap the token to mint this token.
  * Holder of this token can retrieve the wrapped token by burning this token.
  */
+<<<<<<< HEAD
 abstract contract ERC20Wrapper is Initializable, AccessControlEnumerableUpgradeable, ERC20Upgradeable {
     using AddressUpgradeable for address;
+=======
+abstract contract ERC20Wrapper is
+    Initializable,
+    AccessControlEnumerableUpgradeable,
+    ERC20Upgradeable
+{    
+    using SafeERC20Upgradeable for IERC20Upgradeable;
+>>>>>>> master
     // base token, the token to be wrapped
-    IERC20 private _token;
+    IERC20Upgradeable private _token;
 
-    mapping (address => mapping (uint256 => bool)) private _usedNonces;
+    mapping(address => mapping(uint256 => bool)) private _usedNonces;
 
     // collects mint/burn relay fee
     bytes32 public constant WRAPPER_ROLE = keccak256("WRAPPER_ROLE");
@@ -27,15 +41,34 @@ abstract contract ERC20Wrapper is Initializable, AccessControlEnumerableUpgradea
     event Mint(address indexed _mintTo, uint256 _value);
     event Burnt(address indexed _burnFrom, uint256 _value);
 
+<<<<<<< HEAD
     function __ERC20Wrapper_init(string memory name, string memory symbol,IERC20 baseToken) internal
     initializer {
         __Context_init_unchained();
+=======
+    function __ERC20Wrapper_init(
+        string memory name,
+        string memory symbol,
+        IERC20Upgradeable baseToken
+    ) internal initializer {
+        __Context_init_unchained();
+        __ERC165_init_unchained();
+        __AccessControl_init_unchained();
+>>>>>>> master
         __AccessControlEnumerable_init_unchained();
         __ERC20_init_unchained(name, symbol);
         __ERC20Wrapper_init_unchained(baseToken);
     }
 
+<<<<<<< HEAD
     function __ERC20Wrapper_init_unchained(IERC20 baseToken) internal virtual initializer {
+=======
+    function __ERC20Wrapper_init_unchained(IERC20Upgradeable baseToken)
+        internal
+        virtual
+        initializer
+    {
+>>>>>>> master
         _setupToken(baseToken);
         _setupRole(WRAPPER_ROLE, _msgSender());
     }
@@ -43,7 +76,7 @@ abstract contract ERC20Wrapper is Initializable, AccessControlEnumerableUpgradea
     /**
      * @dev Returns the address of the base token.
      */
-    function token() external view returns (IERC20) {
+    function token() external view returns (IERC20Upgradeable) {
         return _token;
     }
 
@@ -82,11 +115,34 @@ abstract contract ERC20Wrapper is Initializable, AccessControlEnumerableUpgradea
      * - the contract must have allowance for receiver's base tokens of at least `amount`.
      * - `fee` will be deducted after successfully minting
      */
+<<<<<<< HEAD
     function mint(address minter,  uint256 amount, uint256 fee, uint256 nonce, bytes calldata sig) external
     {
         _useWrapperNonce(minter, nonce);
 
         bytes32 hash = keccak256(abi.encodePacked(GluwacoinModel.SigDomain.Mint, block.chainid, address(this), minter, amount, fee, nonce));
+=======
+    function mint(
+        address minter,
+        uint256 amount,
+        uint256 fee,
+        uint256 nonce,
+        bytes calldata sig
+    ) external {
+        _useWrapperNonce(minter, nonce);
+
+        bytes32 hash = keccak256(
+            abi.encodePacked(
+                GluwacoinModel.SigDomain.Mint,
+                block.chainid,
+                address(this),
+                minter,
+                amount,
+                fee,
+                nonce
+            )
+        );
+>>>>>>> master
         Validate.validateSignature(hash, minter, sig);
 
         __mint(minter, amount);
@@ -122,6 +178,7 @@ abstract contract ERC20Wrapper is Initializable, AccessControlEnumerableUpgradea
      *
      * - the burner must have tokens of at least `amount`, the `fee` is included in the amount.
      */
+<<<<<<< HEAD
     function burn(address burner, uint256 amount, uint256 fee, uint256 nonce,  bytes memory sig)  public
     {
         uint256 burnerBalance = balanceOf(burner);
@@ -130,26 +187,56 @@ abstract contract ERC20Wrapper is Initializable, AccessControlEnumerableUpgradea
         _useWrapperNonce(burner, nonce);
 
         bytes32 hash = keccak256(abi.encodePacked(GluwacoinModel.SigDomain.Burn, block.chainid, address(this), burner, amount, fee, nonce));
+=======
+    function burn(
+        address burner,
+        uint256 amount,
+        uint256 fee,
+        uint256 nonce,
+        bytes calldata sig
+    ) external {
+        uint256 burnerBalance = balanceOf(burner);
+        require(
+            burnerBalance >= amount,
+            "ERC20Wrapper: burn amount exceed balance"
+        );
+
+        _useWrapperNonce(burner, nonce);
+
+        bytes32 hash = keccak256(
+            abi.encodePacked(
+                GluwacoinModel.SigDomain.Burn,
+                block.chainid,
+                address(this),
+                burner,
+                amount,
+                fee,
+                nonce
+            )
+        );
+>>>>>>> master
         Validate.validateSignature(hash, burner, sig);
 
         address wrapper = getRoleMember(WRAPPER_ROLE, 0);
         _transfer(burner, wrapper, fee);
 
         __burn(burner, amount - fee);
+<<<<<<< HEAD
     } 
     
+=======
+    }    
+>>>>>>> master
 
     function __mint(address account, uint256 amount) internal {
-        require(_token.transferFrom(account, address(this), amount), "ERC20Wrapper: could not deposit base tokens");
-
+        _token.safeTransferFrom(account, address(this), amount);
         emit Mint(account, amount);
 
         _mint(account, amount);
     }
 
-    function __burn(address account, uint256 amount) internal {
-        require(_token.transfer(account, amount), "ERC20Wrapper: could not withdraw base tokens");
-
+    function __burn(address account, uint256 amount) internal {       
+        _token.safeTransfer(account, amount);
         emit Burnt(account, amount);
 
         _burn(account, amount);
@@ -162,14 +249,17 @@ abstract contract ERC20Wrapper is Initializable, AccessControlEnumerableUpgradea
      * applications that interact with token contracts will not expect
      * {token} to ever change, and may work incorrectly if it does.
      */
-    function _setupToken(IERC20 token_) internal {
+    function _setupToken(IERC20Upgradeable token_) internal {
         _token = token_;
     }
 
     /* @dev Uses `nonce` for the signer.
-    */
+     */
     function _useWrapperNonce(address signer, uint256 nonce) private {
-        require(!_usedNonces[signer][nonce], "ERC20Wrapper: the nonce has already been used for this address");
+        require(
+            !_usedNonces[signer][nonce],
+            "ERC20Wrapper: the nonce has already been used for this address"
+        );
         _usedNonces[signer][nonce] = true;
     }
 
