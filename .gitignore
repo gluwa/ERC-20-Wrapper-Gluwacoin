@@ -365,3 +365,6 @@ package-lock.json
 *.iml
 *.ipr
 secret
+coverage.json
+.openzeppelin/unknown-*.json
+infuraAPI
