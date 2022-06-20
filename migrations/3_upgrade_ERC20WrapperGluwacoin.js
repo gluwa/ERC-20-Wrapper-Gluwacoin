@@ -8,6 +8,9 @@ const New_ERC20WrapperGluwacoin = artifacts.require('ERC20WrapperGluwacoin');
 
 
 module.exports = async function (deployer, network) {
+  if (network == 'goerli') {
+    console.info("adres " + instance.address);
+  }
   if (network == 'rinkeby') {
     const existing_address = "0x0aD1439A0e0bFdcD49939f9722866651a4AA9B3C";
 

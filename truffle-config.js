@@ -50,6 +50,10 @@ module.exports = {
       port: 8545,            // Standard Ethereum port (default: none)
       network_id: "*",       // Any network (default: none)
     },
+    goerli: {
+      provider: () => new PrivateKeyProvider(privKeygoerli, "https://goerli.infura.io/v3/" + INFURA_API_KEY),
+      network_id: '5',
+    },
     // rinkeby: {
     //   provider: () => new PrivateKeyProvider(privKeyrinkeby, "https://rinkeby.infura.io/v3/" + INFURA_API_KEY),
     //   network_id: '4',
