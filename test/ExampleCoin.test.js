@@ -149,7 +149,7 @@ describe('ExampleCoin_Wrapper', function () {
             await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
             await expectRevert(
                 this.token.mint(mint_amount, { from: minter }),
-                'ERC20: transfer amount exceeds allowance'
+                'ERC20: insufficient allowance'
             );
         });
 
@@ -355,7 +355,7 @@ describe('ExampleCoin_Wrapper', function () {
             await this.baseToken.increaseAllowance(this.token.address, allowance_amount, { from: other });
             await expectRevert(
                 this.token.methods['mint(address,uint256,uint256,uint256,bytes)'](other, mint_amount, mint_fee, nonce, signature, { from: deployer }),
-                'ERC20: transfer amount exceeds allowance'
+                'ERC20: insufficient allowance'
             );
         });
 
@@ -1322,7 +1322,7 @@ describe('ExampleCoin_Reservable', function () {
     
             var signature = sign.signReserve(4,1,this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
-            this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
+            await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
             var reserve = await this.token.getReservation(other, nonce);
     

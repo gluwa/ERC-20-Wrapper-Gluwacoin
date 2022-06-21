@@ -18,7 +18,7 @@ contract('ExampleCoin Proxy', accounts => {
         this.token = await deployProxy(
                 ExampleCoin,
                 [name, symbol, decimals, baseTokenAddress],
-                { from: deployer, unsafeAllowCustomTypes: true, initializer: 'initialize' }
+                { from: deployer, initializer: 'initialize' }
             );
     });
 
@@ -31,7 +31,7 @@ contract('ExampleCoin Proxy', accounts => {
 
     it('retrieve returns a value previously initialized after an upgrade', async function () {
         const newToken = await upgradeProxy(
-            this.token.address, ExampleCoin, { from: deployer, unsafeAllowCustomTypes: true });
+            this.token.address, ExampleCoin, { from: deployer });
 
         expect(await newToken.name()).to.equal(name);
         expect(await newToken.symbol()).to.equal(symbol);

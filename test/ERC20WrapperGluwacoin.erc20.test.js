@@ -194,7 +194,7 @@ describe('ERC20WrapperGluwacoin', function () {
             await this.token.mint(amountHalfAndOne, { from: other });
 
             expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount.add(amountHalfAndOne));
-            this.token.transfer(other, user1, amountHalfAndOne.sub(fee), fee, nonce, signature, { from: deployer }),
+            await this.token.transfer(other, user1, amountHalfAndOne.sub(fee), fee, nonce, signature, { from: deployer }),
             expect(await this.token.balanceOf(user1)).to.be.bignumber.equal(amountHalfAndOne.sub(fee));
             expect(await this.token.balanceOf(other)).to.be.bignumber.equal(amount);
         });
