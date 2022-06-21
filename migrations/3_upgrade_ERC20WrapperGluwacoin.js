@@ -4,8 +4,7 @@
 const { upgradeProxy } = require('@openzeppelin/truffle-upgrades');
 
 const New_ERC20WrapperGluwacoin = artifacts.require('ERC20WrapperGluwacoin');
-//const ERC20WrapperGluwacoin = artifacts.require('ERC20WrapperGluwacoin');
-
+const ERC20WrapperGluwacoin = artifacts.require('ERC20WrapperGluwacoin');
 
 module.exports = async function (deployer, network) {
   if (network == 'goerli') {

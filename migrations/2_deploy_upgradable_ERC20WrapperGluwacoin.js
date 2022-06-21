@@ -3,7 +3,6 @@ const { deployProxy } = require('@openzeppelin/truffle-upgrades');
 
 const ERC20WrapperGluwacoin = artifacts.require('ERC20WrapperGluwacoin');
 
-
 module.exports = async function (deployer, network) {
     const name = 'USDC Gluwacoin';
     const symbol = 'USDC-G';
@@ -15,11 +14,10 @@ module.exports = async function (deployer, network) {
     switch (network) {
         case "goerli":
             {
-                baseTokenAddress = '0x07865c6E87B9F70255377e024ace6630C1Eaa37F';
+                baseTokenAddress = '0x07865c6E87B9F70255377e024ace6630C1Eaa37F'; // USDC Goerli
                 admin = "0xfd91d059f0d0d5f6adee0f4aa1fdf31da2557bc9";
                 break;
             }
-
         case "rinkeby":
             {
                 baseTokenAddress = '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b';

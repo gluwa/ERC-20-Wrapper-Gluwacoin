@@ -1,3 +1,4 @@
+require('dotenv').config({path:__dirname+'/.env.development'});
 /**
  * Use this file to configure your truffle project. It's seeded with some
  * common settings for different networks and features like migrations,
@@ -23,7 +24,7 @@
 //
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
-// const PrivateKeyProvider = require("truffle-privatekey-provider");
+const PrivateKeyProvider = require("truffle-privatekey-provider");
 // const privKeyrinkeby = require("./secret");
 // const INFURA_API_KEY = require("./infuraAPI");
 
@@ -51,13 +52,15 @@ module.exports = {
       network_id: "*",       // Any network (default: none)
     },
     goerli: {
-      provider: () => new PrivateKeyProvider(privKeygoerli, "https://goerli.infura.io/v3/" + INFURA_API_KEY),
+      provider: () => new PrivateKeyProvider(process.env.PRIVATE_KEY_GOERLI, process.env.RPC_GOERLI),
+      gasPrice: 62000000000,
+      gas: 3221975,
       network_id: '5',
     },
-    // rinkeby: {
-    //   provider: () => new PrivateKeyProvider(privKeyrinkeby, "https://rinkeby.infura.io/v3/" + INFURA_API_KEY),
-    //   network_id: '4',
-    // },
+    rinkeby: {
+      provider: () => new PrivateKeyProvider(process.env.PRIVATE_KEY_RINKEBY, process.env.RPC_RINKEBY),
+      network_id: '4',
+    },
     // mainnet: {
     //   provider: () => new PrivateKeyProvider(privKeyrinkeby, "https://mainnet.infura.io/v3/" + INFURA_API_KEY),
     //   gasPrice: 62000000000,

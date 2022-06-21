@@ -1,0 +1,65 @@
+[
+  {
+    "name": "ERC20WrapperGluwacoin",
+    "address": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+    "network": "hardhat",
+    "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "deploymentDate": "2022-06-21T15:40:41.259Z",
+    "blockHah": "0xb5c3090cadcaae62766142068d2764ae00fa9ef6cfb85cca748fcef75161f790",
+    "blockNumber": 3
+  },
+  {
+    "name": "ERC20WrapperGluwacoin",
+    "address": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+    "network": "hardhat",
+    "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "deploymentDate": "2022-06-21T15:42:17.367Z",
+    "blockHah": "0x8b16db3bd2ace2dc60eba19f1c7ff68ac091109d11bd74606170e84daa212b12",
+    "blockNumber": 3
+  },
+  {
+    "name": "ProxyAdmin",
+    "address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+    "network": "hardhat",
+    "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "deploymentDate": "2022-06-21T15:42:17.375Z",
+    "blockHah": "",
+    "blockNumber": 0
+  },
+  {
+    "name": "ERC20WrapperGluwacoin",
+    "address": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+    "network": "hardhat",
+    "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "deploymentDate": "2022-06-21T16:06:59.636Z",
+    "blockHah": "0xc711f22df7724ad762012a12de1f375a86bb4f190547a380147a8842cdbe58da",
+    "blockNumber": 3
+  },
+  {
+    "name": "ProxyAdmin",
+    "address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+    "network": "hardhat",
+    "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "deploymentDate": "2022-06-21T16:06:59.644Z",
+    "blockHah": "",
+    "blockNumber": 0
+  },
+  {
+    "name": "ERC20WrapperGluwacoin",
+    "address": "0x000CC169848eC63466A7EfB59e1b925ABAb5F92b",
+    "network": "goerli",
+    "deployer": "0x84eA16043bbFd8916Cb2c764CD858DB0C8b8a6F4",
+    "deploymentDate": "2022-06-21T16:08:46.481Z",
+    "blockHah": "0x466ae48fdd359accf930f486a010b88500003d783a6b058cf5572dffe2790538",
+    "blockNumber": 7098068
+  },
+  {
+    "name": "ProxyAdmin",
+    "address": "0x649F87cac8AD7eA1829c3eB24eFbdB423dC002E6",
+    "network": "goerli",
+    "deployer": "0x84eA16043bbFd8916Cb2c764CD858DB0C8b8a6F4",
+    "deploymentDate": "2022-06-21T16:08:46.680Z",
+    "blockHah": "",
+    "blockNumber": 0
+  }
+]
