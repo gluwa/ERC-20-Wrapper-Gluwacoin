@@ -221,7 +221,7 @@ describe('ERC20WrapperGluwacoin_Reservable', function () {
     
             var signature = sign.signReserve(4, 1, this.token.address, other, other_privateKey, another, executor, reserve_amount, reserve_fee, nonce,expiryBlockNum);
     
-            this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
+            await this.token.reserve(other, another, executor, reserve_amount, reserve_fee, nonce, expiryBlockNum, signature, { from: deployer });
     
             var reserve = await this.token.getReservation(other, nonce);
     

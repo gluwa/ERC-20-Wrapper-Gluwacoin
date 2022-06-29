@@ -22,7 +22,7 @@ contract('ERC20WrapperGluwacoin Proxy', accounts => {
         this.token = await deployProxy(
                 ERC20WrapperGluwacoin,
                 [name, symbol, decimals, deployer, baseTokenAddress],
-                { from: deployer, unsafeAllowCustomTypes: true, initializer: 'initialize' }
+                { from: deployer,  initializer: 'initialize' }
             );
     });
 
@@ -35,7 +35,7 @@ contract('ERC20WrapperGluwacoin Proxy', accounts => {
 
     it('retrieve returns a value previously initialized after an upgrade', async function () {
         const newToken = await upgradeProxy(
-            this.token.address, ERC20WrapperGluwacoin, { from: deployer, unsafeAllowCustomTypes: true });
+            this.token.address, ERC20WrapperGluwacoin, { from: deployer });
 
         expect(await newToken.name()).to.equal(name);
         expect(await newToken.symbol()).to.equal(symbol);
@@ -45,7 +45,7 @@ contract('ERC20WrapperGluwacoin Proxy', accounts => {
     
     it('retrieve returns a value after upgrade with ERC20WrapperGluwacoin', async function () {
         const newToken = await upgradeProxy(
-            this.token.address, ERC20WrapperGluwacoinV2, { from: deployer, unsafeAllowCustomTypes: true });
+            this.token.address, ERC20WrapperGluwacoinV2, { from: deployer });
 
         expect(await newToken.UPGRADED_CONTEXT()).to.equal(UPGRADED_CONTEXT);
         expect((await newToken.decimals()).toString()).to.equal(newDecimal.toString());
