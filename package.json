@@ -37,7 +37,7 @@
     "ethers": "^5.0.0",
     "hardhat": "^2.9.9",
     "mocha": "^8.1.2",
-    "solidity-coverage": "^0.7.16"
+    "solidity-coverage": "^0.8.0"
   },
   "scripts": {
     "test": "mocha --exit --recursive --timeout 10000"
