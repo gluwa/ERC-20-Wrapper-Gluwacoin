@@ -34,7 +34,7 @@
     "deployment-tool": "^0.1.0",
     "dotenv": "^16.0.1",
     "ethereum-waffle": "^3.0.0",
-    "ethers": "^5.0.0",
+    "ethers": "^6.0.0",
     "hardhat": "^2.9.9",
     "mocha": "^8.1.2",
     "solidity-coverage": "^0.7.16"
