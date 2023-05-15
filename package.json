@@ -36,7 +36,7 @@
     "ethereum-waffle": "^3.0.0",
     "ethers": "^5.0.0",
     "hardhat": "^2.9.9",
-    "mocha": "^8.1.2",
+    "mocha": "^10.0.0",
     "solidity-coverage": "^0.8.0"
   },
   "scripts": {
