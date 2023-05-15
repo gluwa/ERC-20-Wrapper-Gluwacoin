@@ -33,7 +33,7 @@
     "chai": "^4.2.0",
     "deployment-tool": "^0.1.0",
     "dotenv": "^16.0.1",
-    "ethereum-waffle": "^3.0.0",
+    "ethereum-waffle": "^4.0.0",
     "ethers": "^5.0.0",
     "hardhat": "^2.9.9",
     "mocha": "^8.1.2",
