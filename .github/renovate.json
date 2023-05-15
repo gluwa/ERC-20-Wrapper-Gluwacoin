@@ -26,6 +26,11 @@
     {
       "matchDepTypes": ["devDependencies"],
       "automerge": true
+    },
+    {
+      "matchDepTypes": ["dependencies"],
+      "excludeDepNames": ["*"],
+      "automerge": false
     }
   ]
 }
