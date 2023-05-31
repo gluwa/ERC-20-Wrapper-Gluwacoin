@@ -29,7 +29,7 @@
     "@openzeppelin/test-environment": "^0.1.9",
     "@openzeppelin/test-helpers": "^0.5.12",
     "@openzeppelin/truffle-upgrades": "^1.8.0",
-    "@truffle/hdwallet-provider": "^1.4.2",
+    "@truffle/hdwallet-provider": "^2.0.0",
     "chai": "^4.2.0",
     "deployment-tool": "^0.1.0",
     "dotenv": "^16.0.1",
