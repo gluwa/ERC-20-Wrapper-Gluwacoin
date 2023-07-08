@@ -17,7 +17,7 @@
   "dependencies": {
     "@nomiclabs/hardhat-etherscan": "^3.1.0",
     "@openzeppelin/contracts": "^4.2.0",
-    "@openzeppelin/hardhat-upgrades": "^1.19.0",
+    "@openzeppelin/hardhat-upgrades": "^2.0.0",
     "truffle": "^5.1.67",
     "truffle-privatekey-provider": "^1.5.0"
   },
