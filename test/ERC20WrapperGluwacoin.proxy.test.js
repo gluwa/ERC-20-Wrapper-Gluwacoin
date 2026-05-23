@@ -22,7 +22,11 @@ contract('ERC20WrapperGluwacoin Proxy', accounts => {
         this.token = await deployProxy(
                 ERC20WrapperGluwacoin,
                 [name, symbol, decimals, deployer, baseTokenAddress],
-                { from: deployer,  initializer: 'initialize' }
+                {
+                    from: deployer,
+                    initializer: 'initialize',
+                    unsafeAllow: ['missing-initializer-call'],
+                }
             );
     });
 

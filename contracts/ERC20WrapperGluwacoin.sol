@@ -22,6 +22,7 @@ contract ERC20WrapperGluwacoin is
     uint8 private _decimals;
 
     /// @dev `decimals` must match that of `token`
+    /// @custom:oz-upgrades-unsafe-allow missing-initializer-call
     function initialize(
         string memory name,
         string memory symbol,
@@ -37,6 +38,7 @@ contract ERC20WrapperGluwacoin is
         return _decimals;
     }
 
+    /// @custom:oz-upgrades-unsafe-allow missing-initializer-call
     function __ERC20WrapperGluwacoin_init(
         string memory name,
         string memory symbol,
