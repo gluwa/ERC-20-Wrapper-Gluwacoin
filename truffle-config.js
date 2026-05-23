@@ -1,4 +1,10 @@
-require('dotenv').config({path:__dirname+'/.env.development'});
+const fs = require('fs');
+const path = require('path');
+
+const envDevelopment = path.join(__dirname, '.env.development');
+if (fs.existsSync(envDevelopment)) {
+  require('dotenv').config({ path: envDevelopment });
+}
 /**
  * Use this file to configure your truffle project. It's seeded with some
  * common settings for different networks and features like migrations,
@@ -24,9 +30,10 @@ require('dotenv').config({path:__dirname+'/.env.development'});
 //
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
-const PrivateKeyProvider = require("truffle-privatekey-provider");
-// const privKeyrinkeby = require("./secret");
-// const INFURA_API_KEY = require("./infuraAPI");
+function privateKeyProvider(privateKey, rpcUrl) {
+  const PrivateKeyProvider = require('truffle-privatekey-provider');
+  return new PrivateKeyProvider(privateKey, rpcUrl);
+}
 
 module.exports = {
   /**
@@ -47,18 +54,18 @@ module.exports = {
     // options below to some value.
     //
     // development: {
-    //   host: "127.0.0.1",     // Localhost (default: none)
-    //   port: 8545,            // Standard Ethereum port (default: none)
-    //   network_id: "*",       // Any network (default: none)
+    //   host: '127.0.0.1',
+    //   port: 8545,
+    //   network_id: '*',
     // },
     goerli: {
-      provider: () => new PrivateKeyProvider(process.env.PRIVATE_KEY_GOERLI, process.env.RPC_GOERLI),
+      provider: () => privateKeyProvider(process.env.PRIVATE_KEY_GOERLI, process.env.RPC_GOERLI),
       gasPrice: 62000000000,
       gas: 3221975,
       network_id: '5',
     },
     rinkeby: {
-      provider: () => new PrivateKeyProvider(process.env.PRIVATE_KEY_RINKEBY, process.env.RPC_RINKEBY),
+      provider: () => privateKeyProvider(process.env.PRIVATE_KEY_RINKEBY, process.env.RPC_RINKEBY),
       network_id: '4',
     },
     // mainnet: {
@@ -102,7 +109,7 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: "^0.8.6",    // Fetch exact version from solc-bin (default: truffle's version)
+      version: "0.8.6", // pinned: truffle-upgrades rejects mixed versions in build/contracts
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
       settings: {          // See the solidity docs for advice about optimization and evmVersion
         optimizer: {
@@ -121,6 +128,6 @@ module.exports = {
       }
     }
   },
-  plugins: ["solidity-coverage"]
+  plugins: process.env.ENABLE_COVERAGE ? ['solidity-coverage'] : [],
 
 };

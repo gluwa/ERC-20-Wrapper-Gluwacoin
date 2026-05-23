@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     steps:
       - uses: actions/checkout@v4
@@ -24,13 +25,10 @@ jobs:
         run: npm ci --ignore-scripts
 
       - name: Truffle compile
-        run: npx truffle compile
-
-      - name: Run Pretest (Start ganache-cli)
-        run: npx ganache-cli --deterministic &
+        run: rm -rf build/contracts && npx truffle compile --all
 
       - name: Run Truffle tests
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+          CI: true
         run: npx truffle test
-
-      - name: Run Posttest (Stop ganache-cli)
-        run: kill -9 $(lsof -t -i:8545) || true
