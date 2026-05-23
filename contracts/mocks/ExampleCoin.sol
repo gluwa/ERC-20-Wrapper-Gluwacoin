@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.6;
 
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "../ERC20WrapperGluwacoin.sol";
 
 /**
@@ -15,7 +16,7 @@ contract ExampleCoin is ERC20WrapperGluwacoin {
         string memory symbol,
         uint8 decimals_,
         IERC20Upgradeable token
-    ) public override {
+    ) public {
         _exampleDecimals = decimals_;
         __ERC20WrapperGluwacoin_init(name, symbol, decimals_, _msgSender(), token);
     }
