@@ -49,7 +49,10 @@ contract('ERC20WrapperGluwacoin Proxy', accounts => {
     
     it('retrieve returns a value after upgrade with ERC20WrapperGluwacoin', async function () {
         const newToken = await upgradeProxy(
-            this.token.address, ERC20WrapperGluwacoinV2, { from: deployer });
+            this.token.address,
+            ERC20WrapperGluwacoinV2,
+            { from: deployer, unsafeAllow: ['missing-initializer-call'] }
+        );
 
         expect(await newToken.UPGRADED_CONTEXT()).to.equal(UPGRADED_CONTEXT);
         expect((await newToken.decimals()).toString()).to.equal(newDecimal.toString());
