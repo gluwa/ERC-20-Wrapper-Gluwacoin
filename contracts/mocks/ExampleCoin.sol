@@ -21,7 +21,7 @@ contract ExampleCoin is ERC20WrapperGluwacoin {
         __ERC20WrapperGluwacoin_init(name, symbol, decimals_, _msgSender(), token);
     }
 
-    function decimals() public view override returns (uint8) {
+    function decimals() public view virtual override returns (uint8) {
         return _exampleDecimals;
     }
 }
