@@ -17,6 +17,7 @@ jobs:
         with:
           node-version: "20"
           cache: npm
+          cache-dependency-path: package-lock.json
 
       - name: Disable migration upgrade script
         run: mv migrations/3_upgrade_ERC20WrapperGluwacoin.js migrations/3_upgrade_ERC20WrapperGluwacoin.js_
