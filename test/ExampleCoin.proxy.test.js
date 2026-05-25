@@ -18,7 +18,11 @@ contract('ExampleCoin Proxy', accounts => {
         this.token = await deployProxy(
                 ExampleCoin,
                 [name, symbol, decimals, baseTokenAddress],
-                { from: deployer, initializer: 'initialize' }
+                {
+                    from: deployer,
+                    initializer: 'initialize',
+                    unsafeAllow: ['missing-initializer-call'],
+                }
             );
     });
 

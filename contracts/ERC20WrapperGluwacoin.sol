@@ -3,6 +3,7 @@ pragma solidity ^0.8.6;
 
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./abstracts/ERC20ETHlessTransfer.sol";
 import "./abstracts/ERC20Reservable.sol";
@@ -22,6 +23,7 @@ contract ERC20WrapperGluwacoin is
     uint8 private _decimals;
 
     /// @dev `decimals` must match that of `token`
+    /// @custom:oz-upgrades-unsafe-allow missing-initializer-call
     function initialize(
         string memory name,
         string memory symbol,
@@ -37,6 +39,7 @@ contract ERC20WrapperGluwacoin is
         return _decimals;
     }
 
+    /// @custom:oz-upgrades-unsafe-allow missing-initializer-call
     function __ERC20WrapperGluwacoin_init(
         string memory name,
         string memory symbol,

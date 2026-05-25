@@ -37,9 +37,15 @@
     "ethers": "^5.0.0",
     "hardhat": "^2.9.9",
     "mocha": "^8.1.2",
-    "solidity-coverage": "^0.8.0"
+    "solidity-coverage": "^0.8.0",
+    "underscore": "^1.9.1"
   },
   "scripts": {
-    "test": "mocha --exit --recursive --timeout 10000"
+    "test": "mocha --exit --recursive --timeout 10000",
+    "test:truffle": "rm -rf build/contracts && truffle compile --all && truffle test",
+    "ci:install": "npm ci"
+  },
+  "engines": {
+    "node": ">=18 <=23"
   }
 }
